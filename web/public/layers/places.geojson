@@ -1,0 +1,77 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "tourelhe",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -8.14845,
+          40.679038
+        ]
+      },
+      "properties": {
+        "name": "Tourelhe",
+        "kind": "ignition-area",
+        "description": "Approximate locality marker. The ICNF identifies Chamusqueiros as the ignition locality.",
+        "source": "https://www.icnf.pt/api/file/doc/d305b338642255f3",
+        "coordinateSource": "https://www.codigo-postal.pt/vouzela/tourelhe/"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "matadegas",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -8.266248,
+          40.599333
+        ]
+      },
+      "properties": {
+        "name": "Matadegas",
+        "kind": "evacuation",
+        "description": "This village in Tondela was reported evacuated.",
+        "source": "https://www.sabado.pt/portugal/amp/duas-aldeias-evacuadas-em-tondela-por-causa-do-incendio-de-vouzela",
+        "coordinateSource": "https://www.codigo-postal.pt/tondela/sao-joao-do-monte/2.html"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "mansores",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -8.232618,
+          40.598694
+        ]
+      },
+      "properties": {
+        "name": "Mansores",
+        "kind": "evacuation",
+        "description": "This village in Tondela was reported evacuated.",
+        "source": "https://www.sabado.pt/portugal/amp/duas-aldeias-evacuadas-em-tondela-por-causa-do-incendio-de-vouzela",
+        "coordinateSource": "https://www.codigo-postal.pt/tondela/sao-joao-do-monte/2.html"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "cambarinho",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -8.204263888888889,
+          40.67445277777777
+        ]
+      },
+      "properties": {
+        "name": "Cambarinho Botanical Reserve",
+        "kind": "natural-heritage",
+        "description": "The marker shows the reserve's walking trail starting point.",
+        "source": "https://executivedigest.sapo.pt/?p=788227",
+        "coordinateSource": "https://www.visitviseudaolafoes.pt/wp-content/uploads/2024/07/Folheto_A4_PR-Cambarinho-VZL-5Jun-1.pdf"
+      }
+    }
+  ]
+}
