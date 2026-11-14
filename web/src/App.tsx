@@ -1,4 +1,6 @@
 // Placeholder shell. The real app is built by fronts C (map) and D (story): see docs/PLAN.md.
+import MapView from "./map/MapView";
+
 const acts = [
   "Before",
   "The fire",
@@ -38,12 +40,8 @@ export default function App() {
           ))}
         </section>
 
-        <section className="placeholder" aria-label="Work in progress">
-          <h2>Map and story coming next</h2>
-          <p>
-            Layers are read from <code>public/layers/manifest.json</code>; see{" "}
-            <code>docs/CONTRACT.md</code>.
-          </p>
+        <section className="map-section" aria-label="Map of the fire area">
+          <MapView />
         </section>
       </main>
 
