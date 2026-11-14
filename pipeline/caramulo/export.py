@@ -176,6 +176,17 @@ def write_manifest(path: Path | str, layers: list[dict]) -> Path:
     return path
 
 
+def upsert_manifest_entry(path: Path | str, entry: dict) -> Path:
+    """Insert or replace one layer entry in manifest.json, keeping the other layers."""
+    path = Path(path)
+    layers: list[dict] = []
+    if path.exists():
+        existing = json.loads(path.read_text())
+        layers = [layer for layer in existing.get("layers", []) if layer.get("id") != entry["id"]]
+    layers.append(entry)
+    return write_manifest(path, layers)
+
+
 def write_geojson(path: Path | str, features: list[tuple[BaseGeometry, dict]]) -> Path:
     """Write a FeatureCollection; each feature is a (shapely geometry, properties) pair."""
     collection = {
