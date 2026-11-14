@@ -95,9 +95,11 @@ A app não conhece nomes de ficheiros: lê `web/public/layers/manifest.json` e d
 
 ## Dentro dos HDF5
 
-Caminhos do GUNW confirmados no primeiro ficheiro real (tarefa A1, 14 nov 2026); os do GCOV aguardam a B1.
+Caminhos do GUNW confirmados no primeiro ficheiro real (tarefa A1, 14 nov 2026) e do GCOV no primeiro GCOV (tarefa B1, 14 nov 2026).
 
 - GUNW (coerência): `science/LSAR/GUNW/grids/frequencyA/unwrappedInterferogram/HH/coherenceMagnitude` — float32, 0 a 1 (4392 × 4455 px a 80 m no produto usado).
 - GUNW (projeção): `science/LSAR/GUNW/grids/frequencyA/unwrappedInterferogram/projection` — **código EPSG escalar (uint32)**, não WKT (32629 = UTM 29N neste produto).
 - GUNW (coordenadas): `science/LSAR/GUNW/grids/frequencyA/unwrappedInterferogram/HH/xCoordinates` e `.../HH/yCoordinates` — float64, centros de píxel, x crescente e y decrescente.
-- GCOV: `science/LSAR/GCOV/grids/frequencyA/HHHH` e `HVHV`, em potência linear; dB = 10 · log10(valor) — por confirmar na B1.
+- GCOV (potência): `science/LSAR/GCOV/grids/frequencyA/HHHH` e `HVHV` — float32, potência linear, 20 m/px; dB = 10 · log10(valor). Fora do swath os valores são **NaN** (o dataset `mask` marca 255 nos píxeis sem dados; 0 e 1 têm dados finitos). Na prática, a validade testa-se com `np.isfinite`.
+- GCOV (projeção): `science/LSAR/GCOV/grids/frequencyA/projection` — código EPSG escalar (uint32), 32629 = UTM 29N.
+- GCOV (coordenadas): `science/LSAR/GCOV/grids/frequencyA/xCoordinates` e `yCoordinates` — float64, centros de píxel, x crescente e y decrescente; o espaçamento vem em `xCoordinateSpacing`/`yCoordinateSpacing` (20 m neste produto).
