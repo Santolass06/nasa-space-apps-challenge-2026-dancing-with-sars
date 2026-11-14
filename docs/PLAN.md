@@ -77,7 +77,7 @@ Todas as camadas raster saem exatamente com a mesma caixa, projeção e tamanho,
 
 - Caixa: lon −8,50 a −7,95; lat 40,45 a 40,85 (a do dossier, estendida a oeste no A2).
 - Projeção de saída: Web Mercator (EPSG:3857), a do mapa.
-- Tamanho: 2000 px de largura (cerca de 23 m por píxel); a altura sai de `grid.py`.
+- Tamanho: metade da grelha — 1000 px de largura (~46 m/px, 1000 × 958) para as camadas raster, abaixo de 1 MB cada (C7); a grelha de análise fica a 2000 px (~23 m/px) em `grid.py`.
 - `grid.py` é a única fonte destes valores. Ninguém os escreve à mão noutro ficheiro.
 
 ### Nomes dos ficheiros
