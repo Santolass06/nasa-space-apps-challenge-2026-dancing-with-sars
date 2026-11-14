@@ -11,12 +11,12 @@ Uma linha por decisão: data, decisão, quem decidiu.
 
 ## Frentes (atualizar sempre que alguém entra ou sai)
 
-O plano mantém as cinco frentes ([PLAN.md](PLAN.md), "Equipa"); aqui está quem as tem agora. Nomes por preencher.
+O plano mantém as cinco frentes ([PLAN.md](PLAN.md), "Equipa"); aqui está quem as tem agora.
 
 | Pessoa | Frentes | Notas |
 | --- | --- | --- |
-| _a preencher_ | A + B (pipeline) | Mais carregada. O E ajuda o A se o A1 atrasar |
-| _a preencher_ | C + D (web) | |
-| _a preencher_ | E (integração) | Também fica com B3 (`s2.py`) e com a parte GCOV de A3 |
+| André ([@Santolass06](https://github.com/Santolass06)) | A + B (pipeline) | Mais carregada. O E ajuda o A se o A1 atrasar |
+| Fungy ([@Fungy03](https://github.com/Fungy03)) | C + D (web) | |
+| Cristiano ([@Cristiano20060707](https://github.com/Cristiano20060707)) | E (integração) | Também fica com B3 (`s2.py`) e com a parte GCOV de A3 |
 
 Regra: quando alguém **entra**, divide-se a frente junta com mais tarefas abertas na fase atual (na F1, A+B; na F2 e F3, C+D). Quando alguém **sai**, junta-se pela ordem inversa.
