@@ -11,6 +11,7 @@ Uma linha por decisão: data, decisão, quem decidiu.
 | 2026-11-14 | Caminhos HDF5 do GUNW confirmados no primeiro ficheiro real: coerência no caminho previsto; projeção é código EPSG (uint32) e as coordenadas estão em `unwrappedInterferogram/HH`, não no grupo `frequencyA` | André (A1) |
 | 2026-11-14 | Grelha comum estendida a oeste de −8,35 para −8,50 (WIDTH 2000, ~23 m/px): a cicatriz real em coerência mede 12-13,7 mil ha em lon −8,40..−8,13 e o bbox antigo cortava a ponta ocidental | André (A2; CONTRACT a avisar o E) |
 | 2026-11-14 | Cicatriz medida nos dados reais: 13.687 ha (limiar −0,25 no diferencial coerência fogo vs controlo), centroide −8,27/40,62, vertente NW da serra (Tourelhe→Águeda); compatível com os 12.804 ha oficiais | André (A2) |
+| 2026-11-14 | A4: polígono final da cicatriz = 13.501 ha (maior componente após morfologia; 1.975 ha de blobs separados excluídos e registados no `stats.json`); sobreposição com o perímetro oficial fica pendente do E1 | André (A4) |
 
 ## Frentes (atualizar sempre que alguém entra ou sai)
 

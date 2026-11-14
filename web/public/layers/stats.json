@@ -1,0 +1,16 @@
+{
+  "method": {
+    "kind": "coherence difference (fire pair minus control pair)",
+    "threshold": -0.25,
+    "smoothing_m": 1000.0,
+    "components": 13,
+    "dropped_ha": 1974.9
+  },
+  "fire_layer": "coh_D52_20260629_20260711",
+  "control_layer": "coh_D52_20260711_20260723",
+  "our_area_ha": 13501.0,
+  "official_area_ha": null,
+  "overlap_ha": null,
+  "overlap_pct_of_official": null,
+  "overlap_pct_of_ours": null
+}
