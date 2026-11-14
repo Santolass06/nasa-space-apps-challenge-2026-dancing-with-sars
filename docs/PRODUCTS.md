@@ -77,3 +77,27 @@ A116 e D124 em 2026-07-28.
 | `coh_A15_20260627_20260709` | `NISAR_L2_PR_GUNW_024_015_A_022_025_2000_SH_20260627T053219_20260627T053254_20260709T053218_20260709T053253_P05023_N_F_J_001` | 2026-11-14 |
 | `coh_A116_20260622_20260704` | `NISAR_L2_PR_GUNW_023_116_A_022_024_2000_SH_20260622T054039_20260622T054111_20260704T054038_20260704T054111_P05023_N_F_J_001` | 2026-11-14 |
 | `coh_D124_20260622_20260704` | `NISAR_L2_PR_GUNW_023_124_D_068_024_2000_SH_20260622T192605_20260622T192640_20260704T192605_20260704T192639_P05023_N_F_J_001` | 2026-11-14 |
+| `s2_20260629` | `S2A_29TNF_20260629_0_L2A` + `S2A_29TNE_20260629_0_L2A` | 2026-11-14 |
+| `s2_20260709` | `S2A_29TNF_20260709_0_L2A` + `S2A_29TNE_20260709_0_L2A` | 2026-11-14 |
+
+
+### Sentinel-2 L2A em cor verdadeira
+
+As duas camadas foram geradas a partir de imagens do Earth Search
+(Element 84), combinando dois tiles por data na grelha comum do projeto.
+
+- **29 de junho de 2026:** imagem anterior ao incêndio, com a zona entre
+  Tourelhe e Águeda maioritariamente visível e algumas nuvens isoladas.
+- **9 de julho de 2026:** primeira imagem posterior útil entre as cenas
+  analisadas. A cicatriz é visível na vertente noroeste do Caramulo, mas
+  as nuvens ocultam parte do limite oeste.
+
+**Visibilidade durante o incêndio (2–5 de julho de 2026):**
+
+- **2 de julho:** observa-se uma faixa acinzentada compatível com fumo
+  perto da zona do incêndio.
+- **3 e 4 de julho:** a pesquisa no Earth Search não devolveu cenas
+  Sentinel-2 L2A para a caixa de trabalho.
+- **5 de julho:** a visibilidade sobre a área ardida foi parcial. Não foi
+  possível confirmar se o fumo contribuiu para essa limitação.
+
