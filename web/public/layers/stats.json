@@ -12,5 +12,49 @@
   "official_area_ha": 12819.8,
   "overlap_ha": 12127.8,
   "overlap_pct_of_official": 94.6,
-  "overlap_pct_of_ours": 89.7
+  "overlap_pct_of_ours": 89.7,
+  "act4": {
+    "method": "mean inside the burn polygon vs the rest of the grid, computed from the products, not from the PNG layers",
+    "dates": {
+      "before": "2026-06-29",
+      "after": "2026-07-11"
+    },
+    "backscatter_db": {
+      "hh": {
+        "before": {
+          "inside": -7.549,
+          "outside": -7.696
+        },
+        "after": {
+          "inside": -7.822,
+          "outside": -7.838
+        },
+        "change_inside_db": -0.273,
+        "change_outside_db": -0.142
+      },
+      "hv": {
+        "before": {
+          "inside": -12.453,
+          "outside": -12.961
+        },
+        "after": {
+          "inside": -13.123,
+          "outside": -13.234
+        },
+        "change_inside_db": -0.67,
+        "change_outside_db": -0.273
+      }
+    },
+    "coherence": {
+      "fire": {
+        "inside": 0.284,
+        "outside": 0.531
+      },
+      "control": {
+        "inside": 0.699,
+        "outside": 0.631
+      }
+    },
+    "answer": "Inside the scar HV changes -0.67 dB and HH -0.27 dB between 2026-06-29 and 2026-07-11; outside, -0.27 and -0.14 dB. HV moves 2.5x more than HH inside the scar: the scar is visible in HV and barely in HH. Coherence inside the scar is 0.28 in the fire pair against 0.70 in the control pair (a drop of 0.41); outside it is 0.53 and 0.63."
+  }
 }
