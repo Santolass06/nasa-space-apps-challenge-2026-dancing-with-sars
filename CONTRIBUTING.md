@@ -8,33 +8,23 @@ Thanks for helping with **Dancing with the SARs**!
 
 ## Workflow
 
-1. Create a branch from `main`:
+Tasks, owners and gates are in [`docs/PLAN.md`](docs/PLAN.md); every task has an ID (`A2`, `D4`…).
+
+1. One branch per task, with the ID in the name:
    ```bash
-   git switch -c feat/<short-description>
+   git switch -c a2-gunw-coherence
    ```
-2. Make focused commits using [Conventional Commits](https://www.conventionalcommits.org/):
-   ```
-   feat(frontend): add scene timeline slider
-   fix(api): handle missing bbox parameter
-   docs(data): add NISAR citation strings
-   ```
+2. Commit messages start with the task ID: `A2: export coherence to common grid`.
 3. Run the checks locally before pushing:
    ```bash
    make check
    ```
-4. Open a pull request using the template. Keep PRs small and describe the
-   **what**, the **why** and how you tested it.
-5. At least one review is required before merging.
-
-## Branch naming
-
-| Prefix | Use |
-| --- | --- |
-| `feat/` | New feature |
-| `fix/` | Bug fix |
-| `data/` | Data pipeline or dataset changes |
-| `docs/` | Documentation only |
-| `chore/` | Tooling, CI, dependencies |
+4. Open a small pull request using the template and merge it into `main` (several times per
+   phase; nothing stays out of `main` for more than two hours). `main` always works: every merge
+   will publish the app.
+5. Raw data never enters git; only the final layers in `web/public/layers/`.
+6. Changes to `docs/CONTRACT.md`, `pipeline/caramulo/grid.py` or the map API are announced
+   before they are made.
 
 ## Data and licensing rules
 
@@ -44,14 +34,15 @@ Space Apps requires every solution to be open source and every source to be cite
   credential files are git-ignored.
 - Any new dataset or library must be added to [`NOTICE`](NOTICE) and
   [`docs/data-sources.md`](docs/data-sources.md) with its license and citation.
+- Relevant AI use goes in one line in [`docs/AI_USE.md`](docs/AI_USE.md).
 - Only OSI-approved licenses are allowed for code we write.
 - Do not paste proprietary or export-controlled material into the repository.
 
 ## Code style
 
-- Python: `ruff format` + `ruff check` (config in `backend/pyproject.toml`).
-- TypeScript/React: `npm run lint` and `npm run build` inside `frontend/`.
-- Keep public functions typed and documented where the intent is not obvious.
+- Python: `ruff format` + `ruff check` (config in `pipeline/pyproject.toml`).
+- TypeScript/React: `npm run lint` and `npm run build` inside `web/`.
+- Each pipeline module starts with a comment: what goes in, what comes out, which product it reads.
 
 ## Commit authorship
 

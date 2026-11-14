@@ -1,6 +1,6 @@
-Dancing with the SARs
+Caramulo em chamas
 NASA Space Apps Challenge 2026
-Copyright 2026 The Dancing with the SARs team
+Copyright 2026 The Caramulo em chamas team
 
 This product is released under the Apache License, Version 2.0 (see LICENSE).
 
@@ -26,17 +26,25 @@ its license is recorded in docs/data-sources.md.
 SOFTWARE DEPENDENCIES
 --------------------------------------------------------------------------------
 
-Third-party libraries keep their original licenses. The main dependencies and
-licenses are:
+Third-party libraries keep their original licenses. Main dependencies (licenses to be
+verified with `pip-licenses` / `npm ls` before the final submission):
 
-  FastAPI, Uvicorn, Pydantic        MIT / BSD-3-Clause
-  NumPy, SciPy, Xarray              BSD-3-Clause
-  Rasterio, rioxarray               BSD-3-Clause
-  React, React DOM, Vite            MIT
-  MapLibre GL JS                    BSD-3-Clause
+  asf_search, earthaccess            BSD-3-Clause / MIT
+  h5py, NumPy, SciPy                 BSD-3-Clause
+  Rasterio, GeoPandas, Shapely       BSD-3-Clause
+  pystac-client                      Apache-2.0
+  React, React DOM, Vite             MIT
+  MapLibre GL JS                     BSD-3-Clause
+  scrollama, Observable Plot         MIT / ISC
+  Tailwind CSS                       MIT
 
-Run `pip-licenses` / `npm ls` before the final submission to produce a complete,
-up-to-date inventory, and cite every source in the Space Apps project form.
+Additional data and basemap attribution (fill in when used):
+
+  Copernicus Sentinel-2 (via Earth Search, Element 84)   [attribution text to add]
+  EFFIS / ICNF burned-area perimeter                      [attribution text to add]
+  Basemap: OpenFreeMap / OpenStreetMap contributors       [attribution text to add]
+
+Cite every source in the Space Apps project form.
 
 --------------------------------------------------------------------------------
 TRADEMARKS

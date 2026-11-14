@@ -7,13 +7,15 @@ Project Submission Guide before the deadline.
 ## Hard requirements
 
 - [ ] Project submitted from the **team page → Project tab** before
-      **Sunday 15 November 2026, 23:59 local time** (timezone of the Team Owner).
-- [ ] Team registered, 1–6 members, all in the same Local Event or the Universal Event.
+      **Sunday 15 November 2026, 23:59 local time**. Team target: submitted by **20:00**.
+- [ ] Team registered, 1–6 members, all in the same Local Event or the Universal Event, and
+      **visible on the team page before the deadline**.
 - [ ] The solution addresses **one** official challenge — *Dancing with the SARs*.
 - [ ] Work was **created during the event** (14–15 Nov). The commit history is the check:
       no pre-built project code.
 - [ ] **Open-source license** — OSI-approved. This repo uses Apache-2.0 (NASA's default when
       no license is given). Keep `LICENSE`, `NOTICE` and `docs/data-sources.md` up to date.
+- [ ] External resources (code, images, text) identified as such.
 - [ ] **Code in a public repository** linked from the project page (this repo is public).
 - [ ] **Publicly accessible demo link**, with no password, permission request or registration.
       GitHub, YouTube, Google Drive, OneDrive, Dropbox or a hosted site are accepted.
@@ -27,7 +29,11 @@ Project Submission Guide before the deadline.
 | Slide presentation | **Maximum 7 slides**, including title and intro slides |
 | Video presentation | **Maximum 30 seconds** |
 
-- [ ] Demo uploaded to an external host and the link tested in a private/incognito window.
+- [ ] Going over the limit takes the project out of global judging.
+- [ ] Project page and materials in **English**; a video may be spoken in another language but
+      needs **English subtitles**.
+- [ ] Demo uploaded to an external host (not to the Space Apps site) and the link tested in a
+      private/incognito window.
 - [ ] No PII; no names, voices or likeness of people under 18.
 
 ## Project page content
@@ -37,6 +43,7 @@ Project Submission Guide before the deadline.
 - [ ] Screenshots or a short walkthrough.
 - [ ] Demo link and repository link.
 - [ ] References: every dataset, paper, tutorial and library with links.
+- [ ] Use of AI described (from [`AI_USE.md`](AI_USE.md)).
 - [ ] Credits: team members and their roles.
 
 ## Finalisation

@@ -43,15 +43,20 @@ Guide before submitting):
 
 ## Datasets actually used by this project
 
-Keep this table in sync with `NOTICE` and the Space Apps submission form.
+Keep this table in sync with `NOTICE`, `docs/PRODUCTS.md` and the Space Apps submission form.
+Rows marked *verify* have a licence or attribution text still to confirm.
 
-| Dataset / product | Dates | Area | Source URL | License | Citation |
+| Dataset / product | Dates | Area | Source | License | Citation |
 | --- | --- | --- | --- | --- | --- |
-| _e.g. NISAR GCOV_ | _2026-…_ | _…_ | _…_ | NASA open | _…_ |
+| NISAR L2 GUNW (coherence) | 2026-06-17 → 2026-07-23 | Vouzela / Caramulo | [ASF Vertex](https://vertex.daac.asf.alaska.edu/) | NASA open | NASA/JPL-Caltech and ISRO, via ASF DAAC. Product names in `PRODUCTS.md` |
+| NISAR L2 GCOV (HH, HV backscatter) | 2026-06 → 2026-10 | Vouzela / Caramulo | [ASF Vertex](https://vertex.daac.asf.alaska.edu/) | NASA open | NASA/JPL-Caltech and ISRO, via ASF DAAC |
+| Sentinel-2 L2A (true colour context) | 2026-06 / 2026-07 | Vouzela / Caramulo | [Earth Search](https://earth-search.aws.element84.com/) (Element 84) | Copernicus free and open (*verify* wording) | Contains modified Copernicus Sentinel data 2026 |
+| Official burned-area perimeter | 2026-07 | Vouzela / Caramulo | EFFIS or ICNF (*verify* which and the format) | *verify* | *verify* |
+| Basemap | n/a | Portugal | OpenFreeMap / OpenStreetMap (*verify* in F0) | ODbL (*verify*) | © OpenStreetMap contributors |
+| Fire facts (start, end, hectares, evacuations) | 2026-07 | Vouzela / Caramulo | News and ICNF, listed in the "Fontes" section of [`DOSSIER.md`](DOSSIER.md) | Cited, not redistributed | Lusa, Agroportal, Sábado, ICNF |
 
 ## Reproducibility
 
-- Record the product identifiers (e.g. granule names) in `data/README.md` or a manifest,
-  not the data itself.
+- Record the product identifiers (granule names) in [`PRODUCTS.md`](PRODUCTS.md), not the data itself.
 - Downloads go to `data/raw/` and are git-ignored.
 - If a processing step depends on a specific product version, pin it in the manifest.

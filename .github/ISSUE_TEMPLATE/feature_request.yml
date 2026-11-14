@@ -29,8 +29,7 @@ body:
     attributes:
       label: Area
       options:
-        - Frontend / visualisation
-        - Backend / API
-        - Data / NISAR processing
+        - Map / story (web)
+        - Data pipeline (NISAR processing)
         - Storytelling / content
         - Documentation / tooling

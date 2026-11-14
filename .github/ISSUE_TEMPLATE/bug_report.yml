@@ -6,7 +6,7 @@ body:
     id: what-happened
     attributes:
       label: What happened?
-      description: A clear description of the bug, including the study area or endpoint involved.
+      description: A clear description of the bug, including the layer, act of the story or pipeline step involved.
     validations:
       required: true
 
@@ -22,7 +22,7 @@ body:
     attributes:
       label: Steps to reproduce
       placeholder: |
-        1. Run `make dev`
+        1. Run `make dev-web`
         2. Open http://localhost:5173
         3. …
     validations:

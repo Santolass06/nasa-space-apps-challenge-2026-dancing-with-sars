@@ -1,103 +1,88 @@
-# Dancing with the SARs
+# Caramulo em chamas
 
-**NASA Space Apps Challenge 2026 — interactive exploration of NISAR surface change**
+**NASA Space Apps Challenge 2026 — *Dancing with the SARs*.** The largest wildfire of
+Portugal's 2026 season, told with NISAR radar.
 
 [![CI](https://github.com/Santolass06/nasa-space-apps-challenge-2026-dancing-with-sars/actions/workflows/ci.yml/badge.svg)](https://github.com/Santolass06/nasa-space-apps-challenge-2026-dancing-with-sars/actions/workflows/ci.yml)
 
-An open-source, interactive web application that turns radar remote sensing data from the
-**NASA-ISRO Synthetic Aperture Radar (NISAR)** mission into an accessible story of how
-Earth's surface changes over time.
+An open-source, interactive web story about the **Vouzela / Serra do Caramulo wildfire**
+(2–5 July 2026, 12,804 ha burned) built only with radar remote sensing from the
+**NASA-ISRO NISAR** mission: what happened, how the L-band radar saw it through the smoke, and
+what came after.
 
-- **Challenge:** [Dancing with the SARs](https://www.spaceappschallenge.org/2026/challenges/dancing-with-the-sars/) — NASA Space Apps Challenge 2026
+- **Challenge:** [Dancing with the SARs](https://www.spaceappschallenge.org/2026/challenges/dancing-with-the-sars/)
 - **Event:** 14–15 November 2026
-- **Theme:** The Next Frontier
-- **License:** [Apache-2.0](LICENSE) (NASA's default license for Space Apps solutions)
+- **License:** [Apache-2.0](LICENSE)
 
-> **Status:** 🚧 initial scaffold — the concept, study areas and change-detection
-> products are being defined during the hackathon. See `docs/` for the challenge
-> statement, data sources and submission rules.
+> **Status:** 🚧 under construction during the hackathon. Tasks and gates: [`docs/PLAN.md`](docs/PLAN.md).
 
----
+## How it works
 
-## What it will do
+Two halves that only touch through files, so nothing can fail during the demo:
 
-1. Pick a study area anywhere on Earth (wetland, glacier, wildfire scar, flooded
-   neighbourhood, agricultural region, volcano…).
-2. Load NISAR SAR scenes for two or more dates (plus optional optical/GIS context layers).
-3. Compute and display a **change signal** (backscatter difference, coherence, RGB
-   multitemporal composites, time-series).
-4. Tell the story: interactive maps, swipe/slider comparisons, animations and short
-   explanations of the physical drivers behind the change.
+1. **`pipeline/`** — offline Python. Downloads NISAR GUNW (coherence) and GCOV (HH/HV
+   backscatter) products, puts them on one common grid, and writes PNG layers, GeoJSON and a
+   `manifest.json` to `web/public/layers/`.
+2. **`web/`** — a static React app (Vite, TypeScript, MapLibre) that reads the manifest and tells
+   the story in six acts: before, the fire, the scar, why radar sees it, afterwards, what next.
+
+The data contract between them is in [`docs/CONTRACT.md`](docs/CONTRACT.md).
 
 ## Repository layout
 
 ```
 .
-├── backend/          # FastAPI service: data access, change detection, tiles
-├── frontend/         # React + TypeScript + Vite interactive app
-├── data/             # Local data lake (not versioned: raw / interim / processed)
-├── notebooks/        # Exploration and analysis notebooks
-├── scripts/          # Download and preprocessing CLIs
-├── docs/             # Challenge statement, data sources, architecture, submission rules
-├── .github/          # CI, issue/PR templates, CODEOWNERS
-├── Makefile          # One-liners for setup, dev, lint and tests
-└── docker-compose.yml
+├── pipeline/         # Python pipeline (uv): fetch, gunw, gcov, s2, burn, series, export
+├── web/              # Static app: map, story, explore, content
+│   └── public/layers/  # pipeline output read by the app (versioned)
+├── data/             # Raw and intermediate data (not versioned)
+├── docs/             # Dossier, plan, contract, products, decisions, AI use, challenge, rules
+├── AGENTS.md         # Instructions for AI agents
+└── Makefile          # setup, dev, lint, check
 ```
 
 ## Quick start
 
-Requirements: Python 3.11+, Node.js 20+, and (for data downloads) a free
-[NASA Earthdata](https://urs.earthdata.nasa.gov/) account.
+Requirements: [uv](https://docs.astral.sh/uv/), Node.js 20+, and a free
+[NASA Earthdata](https://urs.earthdata.nasa.gov/) account to download data.
 
 ```bash
-cp .env.example .env          # add your Earthdata credentials
-make install                  # backend venv + frontend npm install
-
-make dev-backend              # http://localhost:8000/docs
-make dev-frontend             # http://localhost:5173
+make install      # uv sync + npm install
+make dev-web      # http://localhost:5173
+make check        # what CI runs
 ```
 
-Or with Docker:
+Search the NISAR products over the fire (no download, no login needed):
 
 ```bash
-docker compose up --build
-```
-
-## Data
-
-NISAR data is downloaded on demand and **never committed** to the repository
-(`data/` is git-ignored). See [`docs/data-sources.md`](docs/data-sources.md) for
-the full list of NASA and Space Agency Partner resources, access instructions,
-licenses and the citations you must include in the project submission.
-
-```bash
-python scripts/download_nisar.py \
-  --bbox -122.5 37.7 -121.9 38.1 \
-  --start 2026-01-01 --end 2026-03-01 \
-  --out data/raw
+cd pipeline
+uv run python -m caramulo.fetch --start 2026-06-17 --end 2026-07-25 --dry-run
 ```
 
 ## Documentation
 
 | Document | Contents |
 | --- | --- |
-| [`docs/challenge.md`](docs/challenge.md) | Official challenge statement, objectives and considerations |
-| [`docs/data-sources.md`](docs/data-sources.md) | NISAR / partner data, access, licenses, citation strings |
-| [`docs/architecture.md`](docs/architecture.md) | System design and data flow |
-| [`docs/submission-checklist.md`](docs/submission-checklist.md) | 2026 submission rules (demo limits, public link, citations) |
-| [`docs/judging.md`](docs/judging.md) | Judging criteria and global awards |
-| [`docs/team-and-concept.md`](docs/team-and-concept.md) | Team, concept, study areas and demo script |
+| [`docs/DOSSIER.md`](docs/DOSSIER.md) | The problem, the radar, the case and the shared values (area, dates, orbits) |
+| [`docs/PLAN.md`](docs/PLAN.md) | Who does what and when: stack, phases, gates, tasks |
+| [`docs/CONTRACT.md`](docs/CONTRACT.md) | Common grid, file names, `manifest.json`, HDF5 paths |
+| [`docs/PRODUCTS.md`](docs/PRODUCTS.md) | NISAR products that exist and the ones used |
+| [`docs/DECISIONS.md`](docs/DECISIONS.md) | Decisions taken during the weekend |
+| [`docs/AI_USE.md`](docs/AI_USE.md) | Where and how AI was used |
+| [`docs/challenge.md`](docs/challenge.md) | Official challenge statement (offline snapshot) |
+| [`docs/data-sources.md`](docs/data-sources.md) | Data sources, licenses, citations |
+| [`docs/judging.md`](docs/judging.md) | Judging criteria |
+| [`docs/submission-checklist.md`](docs/submission-checklist.md) | Submission rules |
 
 ## Contributing
 
-The repository is **public to view and clone**, but write access is restricted to
-**invited collaborators**. See [`CONTRIBUTING.md`](CONTRIBUTING.md) for the branch
-and commit conventions. Everyone else is welcome to open an issue.
+The repository is **public to view and clone**, but write access is restricted to **invited
+collaborators**. See [`CONTRIBUTING.md`](CONTRIBUTING.md). Everyone else is welcome to open an issue.
 
 ## License and attribution
 
-Released under the [Apache License 2.0](LICENSE). Third-party data, libraries and
-imagery keep their own licenses — see [`NOTICE`](NOTICE). NISAR data is provided by
-NASA/JPL-Caltech and ISRO and accessed through the Alaska Satellite Facility DAAC.
+Released under the [Apache License 2.0](LICENSE). Third-party data, libraries and imagery keep
+their own licenses — see [`NOTICE`](NOTICE). NISAR data is provided by NASA/JPL-Caltech and ISRO
+and accessed through the Alaska Satellite Facility DAAC.
 
 This project is not affiliated with or endorsed by NASA.

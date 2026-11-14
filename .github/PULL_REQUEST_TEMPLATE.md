@@ -1,25 +1,18 @@
-<!-- Keep it short and focused. -->
+<!-- Keep it short and focused. Branch and title start with the task ID, e.g. a2-gunw-coherence / "A2: ..." -->
 
-## What and why
+## Task and why
 
-<!-- What does this PR change, and which part of the challenge does it serve? -->
-
-## Type of change
-
-- [ ] `feat` — new feature
-- [ ] `fix` — bug fix
-- [ ] `data` — data pipeline / dataset
-- [ ] `docs` — documentation
-- [ ] `chore` — tooling, CI, dependencies
+<!-- Task ID from docs/PLAN.md (e.g. A2) and what this PR changes. -->
 
 ## How was it tested?
 
-<!-- Commands run, screenshots, or the study area used. -->
+<!-- Commands run, screenshots, or the layer checked. -->
 
 ## Checklist
 
 - [ ] `make check` passes locally
 - [ ] No data files, secrets or credentials added
+- [ ] New layers are in `manifest.json` with `source` and `caveat`
+- [ ] Numbers shown to the user come from a pipeline file, not typed by hand
 - [ ] New data sources or libraries added to `NOTICE` and `docs/data-sources.md`
-- [ ] Documentation updated if behaviour changed
-- [ ] Work was produced during the hackathon (14–15 Nov 2026)
+- [ ] Someone else on the team saw the result

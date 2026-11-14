@@ -1,7 +1,7 @@
 cff-version: 1.2.0
 message: "If you use this software or the visualisations it produces, please cite it as below."
-title: "Dancing with the SARs"
-abstract: "Interactive, open-source application for tracking and visualising Earth surface change with NISAR synthetic aperture radar data."
+title: "Caramulo em chamas"
+abstract: "Interactive story of the July 2026 Vouzela/Caramulo wildfire (Portugal), told with NISAR L-band synthetic aperture radar. NASA Space Apps Challenge 2026: Dancing with the SARs."
 type: software
 license: Apache-2.0
 repository-code: "https://github.com/Santolass06/nasa-space-apps-challenge-2026-dancing-with-sars"
@@ -12,7 +12,9 @@ keywords:
   - Earth observation
   - NASA Space Apps Challenge
   - change detection
+  - wildfire
+  - coherence
 authors:
-  - name: "Dancing with the SARs team"
+  - name: "Caramulo em chamas team"
 date-released: "2026-11-14"
 version: "0.1.0"

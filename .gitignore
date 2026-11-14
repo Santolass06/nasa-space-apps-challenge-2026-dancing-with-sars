@@ -39,10 +39,10 @@ dist/
 build/
 pip-wheel-metadata/
 
-# --- Node / frontend -------------------------------------------------------
+# --- Node / web -------------------------------------------------------
 node_modules/
-frontend/dist/
-frontend/.vite/
+web/dist/
+web/.vite/
 npm-debug.log*
 yarn-error.log*
 pnpm-debug.log*
@@ -56,9 +56,6 @@ Thumbs.db
 .vscode/
 *.swp
 *.swo
-
-# --- Notebooks -------------------------------------------------------------
-notebooks/**/*.executed.ipynb
 
 # --- Logs / misc -----------------------------------------------------------
 *.log

@@ -1,50 +1,33 @@
-# Judging and awards
+# Judging
 
-> Summary for planning purposes. The authoritative source is the 2026 *Judging and Awards
-> Guide* on the Space Apps Resources page. Criteria have changed between editions — verify
-> before finalising the pitch.
+> Planning summary. The authoritative source is the 2026 *Judging & Awards Guide* on the Space
+> Apps Resources page; the criteria below come from it (see "Fontes" in
+> [`DOSSIER.md`](DOSSIER.md)). Re-check it before finalising the pitch.
 
-## How judging works
+## Criteria
 
-1. **Local Event judging** — projects are evaluated at the Local Event (or Universal Event)
-   the team registered for.
-2. **Global judging** — nominated projects are evaluated by a NASA panel.
-3. Results: Global Nominees and Finalists (December 2026), Global Winners (January 2027).
+1. **Impact**: what problem it solves and how many people it reaches.
+2. **Creativity**: is the approach new, or a fresh take on an existing idea?
+3. **Validity**: is it scientifically correct, and does it work?
+4. **Relevance**: does it answer the challenge; is it complete and easy to use?
+5. **Presentation**: how clearly the story and the demo are told.
 
-## What judges look for
-
-The long-standing evaluation dimensions are:
-
-- **Impact** — how big and how real is the problem solved? Who benefits?
-- **Creativity** — is the approach new, or a fresh take on an existing idea?
-- **Product** — does it fit the challenge, is it usable, is it a complete experience or a
-  promising prototype?
-
-Complementary signals that consistently help:
-
-- **Use of NASA / partner data** — meaningful analysis, not just a pretty basemap.
-- **Storytelling** — a clear narrative that a non-specialist can follow.
-- **Feasibility** — the path from prototype to real use.
-- **Openness** — licence, documentation, reproducibility.
-
-## Award categories (recent editions)
-
-Best Use of Data · Best Use of Technology/Hardware · Best Mission Concept · Most Inspiring ·
-Galactic Impact · Best Storytelling · Local Impact · Global Connection · People's Choice.
+The organisers warn that teams neglect the presentation: the 30-second demo weighs as much as
+the rest.
 
 ## How this project addresses them
 
 | Criterion | Our answer |
 | --- | --- |
-| Impact | Surface change (floods, wetlands, glaciers, agriculture) affects communities directly. |
-| Creativity | Turning radar backscatter into an intuitive, story-driven visual experience. |
-| Product | Map + time slider + change layers, usable without remote-sensing training. |
-| Data | NISAR L-band SAR, with ancillary optical/GIS context layers. |
-| Openness | Apache-2.0, public repo, documented sources and citations. |
+| Impact | Radar sees fires through smoke and clouds: faster response and tracking of the recovery of the serra. |
+| Creativity | A scrollytelling built only with radar; the burned trunks that "fool" the brightness while coherence shows the scar. |
+| Validity | Our burned area (from NISAR coherence) next to the official perimeter; every claim marked confirmed, hypothesis or removed. |
+| Relevance | NISAR L-band, several dates, HH vs HV vs coherence, hypothesis about the physics, future applications. |
+| Presentation | Story in four beats: before → fire → scar → why it matters. |
 
 ## Pitch checklist
 
-- Lead with the **story of the place**, then the data.
-- Show the **before/after** in the first 10 seconds of the demo.
-- State the **hypothesis** behind the change and its uncertainty.
-- End with **who uses it** and what comes next.
+- Lead with the place and the fire, then the data.
+- Show the before/after in the first 10 seconds.
+- State the hypothesis and its uncertainty.
+- End with who uses it and what comes next.
