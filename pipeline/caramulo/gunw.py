@@ -24,7 +24,7 @@ from rasterio.transform import from_bounds, from_origin
 from rasterio.warp import Resampling, reproject
 
 from caramulo import export
-from caramulo.grid import EXTENT_3857, HEIGHT, WIDTH
+from caramulo.grid import CRS, EXTENT_3857, HEIGHT, WIDTH
 
 # GUNW layout confirmed on the first real file (task A1, 2026-11-14):
 # coherence sits at the CONTRACT path; projection and coordinates are inside
@@ -109,7 +109,7 @@ def coherence_on_grid(h5_path: Path) -> np.ndarray:
         src_transform=_transform(x, y),
         src_crs=crs,
         dst_transform=from_bounds(*EXTENT_3857, WIDTH, HEIGHT),
-        dst_crs="EPSG:3857",
+        dst_crs=CRS,
         resampling=Resampling.bilinear,
         src_nodata=np.nan,
         dst_nodata=np.nan,
