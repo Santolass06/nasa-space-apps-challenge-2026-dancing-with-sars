@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import CompareView from "../map/CompareView";
 import LayerPicker from "../map/LayerPicker";
+import Legend from "../map/Legend";
 import MapView from "../map/MapView";
 import { LayerManager } from "../map/layers";
 import { loadManifest, type Layer, type Manifest } from "../map/manifest";
@@ -161,6 +162,14 @@ export default function Story() {
   const current = steps[active] ?? steps[0];
   const comparison = current?.step.comparisons?.[0];
 
+  // C3: one legend per raster layer the step shows (at most two).
+  const legendLayers: Layer[] = current
+    ? current.step.layers
+        .map((ref) => manifest?.layers.find((layer) => layer.id === ref.id))
+        .filter((layer): layer is Layer => Boolean(layer))
+        .slice(0, 2)
+    : [];
+
   // Drive the single map. Comparison steps draw their own pair instead.
   useEffect(() => {
     const manager = managerRef.current;
@@ -223,6 +232,13 @@ export default function Story() {
 
       <div className="story__map">
         <MapView className="story__map-view" onReady={onMapReady} />
+        {legendLayers.length > 0 && (
+          <div className="legend-stack">
+            {legendLayers.map((layer) => (
+              <Legend key={layer.id} layer={layer} />
+            ))}
+          </div>
+        )}
         {current?.step.id === "explore-the-map" && manifest && (
           <LayerPicker
             manifest={manifest}

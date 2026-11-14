@@ -395,6 +395,62 @@ h1 {
   border-radius: 8px;
 }
 
+.legend-stack {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  z-index: 3;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.legend {
+  width: 13rem;
+  margin: 0;
+  padding: 0.5rem 0.6rem;
+  background: rgba(11, 16, 32, 0.88);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  backdrop-filter: blur(6px);
+}
+
+.legend__title {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.legend__ramp {
+  height: 8px;
+  margin: 0.35rem 0 0.2rem;
+  border-radius: 4px;
+}
+
+.legend__scale {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.66rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.legend__note {
+  margin: 0.3rem 0 0;
+  font-size: 0.66rem;
+  color: var(--muted);
+}
+
+.legend__caveat {
+  display: -webkit-box;
+  margin: 0.4rem 0 0;
+  overflow: hidden;
+  font-size: 0.62rem;
+  line-height: 1.35;
+  color: var(--muted);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
 .stats {
   display: grid;
   gap: 0.5rem;
