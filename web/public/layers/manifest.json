@@ -152,6 +152,42 @@
       "colormap": "gray",
       "source": "NISAR_L2_PR_GUNW_025_052_D_068_026_2000_SH_20260711T193423_20260711T193458_20260723T193423_20260723T193458_P05023_N_F_J_001.h5",
       "caveat": "Low coherence also occurs over water and dense forest; this pair brackets the fire (2-5 Jul 2026)."
+    },
+    {
+      "id": "s2_20260629",
+      "kind": "s2",
+      "file": "s2_20260629.png",
+      "orbit": null,
+      "dates": [
+        "2026-06-29"
+      ],
+      "title": "Sentinel-2 true colour, 29 Jun 2026",
+      "units": "RGB",
+      "range": [
+        0,
+        255
+      ],
+      "colormap": "rgb",
+      "source": "Contains modified Copernicus Sentinel data 2026, accessed via Earth Search (Element 84): S2A_29TNF_20260629_0_L2A, S2A_29TNE_20260629_0_L2A",
+      "caveat": "Isolated clouds are visible near the study area."
+    },
+    {
+      "id": "s2_20260709",
+      "kind": "s2",
+      "file": "s2_20260709.png",
+      "orbit": null,
+      "dates": [
+        "2026-07-09"
+      ],
+      "title": "Sentinel-2 true colour, 09 Jul 2026",
+      "units": "RGB",
+      "range": [
+        0,
+        255
+      ],
+      "colormap": "rgb",
+      "source": "Contains modified Copernicus Sentinel data 2026, accessed via Earth Search (Element 84): S2A_29TNF_20260709_0_L2A, S2A_29TNE_20260709_0_L2A",
+      "caveat": "The burn scar is visible, but clouds obscure parts of its western edge."
     }
   ]
 }
