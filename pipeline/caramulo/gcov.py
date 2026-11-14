@@ -49,8 +49,9 @@ _MONTHS = (
 )  # fmt: skip
 
 _CAVEAT = (
-    "Speckle is present. Burned trunks keep returning echo, so the scar darkens "
-    "only slightly in backscatter (docs/DOSSIER.md); coherence is the fire signal."
+    "Speckle is present. The scar darkens only slightly in backscatter; the "
+    "standing-trunk explanation in docs/DOSSIER.md is a hypothesis, not a "
+    "measurement. Coherence is the fire signal."
 )
 
 
