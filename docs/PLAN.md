@@ -154,7 +154,7 @@ Cada fase acaba num portão: dez minutos em que os cinco param, juntam o trabalh
 
 | Fase | Quando | Objetivo | Portão: passa se… |
 | --- | --- | --- | --- |
-| F0 — Arranque | Sáb 16:00–17:00 | Repositório, contrato, camadas falsas, contas, frentes atribuídas | P0: `CONTRACT.md` em `main`, camadas falsas na app, as cinco máquinas correm o projeto |
+| F0 — Arranque | Sáb 16:00–17:00 | Repositório, contrato, camadas falsas, contas, frentes atribuídas | P0: `CONTRACT.md` em `main`; `run.py --mock` escreve PNG falsos e `manifest.json` em `web/public/layers/`; a app publicada abre o mapa em Vouzela; todas as máquinas ativas correm o projeto (mostrar as camadas falsas é a C1, no P1) |
 | F1 — Fundações | Sáb 17:00–20:30 | Cada frente prova a sua parte mais arriscada | P1: fatia vertical — uma coerência real aparece na app publicada, vinda do manifest |
 | F2 — Núcleo | Sáb 20:30–01:00 | Atos 1, 3 e 4 com dados reais | P2: slider antes/depois, polígono com área em hectares e comparação HH, HV e coerência funcionam |
 | F3 — História completa | Dom 09:00–14:00 | Atos 2, 5 e 6, exploração livre | P3: os seis atos leem-se de ponta a ponta; a partir daqui não entram funcionalidades |
@@ -174,7 +174,7 @@ Cada tarefa tem um ID para usar em branches, commits e pedidos aos agentes. “D
 | T1 | C | Criar o repositório com a estrutura de pastas; Vite + React + TypeScript + Tailwind + MapLibre a compilar; publicação automática no GitHub Pages | — | O link público mostra um mapa centrado em Vouzela |
 | T2 | A + B | `pipeline/` com `uv`; `grid.py` e `export.py`; modo `--mock` que gera camadas falsas na grelha certa | — | `uv run python run.py --mock` escreve PNG e `manifest.json` em `web/public/layers/` |
 | T3 | E | Escrever `CONTRACT.md`, `AGENTS.md` e `DECISIONS.md`; registar quem fica em cada frente | — | Os três ficheiros em `main`, lidos pelos cinco |
-| T4 | Todos | Conta Earthdata e `.netrc` em cada máquina | — | `asf_search` devolve produtos NISAR para a caixa em pelo menos três máquinas |
+| T4 | Todos | Conta Earthdata e `.netrc` em cada máquina | — | o login com `.netrc` funciona em todas as máquinas ativas. A pesquisa `asf_search` funciona sem login, por isso não prova nada: o teste a sério é o primeiro download de A1 |
 | T5 | D + E | Storyboard: cada ato dividido em passos, e cada passo com as camadas de que precisa | T3 | `story.en.json` com todos os passos e IDs de camada, textos ainda provisórios |
 
 ### F1 — Fundações (sábado 17:00–20:30)
@@ -338,4 +338,4 @@ Quatro escolhas ficam para a Fase 0. Cada uma tem uma proposta; se ninguém disc
 - [ ] Órbita da série do ato 5. Proposta: D52, por ser a do par principal.
 - [ ] Nome público do projeto em inglês. Proposta: decidir até P2, para entrar no vídeo e na página.
 
-Pressupostos deste plano, a corrigir se estiverem errados: os cinco estão disponíveis nas duas janelas de trabalho, cada um com computador próprio e acesso a um agente de IA; os caminhos HDF5 e o mapa de base estão por confirmar na F0 e F1.
+Pressupostos deste plano, a corrigir se estiverem errados: o plano mantém as cinco frentes, mas o número de pessoas ativas varia ao longo do fim de semana; cada pessoa tem computador próprio e acesso a um agente de IA; a atribuição atual das frentes está em `docs/DECISIONS.md`; os caminhos HDF5 e o mapa de base estão por confirmar na F0 e F1.
