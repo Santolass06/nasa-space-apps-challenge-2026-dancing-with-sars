@@ -9,8 +9,10 @@ Reads: the coherence layers produced by caramulo.gunw.
 Method (task A4): threshold on the coherence DIFFERENCE (fire pair minus
 control pair), not on the fire pair alone — the control pair removes the
 summer decorrelation that affects the whole frame. The threshold -0.25 was
-calibrated on 2026-11-14 against the official areas (12,160 ha EFFIS,
-12,804 ha ICNF) and lands at ~13.7k ha before morphology.
+calibrated on 2026-11-14 against the official areas known then (12,160 ha
+EFFIS, 12,804 ha ICNF provisional) and lands at ~13.7k ha before morphology.
+The final ICNF figure is 12,828.9 ha (REE_2026_004, p. 6); the threshold was
+not re-tuned.
 
 Run inside pipeline/:
 

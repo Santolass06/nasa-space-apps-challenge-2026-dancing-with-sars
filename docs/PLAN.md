@@ -75,9 +75,9 @@ caramulo/
 
 Todas as camadas raster saem exatamente com a mesma caixa, projeção e tamanho, para se sobreporem sem ajustes.
 
-- Caixa: lon −8,35 a −7,95; lat 40,45 a 40,85 (a do dossier).
+- Caixa: lon −8,50 a −7,95; lat 40,45 a 40,85 (a do dossier, estendida a oeste no A2).
 - Projeção de saída: Web Mercator (EPSG:3857), a do mapa.
-- Tamanho: 2000 px de largura (cerca de 17 m por píxel); a altura sai de `grid.py`.
+- Tamanho: 2000 px de largura (cerca de 23 m por píxel); a altura sai de `grid.py`.
 - `grid.py` é a única fonte destes valores. Ninguém os escreve à mão noutro ficheiro.
 
 ### Nomes dos ficheiros
@@ -101,7 +101,7 @@ A app não conhece nomes de ficheiros: lê `web/public/layers/manifest.json` e d
 ```json
 {
   "version": 1,
-  "bounds": [-8.35, 40.45, -7.95, 40.85],
+  "bounds": [-8.5, 40.45, -7.95, 40.85],
   "layers": [
     {
       "id": "coh_D52_20260629_20260711",
