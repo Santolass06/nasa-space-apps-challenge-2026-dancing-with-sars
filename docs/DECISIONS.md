@@ -16,6 +16,7 @@ Uma linha por decisão: data, decisão, quem decidiu.
 | 2026-11-14 | A6: progressão 0 → 6.831 ha (4 jul) → 13.501 ha; o "durante" é a parte da cicatriz final abaixo da mediana−2 MAD do A116 (o par não tem controlo e um limiar absoluto apanha água e vales: 45% dentro no melhor caso) | André (A6) |
 | 2026-11-14 | B2: HH/HV em dB, potência linear reprojetada (média sem viés) e escala fixa por polarização — HH −15..−2 dB, HV −20..−8 dB (percentis 2–98 no grid), a mesma em todas as datas (B8); o brilho quase não vê a cicatriz (HH dentro = fora), como o dossier previa | André (B2) |
 | 2026-11-14 | B6: as camadas de agosto (HH/HV) e outubro (coerência) que o `story.en.json` já citava passam a existir — o contrato exige que todos os IDs da história estejam no manifest, e sem elas qualquer PR falhava a auditoria | André (B6) |
+| 2026-11-14 | C7: camadas raster a metade da grelha (1000 px, ~46 m/px) e no formato mais leve — gray+alpha com filtro PNG "Up" para a coerência (731–810 KB), paleta de 255 cores para HH/HV e uma paleta de 216 cores para o ótico (337–382 KB); a compressão sozinha não chegava (RGBA a 1000 px ainda dava 1,07 MB e o ótico 2,5 MB). A área da cicatriz não muda: 13.517,9 ha | André (C7) |
 
 ## Frentes (atualizar sempre que alguém entra ou sai)
 
