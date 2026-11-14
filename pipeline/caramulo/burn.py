@@ -37,7 +37,7 @@ from shapely.geometry import MultiPolygon, Polygon, shape
 from shapely.ops import unary_union
 
 from caramulo import export
-from caramulo.grid import BBOX, EXTENT_3857, HEIGHT, WIDTH
+from caramulo.grid import BBOX, CRS, EXTENT_3857, HEIGHT, WIDTH
 
 THRESHOLD = -0.25  # coherence drop vs the control pair; calibrated against the official areas
 SMOOTHING_M = 1000.0  # box smoothing on the ground before thresholding
@@ -139,7 +139,7 @@ def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
     mask, info = burn_mask(args.fire, args.control, args.threshold)
     geom_merc = mask_to_polygon(mask)
-    geom_wgs = shape(transform_geom("EPSG:3857", WGS84, geom_merc.__geo_interface__))
+    geom_wgs = shape(transform_geom(CRS, WGS84, geom_merc.__geo_interface__))
     area_ha = _utm_area_ha(geom_wgs)
 
     stats = {
