@@ -153,15 +153,21 @@ O que isto nos dá para a história: uma linha do tempo curta e dramática, nome
 
 ## O que já vimos nos dados
 
-O sinal do incêndio existe nos dados NISAR reais e vê-se melhor pela coerência do que pelo brilho. Imagens tiradas das pré-visualizações oficiais da ASF e recortadas para a zona.
+O sinal do incêndio existe nos dados NISAR reais e vê-se melhor pela coerência do que pelo brilho.
 
-&#91;image: Interferogramas NISAR sobre Vouzela: par que atravessa o incêndio vs par de controlo\]
+**Primeira leitura (pré-visualizações ASF, 14 nov):** as cores são a fase do interferograma; o que interessa é a textura. À esquerda (29 jun → 11 jul, as duas datas "abraçam" o fogo) via-se uma mancha granulada de cerca de 14 × 10 km — o radar deixou de reconhecer aquele terreno, porque ardeu. À direita (11 → 23 jul, ambas já depois do fogo) a mesma zona voltava a ser lisa. A georreferência das pré-visualizações era aproximada, e a posição da mancha veio a revelar-se deslocada.
 
-**Como ler a imagem:** as cores são a fase do interferograma; o que interessa é a textura. À esquerda (29 jun → 11 jul, as duas datas “abraçam” o fogo) há uma mancha granulada com cerca de 14 × 10 km — o radar deixou de reconhecer aquele terreno, porque ardeu. À direita (11 → 23 jul, ambas já depois do fogo) a mesma zona volta a ser lisa: entre essas datas nada mudou. 14 × 10 km ≈ 14.000 ha, coerente com os 12.804 ha oficiais.
+**Medição nos dados completos (14 nov, tarefas A1/A2):** com os GUNW reais na grelha comum, o diferencial de coerência entre o par do fogo (29 jun → 11 jul) e o par de controlo (11 → 23 jul), suavizado a 1 km, mostra:
+
+- a maior região ligada abaixo de −0,25 tem **13.687 ha** em lon −8,398..−8,130, lat 40,557..40,682 (centroide −8,27, 40,62); a um limiar mais exigente (−0,30) fica com 12.063 ha. Os números oficiais: 12.160 ha (EFFIS, 3 jul) e 12.804 ha (ICNF, provisório) — a nossa medição bate;
+- dentro da cicatriz, a coerência do par do fogo é **0,24** contra **0,69** no par de controlo (queda de 0,45) — o sinal é forte e localizado;
+- a mancha é maior do que a elipse das pré-visualizações (caixa de ~22 × 13 km) e está mais a **oeste**: a vertente NW da serra, de Tourelhe (ignição, perto de Cambra) na direção de Águeda. As notícias registam que o fogo atingiu o concelho de Águeda (lon ≈ −8,45), o que é consistente com o que os dados mostram.
+
+**Consequência:** a grelha comum foi estendida a oeste, de −8,35 para −8,50 (pixel de ~17 m para ~23 m), para não cortar a ponta ocidental da cicatriz. Ver `docs/CONTRACT.md` e `docs/DECISIONS.md`.
 
 **A surpresa:** na imagem de brilho HV (antes vs. depois) a cicatriz quase não se nota. A explicação provável é física: os pinheiros queimados ficam de pé e a banda L continua a receber eco dos troncos. Para o fogo, o indicador principal deve ser a coerência; o brilho serve para acompanhar o que acontece depois (queda e corte das árvores, regeneração). Isto é bom material para o júri: mostra que percebemos o sensor.
 
-**Cuidado:** a georreferência das pré-visualizações é aproximada. Falta confirmar a posição da mancha com o perímetro oficial e com os dados completos.
+**Por confirmar:** o polígono oficial (E1), para medir a sobreposição exata, e a comparação com o brilho HV nos GCOV (B).
 
 ## A ideia do projeto
 
@@ -199,7 +205,7 @@ Valores comuns para toda a gente (e todos os agentes) trabalhar com as mesmas zo
 ### Zona de interesse
 
 - **Ponto de referência:** lon −8,11, lat 40,68 (Vouzela).
-- **Caixa de trabalho provisória:** lon −8,35 a −7,95; lat 40,45 a 40,85 (WGS84). Tem margem; afinar quando tivermos o perímetro oficial.
+- **Caixa de trabalho:** lon −8,50 a −7,95; lat 40,45 a 40,85 (WGS84), definida em `grid.py` (a única fonte). Estendida a oeste a 14 nov para cobrir a ponta ocidental da cicatriz — ver "O que já vimos nos dados" e `DECISIONS.md`.
 
 ### Passagens NISAR principais
 
@@ -244,7 +250,7 @@ Nomeamos cada órbita pela direção + número do track: **D52** = descendente, 
 
 Estas questões não estão confirmadas. Quem as esclarecer atualiza esta lista.
 
-- **A mancha coincide com o perímetro oficial?** Só vimos pré-visualizações com georreferência aproximada.
+- **A mancha coincide com o perímetro oficial?** O tamanho bate (12-13,7 mil ha medidos por nós vs 12.804 ha do ICNF), mas o polígono oficial ainda não foi comparado — falta o perímetro (E1).
 - **O fumo tapou mesmo os satélites óticos entre 2 e 5 de julho?** Faz sentido, mas ainda não verificámos as imagens Sentinel-2 desses dias. Em Leiria, durante a Kristin, confirmámos que o ótico ficou \~3 semanas sem imagens limpas.
 - **Quanto cai a coerência fora da área ardida no verão?** Vegetação seca também muda; o par de controlo (11 → 23 jul) ajuda a separar.
 - **O brilho HV mostra algo ao longo de julho–outubro?** Hipótese: sim, à medida que as árvores queimadas caem ou são cortadas. Por testar.

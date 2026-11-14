@@ -26,4 +26,5 @@ Por listar (tarefa A3). Quando houver, acrescentar o nome completo do produto de
 
 | Camada | Produto (nome completo) | Descarregado em |
 | --- | --- | --- |
-| _por preencher_ | | |
+| `coh_D52_20260629_20260711` | `NISAR_L2_PR_GUNW_024_052_D_068_025_2000_SH_20260629T193424_20260629T193459_20260711T193423_20260711T193458_P05023_N_F_J_001` | 2026-11-14 |
+| `coh_D52_20260711_20260723` | `NISAR_L2_PR_GUNW_025_052_D_068_026_2000_SH_20260711T193423_20260711T193458_20260723T193423_20260723T193458_P05023_N_F_J_001` | 2026-11-14 |
