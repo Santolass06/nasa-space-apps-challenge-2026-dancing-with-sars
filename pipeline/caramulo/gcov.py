@@ -121,10 +121,10 @@ def backscatter_db(power: np.ndarray) -> np.ndarray:
 def backscatter_layer(h5_path: Path, pol: str, orbit: str, date: str, out_dir: Path) -> dict:
     """Write one backscatter PNG and return its manifest entry."""
     layer_id = f"{pol}_{orbit}_{date.replace('-', '')}"
-    db = backscatter_db(power_on_grid(h5_path, pol))
+    db = export.downsample2(backscatter_db(power_on_grid(h5_path, pol)))
     vmin, vmax = _RANGES[pol]
-    rgba = export.scalar_rgba(db, _COLORMAPS[pol], vmin, vmax)
-    export.write_png(out_dir / f"{layer_id}.png", rgba)
+    index = export.scalar_index(db, _COLORMAPS[pol], vmin, vmax)
+    export.write_palette_png(out_dir / f"{layer_id}.png", index, _COLORMAPS[pol])
     return export.layer_entry(
         layer_id=layer_id,
         kind=pol,
