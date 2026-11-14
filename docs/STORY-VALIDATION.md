@@ -6,7 +6,7 @@ Revisão dos atos 1, 3 e 4 de `web/src/content/story.en.json`.
 
 | Ato | Passo | Afirmação | Classificação | Evidência ou limite |
 | --- | --- | --- | --- | --- |
-| 1 | `introduce-caramulo` | O incêndio de julho de 2026 começou perto de Tourelhe, na Serra do Caramulo. | Confirmada | O relatório do ICNF `REE_2026_004` identifica o local de início em Chamusqueiros, no concelho de Vouzela. |
+| 1 | `introduce-caramulo` | O incêndio de Tourelhe teve início em Chamusqueiros, no concelho de Vouzela. | Confirmada | O relatório do ICNF `REE_2026_004` usa Tourelhe como nome do incêndio e identifica Chamusqueiros como o local de início. |
 | 1 | `introduce-caramulo` | A imagem ótica mostra as montanhas e os vales antes do incêndio. | Confirmada | A imagem Sentinel-2 foi adquirida a 29 de junho, antes do incêndio de 2 a 5 de julho. Ver `PRODUCTS.md`. |
 | 1 | `compare-optical-and-radar` | A imagem ótica e a imagem de radar mostram a mesma zona. | Confirmada | As camadas Sentinel-2 e NISAR usam a mesma grelha geográfica. |
 | 1 | `compare-optical-and-radar` | A imagem ótica usa luz solar refletida para mostrar a paisagem em cor natural. | Confirmada | A camada Sentinel-2 é uma composição em cor verdadeira. |
@@ -25,3 +25,9 @@ Revisão dos atos 1, 3 e 4 de `web/src/content/story.en.json`.
 
 O limiar de deteção foi calibrado com os totais de área oficiais. Por isso, a semelhança entre os totais em hectares é um resultado da calibração. A sobreposição acrescenta evidência de que as duas geometrias cobrem, em grande parte, o mesmo terreno.
 
+
+| Afirmação | Classificação | Evidência ou limite |
+| --- | --- | --- |
+| Os troncos que ficaram de pé podem continuar a refletir ondas de radar. | **Hipótese** | A legenda de HH apresenta uma explicação possível. A B5 pode quantificar o comportamento de HH e HV, mas essa medição, por si só, não identifica a causa. |
+| Ramos e folhas podem dispersar as ondas de radar e contribuir para o sinal HV. | **Confirmada**, como explicação geral | A legenda descreve um mecanismo possível de dispersão. A contribuição específica da vegetação nesta imagem fica por determinar. |
+| A cicatriz estende-se pela vertente noroeste do Caramulo, de Tourelhe em direção a Águeda. | **Confirmada** | A localização é sustentada pelo polígono da A4 e pela análise descrita no `DOSSIER.md`. |
