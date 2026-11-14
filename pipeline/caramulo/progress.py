@@ -32,7 +32,7 @@ from shapely.geometry import shape
 from shapely.ops import unary_union
 
 from caramulo import export
-from caramulo.grid import EXTENT_3857, HEIGHT, WIDTH
+from caramulo.grid import CRS, EXTENT_3857, HEIGHT, WIDTH
 
 LAYERS_DIR = Path("../web/public/layers")
 DURING_LAYER = "coh_A116_20260622_20260704"
@@ -54,7 +54,7 @@ def _grid_transform():
 
 def _scar_mask(burn_geojson: Path) -> np.ndarray:
     feature = json.loads(burn_geojson.read_text())["features"][0]
-    geom_merc = transform_geom(WGS84, "EPSG:3857", feature["geometry"])
+    geom_merc = transform_geom(WGS84, CRS, feature["geometry"])
     grid = rasterize(
         [(geom_merc, 1)],
         out_shape=(HEIGHT, WIDTH),
@@ -87,7 +87,7 @@ def _polygon_wgs84(mask: np.ndarray):
         shape(geom)
         for geom, _value in shapes(mask.astype("uint8"), mask=mask, transform=_grid_transform())
     ]
-    return transform_geom("EPSG:3857", WGS84, unary_union(geoms).__geo_interface__)
+    return transform_geom(CRS, WGS84, unary_union(geoms).__geo_interface__)
 
 
 def _area_ha_wgs84(geom: dict) -> float:
