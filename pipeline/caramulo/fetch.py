@@ -12,9 +12,8 @@ Examples (run inside pipeline/)::
     # list the GUNW and GCOV products over Vouzela around the fire, no download
     uv run python -m caramulo.fetch --start 2026-06-17 --end 2026-07-25 --dry-run
 
-    # download only the GUNW products
-    uv run python -m caramulo.fetch --start 2026-06-27 --end 2026-07-12 --level GUNW \
-        --out ../data/raw
+    # download one product by name (use this: a date search can match several GB-sized files)
+    uv run python -m caramulo.fetch --scene NISAR_L2_PR_GUNW_..._001 --out ../data/raw
 """
 
 from __future__ import annotations
@@ -39,8 +38,14 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         metavar=("MIN_LON", "MIN_LAT", "MAX_LON", "MAX_LAT"),
         help="Area of interest in EPSG:4326 (default: the common grid, caramulo.grid.BBOX)",
     )
-    parser.add_argument("--start", required=True, help="Start date (YYYY-MM-DD)")
-    parser.add_argument("--end", required=True, help="End date (YYYY-MM-DD)")
+    parser.add_argument("--start", help="Start date (YYYY-MM-DD); required unless --scene")
+    parser.add_argument("--end", help="End date (YYYY-MM-DD); required unless --scene")
+    parser.add_argument(
+        "--scene",
+        nargs="+",
+        metavar="NAME",
+        help="Exact product name(s) to fetch; bbox, dates and levels are then ignored",
+    )
     parser.add_argument("--out", type=Path, default=Path("../data/raw"), help="Output directory")
     parser.add_argument(
         "--level",
@@ -60,7 +65,10 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         action="store_true",
         help="Only list the matching products, do not download",
     )
-    return parser.parse_args(argv)
+    args = parser.parse_args(argv)
+    if not args.scene and not (args.start and args.end):
+        parser.error("--start and --end are required unless --scene is given")
+    return args
 
 
 def bbox_to_wkt(min_lon: float, min_lat: float, max_lon: float, max_lat: float) -> str:
@@ -98,17 +106,19 @@ def main(argv: list[str] | None = None) -> int:
         print("asf_search is not installed. Run `uv sync` inside pipeline/.", file=sys.stderr)
         return 1
 
-    wkt = bbox_to_wkt(*args.bbox)
-
-    print(f"Searching NISAR {'/'.join(args.level)} for {args.start} → {args.end}")
-    results = asf.geo_search(
-        dataset="NISAR",
-        processingLevel=args.level,
-        intersectsWith=wkt,
-        start=args.start,
-        end=args.end,
-        maxResults=args.max_results,
-    )
+    if args.scene:
+        print(f"Looking up {len(args.scene)} product(s) by name")
+        results = asf.granule_search(args.scene)
+    else:
+        print(f"Searching NISAR {'/'.join(args.level)} for {args.start} → {args.end}")
+        results = asf.geo_search(
+            dataset="NISAR",
+            processingLevel=args.level,
+            intersectsWith=bbox_to_wkt(*args.bbox),
+            start=args.start,
+            end=args.end,
+            maxResults=args.max_results,
+        )
 
     print(f"Found {len(results)} product(s)")
     for product in results:
