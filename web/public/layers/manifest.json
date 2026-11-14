@@ -1,0 +1,157 @@
+{
+  "version": 1,
+  "bounds": [
+    -8.35,
+    40.45,
+    -7.95,
+    40.85
+  ],
+  "layers": [
+    {
+      "id": "coh_D52_20260629_20260711",
+      "kind": "coh",
+      "file": "coh_D52_20260629_20260711.png",
+      "orbit": "D52",
+      "dates": [
+        "2026-06-29",
+        "2026-07-11"
+      ],
+      "title": "Coherence, 29 Jun to 11 Jul",
+      "units": "coherence",
+      "range": [
+        0.0,
+        1.0
+      ],
+      "colormap": "gray",
+      "source": "run.py --mock (synthetic, task T2b)",
+      "caveat": "Synthetic mock layer for development; not real satellite data. The dark ellipse is the fake burn scar."
+    },
+    {
+      "id": "coh_D52_20260711_20260723",
+      "kind": "coh",
+      "file": "coh_D52_20260711_20260723.png",
+      "orbit": "D52",
+      "dates": [
+        "2026-07-11",
+        "2026-07-23"
+      ],
+      "title": "Coherence, 11 Jul to 23 Jul (control)",
+      "units": "coherence",
+      "range": [
+        0.0,
+        1.0
+      ],
+      "colormap": "gray",
+      "source": "run.py --mock (synthetic, task T2b)",
+      "caveat": "Synthetic mock layer for development; not real satellite data. Control pair: no change expected after the fire."
+    },
+    {
+      "id": "hh_D52_20260629",
+      "kind": "hh",
+      "file": "hh_D52_20260629.png",
+      "orbit": "D52",
+      "dates": [
+        "2026-06-29"
+      ],
+      "title": "Backscatter HH, 29 Jun",
+      "units": "dB",
+      "range": [
+        -20.0,
+        -4.0
+      ],
+      "colormap": "viridis",
+      "source": "run.py --mock (synthetic, task T2b)",
+      "caveat": "Synthetic mock layer for development; not real satellite data. Speckle and terrain are invented."
+    },
+    {
+      "id": "hh_D52_20260711",
+      "kind": "hh",
+      "file": "hh_D52_20260711.png",
+      "orbit": "D52",
+      "dates": [
+        "2026-07-11"
+      ],
+      "title": "Backscatter HH, 11 Jul",
+      "units": "dB",
+      "range": [
+        -20.0,
+        -4.0
+      ],
+      "colormap": "viridis",
+      "source": "run.py --mock (synthetic, task T2b)",
+      "caveat": "Synthetic mock layer for development; not real satellite data. Speckle and terrain are invented."
+    },
+    {
+      "id": "hv_D52_20260629",
+      "kind": "hv",
+      "file": "hv_D52_20260629.png",
+      "orbit": "D52",
+      "dates": [
+        "2026-06-29"
+      ],
+      "title": "Backscatter HV, 29 Jun",
+      "units": "dB",
+      "range": [
+        -24.0,
+        -8.0
+      ],
+      "colormap": "magma",
+      "source": "run.py --mock (synthetic, task T2b)",
+      "caveat": "Synthetic mock layer for development; not real satellite data. Speckle and terrain are invented."
+    },
+    {
+      "id": "hv_D52_20260711",
+      "kind": "hv",
+      "file": "hv_D52_20260711.png",
+      "orbit": "D52",
+      "dates": [
+        "2026-07-11"
+      ],
+      "title": "Backscatter HV, 11 Jul",
+      "units": "dB",
+      "range": [
+        -24.0,
+        -8.0
+      ],
+      "colormap": "magma",
+      "source": "run.py --mock (synthetic, task T2b)",
+      "caveat": "Synthetic mock layer for development; not real satellite data. The scar darkens only slightly, as in the real data."
+    },
+    {
+      "id": "s2_20260628",
+      "kind": "s2",
+      "file": "s2_20260628.png",
+      "orbit": null,
+      "dates": [
+        "2026-06-28"
+      ],
+      "title": "Sentinel-2 true color, 28 Jun",
+      "units": "RGB",
+      "range": [
+        0.0,
+        255.0
+      ],
+      "colormap": "rgb",
+      "source": "run.py --mock (synthetic, task T2b)",
+      "caveat": "Synthetic mock layer for development; not real satellite data. Colors are invented, not Sentinel-2 data."
+    },
+    {
+      "id": "s2_20260712",
+      "kind": "s2",
+      "file": "s2_20260712.png",
+      "orbit": null,
+      "dates": [
+        "2026-07-12"
+      ],
+      "title": "Sentinel-2 true color, 12 Jul",
+      "units": "RGB",
+      "range": [
+        0.0,
+        255.0
+      ],
+      "colormap": "rgb",
+      "source": "run.py --mock (synthetic, task T2b)",
+      "caveat": "Synthetic mock layer for development; not real satellite data. Colors are invented, not Sentinel-2 data."
+    }
+  ]
+}
