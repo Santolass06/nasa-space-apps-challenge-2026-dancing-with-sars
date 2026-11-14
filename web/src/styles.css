@@ -362,10 +362,6 @@ h1 {
 }
 
 .picker {
-  position: absolute;
-  top: 0.75rem;
-  left: 0.75rem;
-  z-index: 3;
   display: flex;
   gap: 0.5rem;
   padding: 0.5rem;
@@ -396,12 +392,18 @@ h1 {
 }
 
 .legend-stack {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.map-hud {
   position: absolute;
   top: 0.75rem;
-  right: 0.75rem;
+  left: 0.75rem;
   z-index: 3;
   display: grid;
   gap: 0.4rem;
+  max-width: calc(100% - 1.5rem);
 }
 
 .legend {
@@ -526,6 +528,37 @@ h1 {
     top: auto;
     order: -1;
     height: 55vh;
+  }
+}
+
+@media (max-width: 640px) {
+  .map-hud {
+    top: 0.5rem;
+    right: 0.5rem;
+    left: 0.5rem;
+    max-width: none;
+  }
+
+  .picker {
+    flex-wrap: wrap;
+  }
+
+  .picker__field {
+    flex: 1;
+    min-width: 8rem;
+  }
+
+  .picker__field select {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .legend {
+    width: auto;
+  }
+
+  .legend__caveat {
+    -webkit-line-clamp: 2;
   }
 }
 
