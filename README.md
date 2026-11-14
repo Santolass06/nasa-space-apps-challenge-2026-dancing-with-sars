@@ -6,7 +6,7 @@ Portugal's 2026 season, told with NISAR radar.
 [![CI](https://github.com/Santolass06/nasa-space-apps-challenge-2026-dancing-with-sars/actions/workflows/ci.yml/badge.svg)](https://github.com/Santolass06/nasa-space-apps-challenge-2026-dancing-with-sars/actions/workflows/ci.yml)
 
 An open-source, interactive web story about the **Vouzela / Serra do Caramulo wildfire**
-(2–5 July 2026, 12,804 ha burned) built only with radar remote sensing from the
+(2–5 July 2026, 12,829 ha burned per ICNF) built only with radar remote sensing from the
 **NASA-ISRO NISAR** mission: what happened, how the L-band radar saw it through the smoke, and
 what came after.
 
