@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: NASA Space Apps Challenge
+    url: https://www.spaceappschallenge.org/2026/challenges/dancing-with-the-sars/
+    about: Official challenge page, rules and resources.
+  - name: NASA Earthdata / ASF support
+    url: https://asf.alaska.edu/
+    about: Help with NISAR data access and product formats.

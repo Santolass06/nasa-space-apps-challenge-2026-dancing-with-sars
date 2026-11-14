@@ -1,0 +1,36 @@
+name: Feature request
+description: Suggest an idea for the app, the data pipeline or the story
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What part of the challenge would this help with?
+      placeholder: "As a visitor, I want to compare two dates on the map so that…"
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: Describe the idea, sketch or reference.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Frontend / visualisation
+        - Backend / API
+        - Data / NISAR processing
+        - Storytelling / content
+        - Documentation / tooling

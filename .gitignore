@@ -1,0 +1,66 @@
+# --- Environment / secrets -------------------------------------------------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+.netrc
+.earthdata/
+
+# --- Data (never commit datasets) ------------------------------------------
+data/raw/*
+data/interim/*
+data/processed/*
+!data/raw/.gitkeep
+!data/interim/.gitkeep
+!data/processed/.gitkeep
+*.h5
+*.hdf5
+*.nc
+*.tif
+*.tiff
+*.jp2
+*.zip
+*.SAFE/
+*.grd
+*.slc
+
+# --- Python ----------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.ipynb_checkpoints/
+dist/
+build/
+pip-wheel-metadata/
+
+# --- Node / frontend -------------------------------------------------------
+node_modules/
+frontend/dist/
+frontend/.vite/
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+coverage/
+*.tsbuildinfo
+
+# --- Editors / OS ----------------------------------------------------------
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# --- Notebooks -------------------------------------------------------------
+notebooks/**/*.executed.ipynb
+
+# --- Logs / misc -----------------------------------------------------------
+*.log
+.cache/
+tmp/

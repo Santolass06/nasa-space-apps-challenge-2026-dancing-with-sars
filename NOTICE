@@ -1,0 +1,46 @@
+Dancing with the SARs
+NASA Space Apps Challenge 2026
+Copyright 2026 The Dancing with the SARs team
+
+This product is released under the Apache License, Version 2.0 (see LICENSE).
+
+--------------------------------------------------------------------------------
+DATA ATTRIBUTION
+--------------------------------------------------------------------------------
+
+NISAR (NASA-ISRO Synthetic Aperture Radar)
+  Data provided by NASA/JPL-Caltech and the Indian Space Research Organisation
+  (ISRO), archived and distributed by the Alaska Satellite Facility (ASF) DAAC
+  and NASA Earthdata. NASA Earth science data are free and open, with no
+  restrictions on use: https://www.earthdata.nasa.gov/about/esdis-policy
+
+  Required acknowledgement (adapt when finalising the submission):
+  "NISAR data courtesy of NASA/JPL-Caltech and ISRO, accessed through the ASF
+  DAAC and NASA Earthdata."
+
+Other Space Agency Partner data (e.g. CSA RADARSAT-1/RCM, CONAE SAOCOM) is used
+only where explicitly permitted by the provider's data policy; each source and
+its license is recorded in docs/data-sources.md.
+
+--------------------------------------------------------------------------------
+SOFTWARE DEPENDENCIES
+--------------------------------------------------------------------------------
+
+Third-party libraries keep their original licenses. The main dependencies and
+licenses are:
+
+  FastAPI, Uvicorn, Pydantic        MIT / BSD-3-Clause
+  NumPy, SciPy, Xarray              BSD-3-Clause
+  Rasterio, rioxarray               BSD-3-Clause
+  React, React DOM, Vite            MIT
+  MapLibre GL JS                    BSD-3-Clause
+
+Run `pip-licenses` / `npm ls` before the final submission to produce a complete,
+up-to-date inventory, and cite every source in the Space Apps project form.
+
+--------------------------------------------------------------------------------
+TRADEMARKS
+--------------------------------------------------------------------------------
+
+NASA, NISAR, ISRO and other names and logos are trademarks of their respective
+owners. They are used here for identification only and do not imply endorsement.
