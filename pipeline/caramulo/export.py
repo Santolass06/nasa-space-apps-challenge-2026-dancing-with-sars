@@ -137,6 +137,28 @@ def write_png(path: Path | str, rgba: np.ndarray) -> Path:
     return path
 
 
+def read_png(path: Path | str) -> np.ndarray:
+    """Read an 8-bit RGBA PNG written by write_png back into an (h, w, 4) uint8 array.
+
+    Only our own outputs are supported (filter byte 0 per scanline, no interlace).
+    """
+    data = Path(path).read_bytes()
+    if data[:8] != b"\x89PNG\r\n\x1a\n":
+        raise ValueError(f"{path} is not a PNG")
+    pos, chunks = 8, {}
+    while pos < len(data):
+        (length,) = struct.unpack(">I", data[pos : pos + 4])
+        tag = data[pos + 4 : pos + 8]
+        chunks[tag] = data[pos + 8 : pos + 8 + length]
+        pos += 12 + length
+    width, height, depth, color = struct.unpack(">IIBB", chunks[b"IHDR"][:10])
+    if (depth, color) != (8, 6):
+        raise ValueError(f"{path}: only 8-bit RGBA PNGs are supported ({depth=}, {color=})")
+    raw = zlib.decompress(chunks[b"IDAT"])
+    rows = np.frombuffer(raw, np.uint8).reshape(height, 1 + 4 * width)
+    return rows[:, 1:].reshape(height, width, 4)
+
+
 def layer_entry(
     *,
     layer_id: str,
