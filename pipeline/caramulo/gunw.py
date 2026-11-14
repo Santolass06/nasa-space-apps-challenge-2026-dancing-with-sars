@@ -19,7 +19,7 @@ from pathlib import Path
 import h5py
 import numpy as np
 import rasterio
-from rasterio.crs import CRS
+from rasterio.crs import CRS as RioCRS
 from rasterio.transform import from_bounds, from_origin
 from rasterio.warp import Resampling, reproject
 
@@ -74,10 +74,10 @@ def _read_dataset(f: h5py.File, path: str) -> np.ndarray:
     return np.asarray(dataset[()])
 
 
-def _crs_from_projection(raw: np.ndarray | bytes) -> CRS:
+def _crs_from_projection(raw: np.ndarray | bytes) -> RioCRS:
     """GUNW stores the projection as a scalar EPSG code (uint32)."""
     value = int(np.asarray(raw).reshape(-1)[0])
-    return CRS.from_epsg(value)
+    return RioCRS.from_epsg(value)
 
 
 def _transform(x: np.ndarray, y: np.ndarray) -> rasterio.Affine:
