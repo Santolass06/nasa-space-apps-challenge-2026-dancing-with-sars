@@ -48,35 +48,98 @@
       "title": "The fire",
       "steps": [
         {
-          "id": "ignition-and-evacuations",
-          "text": "The fire was reported near Tourelhe, in Vouzela, at 03:04 local time on 2 July. As it spread, residents of Matadagase and Mansores, in Tondela, were evacuated.",
+          "id": "ignition",
+          "text": "The wildfire was reported near Tourelhe, in Vouzela, at 03:04 local time on 2 July 2026.",
           "layers": [
             {
-              "id": "places_labels",
-              "caption": "The labels locate communities mentioned in reports of the fire."
+              "id": "places",
+              "caption": "The Tourelhe marker locates the reported ignition area."
             }
           ],
           "mapView": {
-            "bounds": [-8.50, 40.45, -7.95, 40.85]
+            "bounds": [
+              -8.5,
+              40.45,
+              -7.95,
+              40.85
+            ]
           },
-          "comparisons": []
+          "comparisons": [],
+          "sources": [
+            "https://executivedigest.sapo.pt/?p=788227",
+            "https://www.icnf.pt/api/file/doc/d305b338642255f3"
+          ]
         },
         {
-          "id": "radar-overpass",
-          "text": "NISAR passed over the region on 4 July while the fire was still active. The fire was reported under control at 12:40 local time on 5 July.",
+          "id": "evacuations",
+          "text": "During the wildfire, residents were evacuated from Matadegas and Mansores in Tondela.",
           "layers": [
             {
-              "id": "amp_HH_D124_20260704",
-              "caption": "This radar image shows the landscape as observed during the 4 July overpass."
+              "id": "places",
+              "caption": "The map locates the two communities reported evacuated."
             }
           ],
           "mapView": {
-            "bounds": [-8.50, 40.45, -7.95, 40.85]
+            "bounds": [
+              -8.5,
+              40.45,
+              -7.95,
+              40.85
+            ]
           },
-          "comparisons": []
+          "comparisons": [],
+          "sources": [
+            "https://www.sabado.pt/portugal/amp/duas-aldeias-evacuadas-em-tondela-por-causa-do-incendio-de-vouzela"
+          ]
+        },
+        {
+          "id": "fire-contained",
+          "text": "The fire was reported under control at 12:40 local time on 5 July 2026.",
+          "layers": [
+            {
+              "id": "places",
+              "caption": "The map shows communities and landmarks associated with the fire."
+            }
+          ],
+          "mapView": {
+            "bounds": [
+              -8.5,
+              40.45,
+              -7.95,
+              40.85
+            ]
+          },
+          "comparisons": [],
+          "sources": [
+            "https://executivedigest.sapo.pt/?p=788227"
+          ]
+        },
+        {
+          "id": "cambarinho",
+          "text": "The wildfire burned through the Cambarinho Botanical Reserve.",
+          "layers": [
+            {
+              "id": "places",
+              "caption": "The reserve marker is located at the start of the Cambarinho walking trail."
+            }
+          ],
+          "mapView": {
+            "bounds": [
+              -8.5,
+              40.45,
+              -7.95,
+              40.85
+            ]
+          },
+          "comparisons": [],
+          "sources": [
+            "https://executivedigest.sapo.pt/?p=788227",
+            "https://www.visitviseudaolafoes.pt/wp-content/uploads/2024/07/Folheto_A4_PR-Cambarinho-VZL-5Jun-1.pdf"
+          ]
         }
       ]
     },
+
     {
       "id": "scar",
       "title": "The fire scar",
