@@ -142,7 +142,7 @@ Foi o maior incêndio de 2026 em Portugal: 12.828,9 hectares (ICNF, REE_2026_004
 | --- | --- | --- |
 | Início | 2 jul 2026, 03:04, Tourelhe (freguesia de Cambra e Carvalhal de Ermidas, Vouzela) | [Lusa](https://executivedigest.sapo.pt/?p=788227) |
 | Dominado | 5 jul 2026, 12:40 | [Lusa](https://executivedigest.sapo.pt/?p=788227) |
-| Área ardida | 12.828,9 ha (ICNF, REE_2026_004, p. 6); a imprensa da época falava em 12.804 ha (provisório) e 13–15 mil ha | ICNF (REE_2026_004); [Agroportal / Lusa](https://www.agroportal.pt/?p=1265118) |
+| Área ardida | 12.828,9 ha (ICNF, REE_2026_004, p. 6); a imprensa da época falava em 12.804 ha (provisório) e 13–15 mil ha | [ICNF REE_2026_004](https://www.icnf.pt/api/file/doc/d305b338642255f3); [Agroportal / Lusa](https://www.agroportal.pt/?p=1265118) |
 | Concelhos afetados | Vouzela, Oliveira de Frades, Tondela e serra do Caramulo | [Lusa](https://www.agroportal.pt/incendios-sul-da-europa-enfrenta-inicio-precoce-da-epoca-de-fogos-florestais/) |
 | Velocidade | Chegou a cerca de 600 ha por hora | [Sábado](https://www.sabado.pt/portugal/amp/incendios-fogo-em-vouzela-ja-queimou-13-mil-hectares-e-e-o-mais-preocupante) |
 | Impacto humano | Aldeias evacuadas (ex.: Matadagase, Mansores, em Tondela); dezenas de feridos | [Sábado](https://www.sabado.pt/portugal/amp/duas-aldeias-evacuadas-em-tondela-por-causa-do-incendio-de-vouzela) |
@@ -272,4 +272,4 @@ Estas questões não estão confirmadas. Quem as esclarecer atualiza esta lista.
 - [Maiores incêndios de 2026 (Lusa / Agroportal)](https://www.agroportal.pt/?p=1265118)
 - [Fogo de Vouzela a 600 ha por hora (Sábado)](https://www.sabado.pt/portugal/amp/incendios-fogo-em-vouzela-ja-queimou-13-mil-hectares-e-e-o-mais-preocupante)
 - [Aldeias evacuadas em Tondela (Sábado)](https://www.sabado.pt/portugal/amp/duas-aldeias-evacuadas-em-tondela-por-causa-do-incendio-de-vouzela)
-- [Relatório provisório de incêndios rurais 2026 (ICNF)](https://www.icnf.pt/api/file/doc/9e38ce228977356f)
+- [Relatório de estabilização de emergência, incêndio rural de Tourelhe, REE_2026_004 (ICNF, 31 jul 2026)](https://www.icnf.pt/api/file/doc/d305b338642255f3)
