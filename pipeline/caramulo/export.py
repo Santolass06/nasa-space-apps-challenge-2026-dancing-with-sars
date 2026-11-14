@@ -79,13 +79,15 @@ def scalar_rgba(
 
     ``mask`` (default: finite values) marks the visible pixels; everything
     else becomes fully transparent so the web map's basemap shows through.
+    Non-finite values are transparent even where ``mask`` is True: they have no
+    colour to show.
     """
     data = np.asarray(data, dtype=float)
     if vmax <= vmin:
         raise ValueError(f"vmax must be greater than vmin; got vmin={vmin}, vmax={vmax}")
-    if mask is None:
-        mask = np.isfinite(data)
-    data = np.where(np.isfinite(data), data, vmin)
+    finite = np.isfinite(data)
+    mask = finite if mask is None else np.asarray(mask, dtype=bool) & finite
+    data = np.where(finite, data, vmin)
     lut = colormap_lut(colormap)
     scaled = np.clip((data - vmin) / (vmax - vmin), 0.0, 1.0)
     rgb = lut[np.round(scaled * 255.0).astype(np.uint8)]
@@ -115,6 +117,8 @@ def write_png(path: Path | str, rgba: np.ndarray) -> Path:
     if rgba.ndim != 3 or rgba.shape[-1] != 4:
         raise ValueError(f"rgba must be (h, w, 4); got shape {rgba.shape}")
     height, width = rgba.shape[:2]
+    if height <= 0 or width <= 0:
+        raise ValueError(f"PNG dimensions must be positive; got {width}x{height}")
 
     def chunk(tag: bytes, payload: bytes) -> bytes:
         return (
@@ -145,16 +149,20 @@ def read_png(path: Path | str) -> np.ndarray:
     data = Path(path).read_bytes()
     if data[:8] != b"\x89PNG\r\n\x1a\n":
         raise ValueError(f"{path} is not a PNG")
-    pos, chunks = 8, {}
+    pos, chunks, idat = 8, {}, []
     while pos < len(data):
         (length,) = struct.unpack(">I", data[pos : pos + 4])
         tag = data[pos + 4 : pos + 8]
-        chunks[tag] = data[pos + 8 : pos + 8 + length]
+        payload = data[pos + 8 : pos + 8 + length]
+        if tag == b"IDAT":  # the PNG spec allows the stream to span several IDAT chunks
+            idat.append(payload)
+        else:
+            chunks[tag] = payload
         pos += 12 + length
     width, height, depth, color = struct.unpack(">IIBB", chunks[b"IHDR"][:10])
     if (depth, color) != (8, 6):
         raise ValueError(f"{path}: only 8-bit RGBA PNGs are supported ({depth=}, {color=})")
-    raw = zlib.decompress(chunks[b"IDAT"])
+    raw = zlib.decompress(b"".join(idat))
     rows = np.frombuffer(raw, np.uint8).reshape(height, 1 + 4 * width)
     return rows[:, 1:].reshape(height, width, 4)
 
@@ -226,3 +234,54 @@ def write_geojson(path: Path | str, features: list[tuple[BaseGeometry, dict]]) -
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(collection, indent=2) + "\n")
     return path
+
+
+if __name__ == "__main__":
+    import struct as _st
+    import tempfile
+    import zlib as _z
+
+    tmp = Path(tempfile.mkdtemp())
+    rng = np.random.default_rng(0)
+
+    # write_png / read_png round trip
+    img = rng.integers(0, 256, size=(9, 13, 4), dtype=np.uint8)
+    assert np.array_equal(read_png(write_png(tmp / "a.png", img)), img)
+
+    # read_png accepts the compressed stream split over two IDAT chunks
+    raw = b"".join(b"\x00" + row.tobytes() for row in img)
+    z = _z.compress(raw)
+    cut = len(z) // 2
+
+    def _chunk(tag, payload):
+        return (
+            _st.pack(">I", len(payload)) + tag + payload + _st.pack(">I", _z.crc32(tag + payload))
+        )
+
+    two = (
+        b"\x89PNG\r\n\x1a\n"
+        + _chunk(b"IHDR", _st.pack(">IIBBBBB", 13, 9, 8, 6, 0, 0, 0))
+        + _chunk(b"IDAT", z[:cut])
+        + _chunk(b"IDAT", z[cut:])
+        + _chunk(b"IEND", b"")
+    )
+    (tmp / "two.png").write_bytes(two)
+    assert np.array_equal(read_png(tmp / "two.png"), img)
+
+    # NaN is transparent even inside an explicit mask
+    out = scalar_rgba(np.array([[np.nan, 0.5]]), "gray", 0.0, 1.0, mask=np.array([[True, True]]))
+    assert out[0, 0, 3] == 0 and out[0, 1, 3] == 255
+
+    # a PNG needs positive dimensions
+    for bad in (
+        np.zeros((0, 0, 4), np.uint8),
+        np.zeros((0, 5, 4), np.uint8),
+        np.zeros((5, 0, 4), np.uint8),
+    ):
+        try:
+            write_png(tmp / "bad.png", bad)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError(f"write_png accepted shape {bad.shape}")
+    print("export self-check ok")

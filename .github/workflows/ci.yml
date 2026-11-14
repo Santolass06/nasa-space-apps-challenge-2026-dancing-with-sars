@@ -22,8 +22,8 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install ruff
-        run: pip install ruff
+      - name: Install ruff and numpy
+        run: pip install ruff numpy
 
       - name: Lint
         run: ruff check .
@@ -33,6 +33,9 @@ jobs:
 
       - name: Grid self-check
         run: python -m caramulo.grid
+
+      - name: Export self-check
+        run: python -m caramulo.export
 
   web:
     name: Web (type-check + build)
