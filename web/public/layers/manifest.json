@@ -188,6 +188,8 @@
       "colormap": "rgb",
       "source": "Contains modified Copernicus Sentinel data 2026, accessed via Earth Search (Element 84): S2A_29TNF_20260709_0_L2A, S2A_29TNE_20260709_0_L2A",
       "caveat": "The burn scar is visible, but clouds obscure parts of its western edge."
+    },
+    {
       "id": "coh_D52_20260617_20260629",
       "kind": "coh",
       "file": "coh_D52_20260617_20260629.png",
