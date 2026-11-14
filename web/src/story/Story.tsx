@@ -2,6 +2,7 @@ import type { Map as MapLibreMap } from "maplibre-gl";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import CompareView from "../map/CompareView";
+import LayerPicker from "../map/LayerPicker";
 import MapView from "../map/MapView";
 import { LayerManager } from "../map/layers";
 import { loadManifest, type Layer, type Manifest } from "../map/manifest";
@@ -222,6 +223,14 @@ export default function Story() {
 
       <div className="story__map">
         <MapView className="story__map-view" onReady={onMapReady} />
+        {current?.step.id === "explore-the-map" && manifest && (
+          <LayerPicker
+            manifest={manifest}
+            onPick={(id) => {
+              managerRef.current?.showLayers([id]);
+            }}
+          />
+        )}
         {comparison && (
           <div className="story__overlay">
             <CompareView
