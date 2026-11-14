@@ -24,6 +24,7 @@ Examples (run inside pipeline/):
 from __future__ import annotations
 
 import argparse
+import json
 from pathlib import Path
 
 import numpy as np
@@ -236,7 +237,20 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         default=LAYERS_DIR,
         help="output directory (default: web/public/layers)",
     )
+    parser.add_argument(
+        "--force",
+        action="store_true",
+        help="overwrite a manifest that already lists real (non-synthetic) layers",
+    )
     return parser.parse_args(argv)
+
+
+def _real_layer_count(manifest_path: Path) -> int:
+    """Layers in the manifest that did not come from --mock."""
+    if not manifest_path.exists():
+        return 0
+    data = json.loads(manifest_path.read_text())
+    return sum(1 for layer in data.get("layers", []) if "synthetic" not in str(layer.get("source", "")))
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -245,6 +259,14 @@ def main(argv: list[str] | None = None) -> int:
         raise SystemExit(
             "Nothing to do: only --mock is implemented so far (task T2b). Real steps "
             "arrive with A2 (gunw.py), B2 (gcov.py) and B3 (s2.py); see docs/PLAN.md."
+        )
+    manifest_path = args.out / "manifest.json"
+    real = _real_layer_count(manifest_path)
+    if real and not args.force:
+        raise SystemExit(
+            f"{manifest_path} already lists {real} real layer(s): --mock would replace them "
+            "with synthetic entries and leave the real PNGs orphaned. "
+            "Pass --force to overwrite anyway."
         )
     entries = mock_layers(args.out)
     manifest = export.write_manifest(args.out / "manifest.json", entries)
