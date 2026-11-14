@@ -9,7 +9,7 @@
           "text": "Explore the Serra do Caramulo in central Portugal, where the July 2026 wildfire began near Tourelhe.",
           "layers": [
             {
-              "id": "opt_S2_20260628",
+              "id": "s2_20260629",
               "caption": "This satellite image shows the hills and valleys of the Serra do Caramulo before the wildfire."
             }
           ],
@@ -28,11 +28,11 @@
           "text": "Move the slider to see how two satellites show the same landscape.",
           "layers": [
             {
-              "id": "opt_S2_20260628",
+              "id": "s2_20260629",
               "caption": "This image uses reflected sunlight to show the landscape in natural colour."
             },
             {
-              "id": "amp_HH_D52_20260629",
+              "id": "hh_D52_20260629",
               "caption": "In this radar image, brighter areas sent a stronger echo back to the satellite."
             }
           ],
@@ -46,8 +46,8 @@
           },
           "comparisons": [
             {
-              "leftLayerId": "opt_S2_20260628",
-              "rightLayerId": "amp_HH_D52_20260629"
+              "leftLayerId": "s2_20260629",
+              "rightLayerId": "hh_D52_20260629"
             }
           ]
         }
@@ -190,7 +190,7 @@
               "caption": "This image shows where radar echoes were less similar between the passes on 29 June and 11 July."
             },
             {
-              "id": "burn_area_official_icnf",
+              "id": "burn_official",
               "caption": "The outline marks the area that Portugal’s forest agency, ICNF, mapped as burned."
             }
           ],
@@ -215,11 +215,11 @@
           "text": "Compare two radar channels from the same overpass and look for areas that appear bright in one channel and dark in the other.",
           "layers": [
             {
-              "id": "amp_HH_D52_20260711",
+              "id": "hh_D52_20260711",
               "caption": "In this HH image, the radar sent and received waves in the same orientation."
             },
             {
-              "id": "amp_HV_D52_20260711",
+              "id": "hv_D52_20260711",
               "caption": "In this HV image, the radar received echoes turned sideways, which can happen when waves scatter through branches and leaves."
             }
           ],
@@ -233,8 +233,8 @@
           },
           "comparisons": [
             {
-              "leftLayerId": "amp_HH_D52_20260711",
-              "rightLayerId": "amp_HV_D52_20260711"
+              "leftLayerId": "hh_D52_20260711",
+              "rightLayerId": "hv_D52_20260711"
             }
           ]
         },
@@ -243,7 +243,7 @@
           "text": "Radar brightness measures the strength of a return from one pass, while coherence measures how similar the radar signals were across two passes.",
           "layers": [
             {
-              "id": "amp_HH_D52_20260711",
+              "id": "hh_D52_20260711",
               "caption": "One possible reason some burned areas still appear bright is that standing trunks may continue to reflect radar waves."
             },
             {
@@ -261,7 +261,7 @@
           },
           "comparisons": [
             {
-              "leftLayerId": "amp_HH_D52_20260711",
+              "leftLayerId": "hh_D52_20260711",
               "rightLayerId": "coh_D52_20260629_20260711"
             }
           ]
@@ -277,11 +277,11 @@
           "text": "Compare July and August radar returns to see which parts of the landscape changed after the fire.",
           "layers": [
             {
-              "id": "amp_HH_D52_20260711",
+              "id": "hh_D52_20260711",
               "caption": "The 11 July image shows the strength of the radar return shortly after the fire."
             },
             {
-              "id": "amp_HH_D52_20260816",
+              "id": "hh_D52_20260816",
               "caption": "The 16 August image shows the radar return over the same landscape later in the summer."
             }
           ],
@@ -295,8 +295,8 @@
           },
           "comparisons": [
             {
-              "leftLayerId": "amp_HH_D52_20260711",
-              "rightLayerId": "amp_HH_D52_20260816"
+              "leftLayerId": "hh_D52_20260711",
+              "rightLayerId": "hh_D52_20260816"
             }
           ]
         },
@@ -309,7 +309,7 @@
               "caption": "The July pair shows how similar the radar signals were during the first weeks after the fire."
             },
             {
-              "id": "coh_D52_20261015_20261027",
+              "id": "coh_D52_20261003_20261015",
               "caption": "The October pair shows how similar the radar signals were during a later 12-day period."
             }
           ],
@@ -324,7 +324,7 @@
           "comparisons": [
             {
               "leftLayerId": "coh_D52_20260711_20260723",
-              "rightLayerId": "coh_D52_20261015_20261027"
+              "rightLayerId": "coh_D52_20261003_20261015"
             }
           ]
         }
@@ -339,7 +339,7 @@
           "text": "Tondela and the University of Aveiro began preparing measures to address the effects of the fire in the Serra do Caramulo.",
           "layers": [
             {
-              "id": "burn_area_official_icnf",
+              "id": "burn_official",
               "caption": "The ICNF perimeter gives a geographic reference for discussing post-fire recovery."
             }
           ],
@@ -362,7 +362,7 @@
               "caption": "This coherence map provides a starting point for exploring the changes observed across the fire."
             },
             {
-              "id": "burn_area_official_icnf",
+              "id": "burn_official",
               "caption": "The ICNF outline helps you compare the radar signal inside and outside the mapped burned area."
             }
           ],
