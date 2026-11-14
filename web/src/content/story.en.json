@@ -10,11 +10,16 @@
           "layers": [
             {
               "id": "opt_S2_20260628",
-              "caption": "This optical image shows the mountains and valleys before the fire."
+              "caption": "This satellite image shows the hills and valleys of the Serra do Caramulo before the wildfire."
             }
           ],
           "mapView": {
-            "bounds": [-8.50, 40.45, -7.95, 40.85]
+            "bounds": [
+              -8.5,
+              40.45,
+              -7.95,
+              40.85
+            ]
           },
           "comparisons": []
         },
@@ -24,15 +29,20 @@
           "layers": [
             {
               "id": "opt_S2_20260628",
-              "caption": "The optical image uses reflected sunlight to show the landscape in natural colour."
+              "caption": "This image uses reflected sunlight to show the landscape in natural colour."
             },
             {
               "id": "amp_HH_D52_20260629",
-              "caption": "In the radar image, brighter pixels show where a stronger radar signal returned to the satellite."
+              "caption": "In this radar image, brighter areas sent a stronger echo back to the satellite."
             }
           ],
           "mapView": {
-            "bounds": [-8.50, 40.45, -7.95, 40.85]
+            "bounds": [
+              -8.5,
+              40.45,
+              -7.95,
+              40.85
+            ]
           },
           "comparisons": [
             {
@@ -139,7 +149,6 @@
         }
       ]
     },
-
     {
       "id": "scar",
       "title": "The fire scar",
@@ -150,15 +159,20 @@
           "layers": [
             {
               "id": "coh_D52_20260629_20260711",
-              "caption": "The pair spanning the fire shows low radar coherence across much of the affected area."
+              "caption": "The radar echoes were less similar across the two passes that bracketed the fire over much of the affected area."
             },
             {
               "id": "coh_D52_20260711_20260723",
-              "caption": "The later pair shows higher coherence across much of the same area."
+              "caption": "In the two passes after the fire, radar echoes were more similar across much of the same area."
             }
           ],
           "mapView": {
-            "bounds": [-8.50, 40.45, -7.95, 40.85]
+            "bounds": [
+              -8.5,
+              40.45,
+              -7.95,
+              40.85
+            ]
           },
           "comparisons": [
             {
@@ -173,15 +187,20 @@
           "layers": [
             {
               "id": "coh_D52_20260629_20260711",
-              "caption": "This map shows how similar the radar signals were between 29 June and 11 July."
+              "caption": "This image shows where radar echoes were less similar between the passes on 29 June and 11 July."
             },
             {
               "id": "burn_area_official_icnf",
-              "caption": "The outline marks the approximately 12,829 hectares mapped by the ICNF for the Tourelhe wildfire."
+              "caption": "The outline marks the area that Portugal’s forest agency, ICNF, mapped as burned."
             }
           ],
           "mapView": {
-            "bounds": [-8.50, 40.45, -7.95, 40.85]
+            "bounds": [
+              -8.5,
+              40.45,
+              -7.95,
+              40.85
+            ]
           },
           "comparisons": []
         }
@@ -197,15 +216,20 @@
           "layers": [
             {
               "id": "amp_HH_D52_20260711",
-              "caption": "HH shows the strength of the horizontally transmitted signal received in horizontal polarisation."
+              "caption": "In this HH image, the radar sent and received waves in the same orientation."
             },
             {
               "id": "amp_HV_D52_20260711",
-              "caption": "HV shows the strength of the horizontally transmitted signal received in vertical polarisation."
+              "caption": "In this HV image, the radar received echoes turned sideways, which can happen when waves scatter through branches and leaves."
             }
           ],
           "mapView": {
-            "bounds": [-8.50, 40.45, -7.95, 40.85]
+            "bounds": [
+              -8.5,
+              40.45,
+              -7.95,
+              40.85
+            ]
           },
           "comparisons": [
             {
@@ -220,15 +244,20 @@
           "layers": [
             {
               "id": "amp_HH_D52_20260711",
-              "caption": "The HH image shows where the radar received stronger or weaker echoes on 11 July."
+              "caption": "One possible reason some burned areas still appear bright is that standing trunks may continue to reflect radar waves."
             },
             {
               "id": "coh_D52_20260629_20260711",
-              "caption": "The coherence map shows where the radar signals were more or less similar across the period that included the fire."
+              "caption": "Lower coherence shows where radar echoes were less alike between the two passes, which can indicate a change on the ground."
             }
           ],
           "mapView": {
-            "bounds": [-8.50, 40.45, -7.95, 40.85]
+            "bounds": [
+              -8.5,
+              40.45,
+              -7.95,
+              40.85
+            ]
           },
           "comparisons": [
             {
@@ -257,7 +286,12 @@
             }
           ],
           "mapView": {
-            "bounds": [-8.50, 40.45, -7.95, 40.85]
+            "bounds": [
+              -8.5,
+              40.45,
+              -7.95,
+              40.85
+            ]
           },
           "comparisons": [
             {
@@ -280,7 +314,12 @@
             }
           ],
           "mapView": {
-            "bounds": [-8.50, 40.45, -7.95, 40.85]
+            "bounds": [
+              -8.5,
+              40.45,
+              -7.95,
+              40.85
+            ]
           },
           "comparisons": [
             {
@@ -305,7 +344,12 @@
             }
           ],
           "mapView": {
-            "bounds": [-8.50, 40.45, -7.95, 40.85]
+            "bounds": [
+              -8.5,
+              40.45,
+              -7.95,
+              40.85
+            ]
           },
           "comparisons": []
         },
@@ -323,7 +367,12 @@
             }
           ],
           "mapView": {
-            "bounds": [-8.50, 40.45, -7.95, 40.85]
+            "bounds": [
+              -8.5,
+              40.45,
+              -7.95,
+              40.85
+            ]
           },
           "comparisons": []
         }
