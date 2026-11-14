@@ -1,0 +1,270 @@
+{
+  "acts": [
+    {
+      "id": "before",
+      "title": "Before the fire",
+      "steps": [
+        {
+          "id": "introduce-caramulo",
+          "text": "Explore the Serra do Caramulo in central Portugal, where the July 2026 wildfire began near Tourelhe.",
+          "layers": [
+            {
+              "id": "opt_S2_20260628",
+              "caption": "This optical image shows the mountains and valleys before the fire."
+            }
+          ],
+          "mapView": {
+            "bounds": [-8.50, 40.45, -7.95, 40.85]
+          },
+          "comparisons": []
+        },
+        {
+          "id": "compare-optical-and-radar",
+          "text": "Move the slider to see how two satellites show the same landscape.",
+          "layers": [
+            {
+              "id": "opt_S2_20260628",
+              "caption": "The optical image uses reflected sunlight to show the landscape in natural colour."
+            },
+            {
+              "id": "amp_HH_D52_20260629",
+              "caption": "In the radar image, brighter pixels show where a stronger radar signal returned to the satellite."
+            }
+          ],
+          "mapView": {
+            "bounds": [-8.50, 40.45, -7.95, 40.85]
+          },
+          "comparisons": [
+            {
+              "leftLayerId": "opt_S2_20260628",
+              "rightLayerId": "amp_HH_D52_20260629"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fire",
+      "title": "The fire",
+      "steps": [
+        {
+          "id": "ignition-and-evacuations",
+          "text": "The fire was reported near Tourelhe, in Vouzela, at 03:04 local time on 2 July. As it spread, residents of Matadagase and Mansores, in Tondela, were evacuated.",
+          "layers": [
+            {
+              "id": "places_labels",
+              "caption": "The labels locate communities mentioned in reports of the fire."
+            }
+          ],
+          "mapView": {
+            "bounds": [-8.50, 40.45, -7.95, 40.85]
+          },
+          "comparisons": []
+        },
+        {
+          "id": "radar-overpass",
+          "text": "NISAR passed over the region on 4 July while the fire was still active. The fire was reported under control at 12:40 local time on 5 July.",
+          "layers": [
+            {
+              "id": "amp_HH_D124_20260704",
+              "caption": "This radar image shows the landscape as observed during the 4 July overpass."
+            }
+          ],
+          "mapView": {
+            "bounds": [-8.50, 40.45, -7.95, 40.85]
+          },
+          "comparisons": []
+        }
+      ]
+    },
+    {
+      "id": "scar",
+      "title": "The fire scar",
+      "steps": [
+        {
+          "id": "compare-fire-and-control",
+          "text": "Compare the radar measurements across the fire with those from the following 12 days.",
+          "layers": [
+            {
+              "id": "coh_D52_20260629_20260711",
+              "caption": "The pair spanning the fire shows low radar coherence across much of the affected area."
+            },
+            {
+              "id": "coh_D52_20260711_20260723",
+              "caption": "The later pair shows higher coherence across much of the same area."
+            }
+          ],
+          "mapView": {
+            "bounds": [-8.50, 40.45, -7.95, 40.85]
+          },
+          "comparisons": [
+            {
+              "leftLayerId": "coh_D52_20260629_20260711",
+              "rightLayerId": "coh_D52_20260711_20260723"
+            }
+          ]
+        },
+        {
+          "id": "compare-with-official-perimeter",
+          "text": "Use the official ICNF perimeter to see where the low-coherence pattern overlaps the mapped burned area.",
+          "layers": [
+            {
+              "id": "coh_D52_20260629_20260711",
+              "caption": "This map shows how similar the radar signals were between 29 June and 11 July."
+            },
+            {
+              "id": "burn_area_official_icnf",
+              "caption": "The outline marks the approximately 12,829 hectares mapped by the ICNF for the Tourelhe wildfire."
+            }
+          ],
+          "mapView": {
+            "bounds": [-8.50, 40.45, -7.95, 40.85]
+          },
+          "comparisons": []
+        }
+      ]
+    },
+    {
+      "id": "radar",
+      "title": "How radar sees change",
+      "steps": [
+        {
+          "id": "compare-hh-and-hv",
+          "text": "Compare two radar channels from the same overpass and look for areas that appear bright in one channel and dark in the other.",
+          "layers": [
+            {
+              "id": "amp_HH_D52_20260711",
+              "caption": "HH shows the strength of the horizontally transmitted signal received in horizontal polarisation."
+            },
+            {
+              "id": "amp_HV_D52_20260711",
+              "caption": "HV shows the strength of the horizontally transmitted signal received in vertical polarisation."
+            }
+          ],
+          "mapView": {
+            "bounds": [-8.50, 40.45, -7.95, 40.85]
+          },
+          "comparisons": [
+            {
+              "leftLayerId": "amp_HH_D52_20260711",
+              "rightLayerId": "amp_HV_D52_20260711"
+            }
+          ]
+        },
+        {
+          "id": "compare-brightness-and-coherence",
+          "text": "Radar brightness measures the strength of a return from one pass, while coherence measures how similar the radar signals were across two passes.",
+          "layers": [
+            {
+              "id": "amp_HH_D52_20260711",
+              "caption": "The HH image shows where the radar received stronger or weaker echoes on 11 July."
+            },
+            {
+              "id": "coh_D52_20260629_20260711",
+              "caption": "The coherence map shows where the radar signals were more or less similar across the period that included the fire."
+            }
+          ],
+          "mapView": {
+            "bounds": [-8.50, 40.45, -7.95, 40.85]
+          },
+          "comparisons": [
+            {
+              "leftLayerId": "amp_HH_D52_20260711",
+              "rightLayerId": "coh_D52_20260629_20260711"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "after",
+      "title": "After the fire",
+      "steps": [
+        {
+          "id": "compare-july-and-august",
+          "text": "Compare July and August radar returns to see which parts of the landscape changed after the fire.",
+          "layers": [
+            {
+              "id": "amp_HH_D52_20260711",
+              "caption": "The 11 July image shows the strength of the radar return shortly after the fire."
+            },
+            {
+              "id": "amp_HH_D52_20260816",
+              "caption": "The 16 August image shows the radar return over the same landscape later in the summer."
+            }
+          ],
+          "mapView": {
+            "bounds": [-8.50, 40.45, -7.95, 40.85]
+          },
+          "comparisons": [
+            {
+              "leftLayerId": "amp_HH_D52_20260711",
+              "rightLayerId": "amp_HH_D52_20260816"
+            }
+          ]
+        },
+        {
+          "id": "compare-july-and-october",
+          "text": "Compare coherence in July and October to see where the radar signals were more consistent between successive passes.",
+          "layers": [
+            {
+              "id": "coh_D52_20260711_20260723",
+              "caption": "The July pair shows how similar the radar signals were during the first weeks after the fire."
+            },
+            {
+              "id": "coh_D52_20261015_20261027",
+              "caption": "The October pair shows how similar the radar signals were during a later 12-day period."
+            }
+          ],
+          "mapView": {
+            "bounds": [-8.50, 40.45, -7.95, 40.85]
+          },
+          "comparisons": [
+            {
+              "leftLayerId": "coh_D52_20260711_20260723",
+              "rightLayerId": "coh_D52_20261015_20261027"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "next",
+      "title": "What comes next?",
+      "steps": [
+        {
+          "id": "local-recovery",
+          "text": "Tondela and the University of Aveiro began preparing measures to address the effects of the fire in the Serra do Caramulo.",
+          "layers": [
+            {
+              "id": "burn_area_official_icnf",
+              "caption": "The ICNF perimeter gives a geographic reference for discussing post-fire recovery."
+            }
+          ],
+          "mapView": {
+            "bounds": [-8.50, 40.45, -7.95, 40.85]
+          },
+          "comparisons": []
+        },
+        {
+          "id": "explore-the-map",
+          "text": "Explore the available dates and layers, then follow the official perimeter to see where the radar pattern changes.",
+          "layers": [
+            {
+              "id": "coh_D52_20260629_20260711",
+              "caption": "This coherence map provides a starting point for exploring the changes observed across the fire."
+            },
+            {
+              "id": "burn_area_official_icnf",
+              "caption": "The ICNF outline helps you compare the radar signal inside and outside the mapped burned area."
+            }
+          ],
+          "mapView": {
+            "bounds": [-8.50, 40.45, -7.95, 40.85]
+          },
+          "comparisons": []
+        }
+      ]
+    }
+  ]
+}
