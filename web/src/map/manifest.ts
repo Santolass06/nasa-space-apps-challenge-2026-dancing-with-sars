@@ -26,13 +26,19 @@ export type Manifest = {
 /** Where the static files live, honouring the Vite base path (GitHub Pages sub-path). */
 export const layersBase = () => `${import.meta.env.BASE_URL}layers/`;
 
+let cached: Promise<Manifest> | undefined;
+
 export async function loadManifest(): Promise<Manifest> {
-  const url = `${layersBase()}manifest.json`;
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new Error(`manifest: HTTP ${response.status} at ${url}`);
-  }
-  return (await response.json()) as Manifest;
+  // One fetch per page: the map, the compare view and the story all share it.
+  cached ??= (async () => {
+    const url = `${layersBase()}manifest.json`;
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`manifest: HTTP ${response.status} at ${url}`);
+    }
+    return (await response.json()) as Manifest;
+  })();
+  return cached;
 }
 
 export function layerUrl(layer: Layer): string {

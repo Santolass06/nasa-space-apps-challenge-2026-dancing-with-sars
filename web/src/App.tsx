@@ -3,6 +3,7 @@ import type { Map as MapLibreMap } from "maplibre-gl";
 import { useCallback, useRef, useState } from "react";
 
 import MapView from "./map/MapView";
+import CompareView from "./map/CompareView";
 import { LayerManager } from "./map/layers";
 import { loadManifest } from "./map/manifest";
 
@@ -72,6 +73,15 @@ export default function App() {
         <section className="map-section" aria-label="Map of the fire area">
           <MapView onReady={onReady} />
           <p className="map-caption">{status}</p>
+        </section>
+
+        <section className="compare-section" aria-label="Before and after the fire">
+          <CompareView
+            before="coh_D52_20260617_20260629"
+            after="coh_D52_20260629_20260711"
+            beforeLabel="17–29 Jun · before the fire"
+            afterLabel="29 Jun–11 Jul · with the fire"
+          />
         </section>
       </main>
 
