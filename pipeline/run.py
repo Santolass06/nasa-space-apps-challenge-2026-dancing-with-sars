@@ -250,7 +250,8 @@ def _real_layer_count(manifest_path: Path) -> int:
     if not manifest_path.exists():
         return 0
     data = json.loads(manifest_path.read_text())
-    return sum(1 for layer in data.get("layers", []) if "synthetic" not in str(layer.get("source", "")))
+    layers = data.get("layers", [])
+    return sum(1 for layer in layers if "synthetic" not in str(layer.get("source", "")))
 
 
 def main(argv: list[str] | None = None) -> int:
