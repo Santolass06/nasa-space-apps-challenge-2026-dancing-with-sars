@@ -51,7 +51,7 @@ Rows marked *verify* have a licence or attribution text still to confirm.
 | NISAR L2 GUNW (coherence) | 2026-06-17 → 2026-07-23 | Vouzela / Caramulo | [ASF Vertex](https://vertex.daac.asf.alaska.edu/) | NASA open | NASA/JPL-Caltech and ISRO, via ASF DAAC. Product names in `PRODUCTS.md` |
 | NISAR L2 GCOV (HH, HV backscatter) | 2026-06 → 2026-10 | Vouzela / Caramulo | [ASF Vertex](https://vertex.daac.asf.alaska.edu/) | NASA open | NASA/JPL-Caltech and ISRO, via ASF DAAC |
 | Sentinel-2 L2A (true colour context) | 2026-06 / 2026-07 | Vouzela / Caramulo | [Earth Search](https://earth-search.aws.element84.com/) (Element 84) | Copernicus free and open (*verify* wording) | Contains modified Copernicus Sentinel data 2026 |
-| Official burned-area perimeter | 2026-07 | Vouzela / Caramulo | EFFIS or ICNF (*verify* which and the format) | *verify* | *verify* |
+| Official burned-area perimeter | 2026-07 | Vouzela / Caramulo | ICNF REE_2026_004 (p. 6: 12.828,9 ha); perimeter file via E1 | *verify* | *verify* |
 | Basemap | n/a | Portugal | OpenFreeMap / OpenStreetMap (*verify* in F0) | ODbL (*verify*) | © OpenStreetMap contributors |
 | Fire facts (start, end, hectares, evacuations) | 2026-07 | Vouzela / Caramulo | News and ICNF, listed in the "Fontes" section of [`DOSSIER.md`](DOSSIER.md) | Cited, not redistributed | Lusa, Agroportal, Sábado, ICNF |
 

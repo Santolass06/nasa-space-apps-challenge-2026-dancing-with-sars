@@ -14,7 +14,7 @@ Aqui está tudo o que precisamos de saber sobre o desafio, sobre o radar e sobre
 ## Resumo em 30 segundos
 
 - **O desafio:** fazer uma app interativa que use imagens de radar do satélite NISAR (NASA + ISRO) para mostrar como uma zona da Terra mudou ao longo do tempo.
-- **O que escolhemos:** o maior incêndio de 2026 em Portugal — Vouzela / Serra do Caramulo, 2 a 5 de julho, 12.804 hectares ardidos.
+- **O que escolhemos:** o maior incêndio de 2026 em Portugal — Vouzela / Serra do Caramulo, 2 a 5 de julho, 12.828,9 hectares ardidos (ICNF, REE_2026_004).
 - **Porquê este:** é o único evento português de 2026 com imagens NISAR antes, durante e depois. A Kristin e as cheias de fevereiro caem num período em que a NASA ainda não publicou os dados.
 - **O que já sabemos:** nos dados NISAR reais, a zona do fogo aparece claramente como “mudança” entre uma imagem de 29 de junho e outra de 11 de julho.
 - **A ideia:** uma história interativa sobre o fogo do Caramulo, contada só com radar — o que aconteceu, como o radar o vê e o que veio depois.
@@ -136,13 +136,13 @@ Se sobrar tempo, Arganil pode ser um segundo capítulo (“a cicatriz de 2026 ao
 
 ## O caso: o incêndio de Vouzela / Caramulo
 
-Foi o maior incêndio de 2026 em Portugal: 12.804 hectares em pouco mais de três dias.
+Foi o maior incêndio de 2026 em Portugal: 12.828,9 hectares (ICNF, REE_2026_004, p. 6) em pouco mais de três dias.
 
 | Facto | Valor | Fonte |
 | --- | --- | --- |
 | Início | 2 jul 2026, 03:04, Tourelhe (freguesia de Cambra e Carvalhal de Ermidas, Vouzela) | [Lusa](https://executivedigest.sapo.pt/?p=788227) |
 | Dominado | 5 jul 2026, 12:40 | [Lusa](https://executivedigest.sapo.pt/?p=788227) |
-| Área ardida | 12.804 ha (ICNF, dados provisórios); notícias da época falam em 13–15 mil ha | [Agroportal / Lusa](https://www.agroportal.pt/?p=1265118) |
+| Área ardida | 12.828,9 ha (ICNF, REE_2026_004, p. 6); a imprensa da época falava em 12.804 ha (provisório) e 13–15 mil ha | ICNF (REE_2026_004); [Agroportal / Lusa](https://www.agroportal.pt/?p=1265118) |
 | Concelhos afetados | Vouzela, Oliveira de Frades, Tondela e serra do Caramulo | [Lusa](https://www.agroportal.pt/incendios-sul-da-europa-enfrenta-inicio-precoce-da-epoca-de-fogos-florestais/) |
 | Velocidade | Chegou a cerca de 600 ha por hora | [Sábado](https://www.sabado.pt/portugal/amp/incendios-fogo-em-vouzela-ja-queimou-13-mil-hectares-e-e-o-mais-preocupante) |
 | Impacto humano | Aldeias evacuadas (ex.: Matadagase, Mansores, em Tondela); dezenas de feridos | [Sábado](https://www.sabado.pt/portugal/amp/duas-aldeias-evacuadas-em-tondela-por-causa-do-incendio-de-vouzela) |
@@ -159,7 +159,7 @@ O sinal do incêndio existe nos dados NISAR reais e vê-se melhor pela coerênci
 
 **Medição nos dados completos (14 nov, tarefas A1/A2):** com os GUNW reais na grelha comum, o diferencial de coerência entre o par do fogo (29 jun → 11 jul) e o par de controlo (11 → 23 jul), suavizado a 1 km, mostra:
 
-- a maior região ligada abaixo de −0,25 tem **13.687 ha** em lon −8,398..−8,130, lat 40,557..40,682 (centroide −8,27, 40,62); a um limiar mais exigente (−0,30) fica com 12.063 ha. O polígono final (A4, após morfologia) tem **13.501 ha** — é o número que a app mostra (`stats.json`). Os números oficiais: 12.160 ha (EFFIS, 3 jul) e 12.804 ha (ICNF, provisório) — a nossa medição bate;
+- a maior região ligada abaixo de −0,25 tem **13.687 ha** em lon −8,398..−8,130, lat 40,557..40,682 (centroide −8,27, 40,62); a um limiar mais exigente (−0,30) fica com 12.063 ha. O polígono final (A4, após morfologia) tem **13.501 ha** — é o número que a app mostra (`stats.json`). O ICNF reporta **12.828,9 ha** (REE_2026_004, p. 6): a nossa medição fica +5,2% acima; a imprensa da época falava em 12.804 ha (provisório) e 13–15 mil ha;
 - dentro da cicatriz, a coerência do par do fogo é **0,24** contra **0,69** no par de controlo (queda de 0,45) — o sinal é forte e localizado;
 - os pares das duas geometrias de observação — A15 e A116 (ascendente) e D52 e D124 (descendente) — mostram todos a mesma queda de coerência dentro da cicatriz (**−0,21 a −0,25**), e o par pré-fogo (17 → 29 jun) não mostra queda (**+0,02**): o sinal não depende da geometria de observação nem da sazonalidade;
 - a mancha é maior do que a elipse das pré-visualizações (caixa de ~22 × 13 km) e está mais a **oeste**: a vertente NW da serra, de Tourelhe (ignição, perto de Cambra) na direção de Águeda. As notícias registam que o fogo atingiu o concelho de Águeda (lon ≈ −8,45), o que é consistente com o que os dados mostram.
@@ -251,7 +251,7 @@ Nomeamos cada órbita pela direção + número do track: **D52** = descendente, 
 
 Estas questões não estão confirmadas. Quem as esclarecer atualiza esta lista.
 
-- **A mancha coincide com o perímetro oficial?** O tamanho bate (12-13,7 mil ha medidos por nós vs 12.804 ha do ICNF), mas o polígono oficial ainda não foi comparado — falta o perímetro (E1).
+- **A mancha coincide com o perímetro oficial?** O tamanho é da mesma ordem (13.501 ha medidos por nós vs 12.828,9 ha do ICNF, +5,2%), mas o polígono oficial ainda não foi comparado — falta o perímetro (E1).
 - **O fumo tapou mesmo os satélites óticos entre 2 e 5 de julho?** Faz sentido, mas ainda não verificámos as imagens Sentinel-2 desses dias. Em Leiria, durante a Kristin, confirmámos que o ótico ficou \~3 semanas sem imagens limpas.
 - **Quanto cai a coerência fora da área ardida no verão?** Vegetação seca também muda; o par de controlo (11 → 23 jul) ajuda a separar.
 - **O brilho HV mostra algo ao longo de julho–outubro?** Hipótese: sim, à medida que as árvores queimadas caem ou são cortadas. Por testar.
