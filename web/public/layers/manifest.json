@@ -264,6 +264,61 @@
       "colormap": "magma",
       "source": "NISAR_L2_PR_GCOV_025_052_D_068_2005_DHDH_A_20260711T193423_20260711T193458_P05023_N_F_J_001.h5",
       "caveat": "Speckle is present. The scar darkens only slightly in backscatter; the standing-trunk explanation in docs/DOSSIER.md is a hypothesis, not a measurement. Coherence is the fire signal."
+    },
+    {
+      "id": "coh_D52_20261003_20261015",
+      "kind": "coh",
+      "file": "coh_D52_20261003_20261015.png",
+      "orbit": "D52",
+      "dates": [
+        "2026-10-03",
+        "2026-10-15"
+      ],
+      "title": "Coherence, 3 Oct to 15 Oct",
+      "units": "coherence",
+      "range": [
+        0.0,
+        1.0
+      ],
+      "colormap": "gray",
+      "source": "NISAR_L2_PR_GUNW_032_052_D_068_033_2000_SH_20261003T193421_20261003T193456_20261015T193421_20261015T193456_P05023_N_F_J_001.h5",
+      "caveat": "Low coherence also occurs over water and dense forest; this pair brackets the fire (2-5 Jul 2026)."
+    },
+    {
+      "id": "hh_D52_20260816",
+      "kind": "hh",
+      "file": "hh_D52_20260816.png",
+      "orbit": "D52",
+      "dates": [
+        "2026-08-16"
+      ],
+      "title": "Backscatter HH, 16 Aug",
+      "units": "dB",
+      "range": [
+        -15.0,
+        -2.0
+      ],
+      "colormap": "viridis",
+      "source": "NISAR_L2_PR_GCOV_028_052_D_068_2005_DHDH_A_20260816T193421_20260816T193456_P05023_N_F_J_001.h5",
+      "caveat": "Speckle is present. The scar darkens only slightly in backscatter; the standing-trunk explanation in docs/DOSSIER.md is a hypothesis, not a measurement. Coherence is the fire signal."
+    },
+    {
+      "id": "hv_D52_20260816",
+      "kind": "hv",
+      "file": "hv_D52_20260816.png",
+      "orbit": "D52",
+      "dates": [
+        "2026-08-16"
+      ],
+      "title": "Backscatter HV, 16 Aug",
+      "units": "dB",
+      "range": [
+        -20.0,
+        -8.0
+      ],
+      "colormap": "magma",
+      "source": "NISAR_L2_PR_GCOV_028_052_D_068_2005_DHDH_A_20260816T193421_20260816T193456_P05023_N_F_J_001.h5",
+      "caveat": "Speckle is present. The scar darkens only slightly in backscatter; the standing-trunk explanation in docs/DOSSIER.md is a hypothesis, not a measurement. Coherence is the fire signal."
     }
   ]
 }
