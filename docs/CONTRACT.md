@@ -1,8 +1,8 @@
 # Contrato de dados
 
 > Versão canónica do contrato (copiada de [PLAN.md](PLAN.md), secção "Arquitetura e contrato de dados").
-> Só o integrador (frente E) a altera, depois de avisar a equipa. **Os caminhos HDF5 estão por confirmar nas
-> tarefas A1 e B1**; quando confirmados, substituir a lista abaixo e remover este aviso.
+> Só o integrador (frente E) a altera, depois de avisar a equipa. Os caminhos HDF5 do GUNW foram
+> **confirmados na tarefa A1** (14 nov 2026) e estão registados abaixo; os do GCOV ficam por confirmar na B1.
 
 
 O contrato de dados é o que permite paralelizar: a app trabalha com camadas falsas no formato certo enquanto o pipeline produz as verdadeiras. Fecha-se na Fase 0 e só muda com aviso a toda a equipa.
@@ -44,9 +44,9 @@ caramulo/
 
 Todas as camadas raster saem exatamente com a mesma caixa, projeção e tamanho, para se sobreporem sem ajustes.
 
-- Caixa: lon −8,35 a −7,95; lat 40,45 a 40,85 (a do dossier).
+- Caixa: lon −8,50 a −7,95; lat 40,45 a 40,85 (estendida a oeste em 14 nov para cobrir a cicatriz inteira; ver `DOSSIER.md` e `DECISIONS.md`).
 - Projeção de saída: Web Mercator (EPSG:3857), a do mapa.
-- Tamanho: 2000 px de largura (cerca de 17 m por píxel); a altura sai de `grid.py`.
+- Tamanho: 2000 px de largura (cerca de 23 m por píxel); a altura sai de `grid.py` (2000 × 1917 px).
 - `grid.py` é a única fonte destes valores. Ninguém os escreve à mão noutro ficheiro.
 
 ## Nomes dos ficheiros
@@ -70,7 +70,7 @@ A app não conhece nomes de ficheiros: lê `web/public/layers/manifest.json` e d
 ```json
 {
   "version": 1,
-  "bounds": [-8.35, 40.45, -7.95, 40.85],
+  "bounds": [-8.50, 40.45, -7.95, 40.85],
   "layers": [
     {
       "id": "coh_D52_20260629_20260711",
@@ -95,8 +95,9 @@ A app não conhece nomes de ficheiros: lê `web/public/layers/manifest.json` e d
 
 ## Dentro dos HDF5
 
-Caminhos esperados, a confirmar com `h5ls -r` no primeiro ficheiro (tarefa A1 e B1) e a registar em `CONTRACT.md`:
+Caminhos do GUNW confirmados no primeiro ficheiro real (tarefa A1, 14 nov 2026); os do GCOV aguardam a B1.
 
-- GUNW: `science/LSAR/GUNW/grids/frequencyA/unwrappedInterferogram/HH/coherenceMagnitude`.
-- GCOV: `science/LSAR/GCOV/grids/frequencyA/HHHH` e `HVHV`, em potência linear; dB = 10 · log10(valor).
-- Em ambos, as coordenadas e a projeção (UTM) vêm em `xCoordinates`, `yCoordinates` e `projection` do mesmo grupo.
+- GUNW (coerência): `science/LSAR/GUNW/grids/frequencyA/unwrappedInterferogram/HH/coherenceMagnitude` — float32, 0 a 1 (4392 × 4455 px a 80 m no produto usado).
+- GUNW (projeção): `science/LSAR/GUNW/grids/frequencyA/unwrappedInterferogram/projection` — **código EPSG escalar (uint32)**, não WKT (32629 = UTM 29N neste produto).
+- GUNW (coordenadas): `science/LSAR/GUNW/grids/frequencyA/unwrappedInterferogram/HH/xCoordinates` e `.../HH/yCoordinates` — float64, centros de píxel, x crescente e y decrescente.
+- GCOV: `science/LSAR/GCOV/grids/frequencyA/HHHH` e `HVHV`, em potência linear; dB = 10 · log10(valor) — por confirmar na B1.

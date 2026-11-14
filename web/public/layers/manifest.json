@@ -1,50 +1,12 @@
 {
   "version": 1,
   "bounds": [
-    -8.35,
+    -8.5,
     40.45,
     -7.95,
     40.85
   ],
   "layers": [
-    {
-      "id": "coh_D52_20260629_20260711",
-      "kind": "coh",
-      "file": "coh_D52_20260629_20260711.png",
-      "orbit": "D52",
-      "dates": [
-        "2026-06-29",
-        "2026-07-11"
-      ],
-      "title": "Coherence, 29 Jun to 11 Jul",
-      "units": "coherence",
-      "range": [
-        0.0,
-        1.0
-      ],
-      "colormap": "gray",
-      "source": "run.py --mock (synthetic, task T2b)",
-      "caveat": "Synthetic mock layer for development; not real satellite data. The dark ellipse is the fake burn scar."
-    },
-    {
-      "id": "coh_D52_20260711_20260723",
-      "kind": "coh",
-      "file": "coh_D52_20260711_20260723.png",
-      "orbit": "D52",
-      "dates": [
-        "2026-07-11",
-        "2026-07-23"
-      ],
-      "title": "Coherence, 11 Jul to 23 Jul (control)",
-      "units": "coherence",
-      "range": [
-        0.0,
-        1.0
-      ],
-      "colormap": "gray",
-      "source": "run.py --mock (synthetic, task T2b)",
-      "caveat": "Synthetic mock layer for development; not real satellite data. Control pair: no change expected after the fire."
-    },
     {
       "id": "hh_D52_20260629",
       "kind": "hh",
@@ -152,6 +114,44 @@
       "colormap": "rgb",
       "source": "run.py --mock (synthetic, task T2b)",
       "caveat": "Synthetic mock layer for development; not real satellite data. Colors are invented, not Sentinel-2 data."
+    },
+    {
+      "id": "coh_D52_20260629_20260711",
+      "kind": "coh",
+      "file": "coh_D52_20260629_20260711.png",
+      "orbit": "D52",
+      "dates": [
+        "2026-06-29",
+        "2026-07-11"
+      ],
+      "title": "Coherence, 29 Jun to 11 Jul",
+      "units": "coherence",
+      "range": [
+        0.0,
+        1.0
+      ],
+      "colormap": "gray",
+      "source": "NISAR_L2_PR_GUNW_024_052_D_068_025_2000_SH_20260629T193424_20260629T193459_20260711T193423_20260711T193458_P05023_N_F_J_001.h5",
+      "caveat": "Low coherence also occurs over water and dense forest; this pair brackets the fire (2-5 Jul 2026)."
+    },
+    {
+      "id": "coh_D52_20260711_20260723",
+      "kind": "coh",
+      "file": "coh_D52_20260711_20260723.png",
+      "orbit": "D52",
+      "dates": [
+        "2026-07-11",
+        "2026-07-23"
+      ],
+      "title": "Coherence, 11 Jul to 23 Jul",
+      "units": "coherence",
+      "range": [
+        0.0,
+        1.0
+      ],
+      "colormap": "gray",
+      "source": "NISAR_L2_PR_GUNW_025_052_D_068_026_2000_SH_20260711T193423_20260711T193458_20260723T193423_20260723T193458_P05023_N_F_J_001.h5",
+      "caveat": "Low coherence also occurs over water and dense forest; this pair brackets the fire (2-5 Jul 2026)."
     }
   ]
 }

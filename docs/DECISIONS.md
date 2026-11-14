@@ -8,6 +8,9 @@ Uma linha por decisão: data, decisão, quem decidiu.
 | 2026-11-14 | Licença: manter Apache-2.0 (o plano dizia MIT; `PLAN.md` foi corrigido) | André |
 | 2026-11-14 | Estrutura: o scaffold inicial (FastAPI, `frontend/`, tiles) foi substituído pela árvore do plano: `pipeline/` + `web/`, sem backend | André |
 | 2026-11-14 | Equipa reduzida (3 pessoas ativas): P0 e T4 corrigidos no plano; B3 e a parte GCOV de A3 passam para o E | André (a rever) |
+| 2026-11-14 | Caminhos HDF5 do GUNW confirmados no primeiro ficheiro real: coerência no caminho previsto; projeção é código EPSG (uint32) e as coordenadas estão em `unwrappedInterferogram/HH`, não no grupo `frequencyA` | André (A1) |
+| 2026-11-14 | Grelha comum estendida a oeste de −8,35 para −8,50 (WIDTH 2000, ~23 m/px): a cicatriz real em coerência mede 12-13,7 mil ha em lon −8,40..−8,13 e o bbox antigo cortava a ponta ocidental | André (A2; CONTRACT a avisar o E) |
+| 2026-11-14 | Cicatriz medida nos dados reais: 13.687 ha (limiar −0,25 no diferencial coerência fogo vs controlo), centroide −8,27/40,62, vertente NW da serra (Tourelhe→Águeda); compatível com os 12.804 ha oficiais | André (A2) |
 
 ## Frentes (atualizar sempre que alguém entra ou sai)
 
