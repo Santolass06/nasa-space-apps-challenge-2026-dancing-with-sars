@@ -159,7 +159,7 @@ O sinal do incêndio existe nos dados NISAR reais e vê-se melhor pela coerênci
 
 **Medição nos dados completos (14 nov, tarefas A1/A2):** com os GUNW reais na grelha comum, o diferencial de coerência entre o par do fogo (29 jun → 11 jul) e o par de controlo (11 → 23 jul), suavizado a 1 km, mostra:
 
-- a maior região ligada abaixo de −0,25 tem **13.687 ha** em lon −8,398..−8,130, lat 40,557..40,682 (centroide −8,27, 40,62); a um limiar mais exigente (−0,30) fica com 12.063 ha. Os números oficiais: 12.160 ha (EFFIS, 3 jul) e 12.804 ha (ICNF, provisório) — a nossa medição bate;
+- a maior região ligada abaixo de −0,25 tem **13.687 ha** em lon −8,398..−8,130, lat 40,557..40,682 (centroide −8,27, 40,62); a um limiar mais exigente (−0,30) fica com 12.063 ha. O polígono final (A4, após morfologia) tem **13.501 ha** — é o número que a app mostra (`stats.json`). Os números oficiais: 12.160 ha (EFFIS, 3 jul) e 12.804 ha (ICNF, provisório) — a nossa medição bate;
 - dentro da cicatriz, a coerência do par do fogo é **0,24** contra **0,69** no par de controlo (queda de 0,45) — o sinal é forte e localizado;
 - a mancha é maior do que a elipse das pré-visualizações (caixa de ~22 × 13 km) e está mais a **oeste**: a vertente NW da serra, de Tourelhe (ignição, perto de Cambra) na direção de Águeda. As notícias registam que o fogo atingiu o concelho de Águeda (lon ≈ −8,45), o que é consistente com o que os dados mostram.
 
