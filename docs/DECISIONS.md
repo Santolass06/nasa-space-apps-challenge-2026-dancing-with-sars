@@ -13,6 +13,7 @@ Uma linha por decisão: data, decisão, quem decidiu.
 | 2026-11-14 | Cicatriz medida nos dados reais: 13.687 ha (limiar −0,25 no diferencial coerência fogo vs controlo), centroide −8,27/40,62, vertente NW da serra (Tourelhe→Águeda); compatível com os 12.804 ha oficiais | André (A2) |
 | 2026-11-14 | A4: polígono final da cicatriz = 13.501 ha (maior componente após morfologia; 1.975 ha de blobs separados excluídos e registados no `stats.json`); sobreposição com o perímetro oficial fica pendente do E1 | André (A4) |
 | 2026-11-14 | A5: quatro pares de coerência a mais (pré-fogo D52, A15, A116, D124); todas as geometrias dão a mesma queda dentro da cicatriz (−0,21 a −0,25) e o pré-fogo dá +0,02 — o sinal não depende da geometria nem da sazonalidade | André (A5) |
+| 2026-11-14 | A6: progressão 0 → 6.831 ha (4 jul) → 13.501 ha; o "durante" é a parte da cicatriz final abaixo da mediana−2 MAD do A116 (o par não tem controlo e um limiar absoluto apanha água e vales: 45% dentro no melhor caso) | André (A6) |
 
 ## Frentes (atualizar sempre que alguém entra ou sai)
 
