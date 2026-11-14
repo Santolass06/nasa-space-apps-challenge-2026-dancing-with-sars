@@ -185,6 +185,18 @@ h1 {
   border-top: 1px solid var(--border);
 }
 
+.place-marker {
+  padding: 0.1rem 0.45rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #0b1020;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 999px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+  white-space: nowrap;
+  cursor: default;
+}
+
 .placeholder h2 {
   margin: 0 0 0.5rem;
   font-size: 1.3rem;
