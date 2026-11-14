@@ -15,6 +15,7 @@ Uma linha por decisão: data, decisão, quem decidiu.
 | 2026-11-14 | A5: quatro pares de coerência a mais (pré-fogo D52, A15, A116, D124); todas as geometrias dão a mesma queda dentro da cicatriz (−0,21 a −0,25) e o pré-fogo dá +0,02 — o sinal não depende da geometria nem da sazonalidade | André (A5) |
 | 2026-11-14 | A6: progressão 0 → 6.831 ha (4 jul) → 13.501 ha; o "durante" é a parte da cicatriz final abaixo da mediana−2 MAD do A116 (o par não tem controlo e um limiar absoluto apanha água e vales: 45% dentro no melhor caso) | André (A6) |
 | 2026-11-14 | B2: HH/HV em dB, potência linear reprojetada (média sem viés) e escala fixa por polarização — HH −15..−2 dB, HV −20..−8 dB (percentis 2–98 no grid), a mesma em todas as datas (B8); o brilho quase não vê a cicatriz (HH dentro = fora), como o dossier previa | André (B2) |
+| 2026-11-14 | B6: as camadas de agosto (HH/HV) e outubro (coerência) que o `story.en.json` já citava passam a existir — o contrato exige que todos os IDs da história estejam no manifest, e sem elas qualquer PR falhava a auditoria | André (B6) |
 
 ## Frentes (atualizar sempre que alguém entra ou sai)
 
