@@ -13,9 +13,9 @@ export default function App() {
           Caramulo <span className="accent">em chamas</span>
         </h1>
         <p className="lede">
-          The largest wildfire of Portugal&apos;s 2026 season (Vouzela, 2–5 July, 12,804 ha),
-          told with NISAR L-band radar alone: what happened, how the radar saw it through the
-          smoke, and what came after.
+          The largest wildfire of Portugal&apos;s 2026 season (Vouzela, 2–5 July), told with
+          NISAR L-band radar alone: what happened, how the radar saw it through the smoke,
+          and what came after.
         </p>
         <div className="badges">
           <span className="badge">NISAR · L-band SAR</span>
