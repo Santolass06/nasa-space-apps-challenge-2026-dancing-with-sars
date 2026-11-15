@@ -49,6 +49,11 @@ Additional data and basemap attribution (fill in when used):
   Reference: ICNF post-fire emergency stabilisation report REE_2026_004, p. 6.
   Processing: Converted from Shapefile (EPSG:3763) to WGS84 GeoJSON.
   License: Dataset-specific reuse terms have not been confirmed.
+  Sentinel-3 smoke image, 3 July 2026 (web/public/figures/sentinel3_smoke_20260703.jpg)
+  Credit: (c) European Union, 2026, Copernicus Sentinel-3 imagery (EC - DG DEFIS), "Image of the day, July 2026".
+  Source: https://commons.wikimedia.org/wiki/File:Portugal_wildfires_send_smoke_over_the_Atlantic_Ocean_(P-070474-00-06).jpg
+  License: CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/).
+  Changes: resized to 1600 px wide and recompressed; nothing else.
   Basemap: OpenFreeMap / OpenStreetMap contributors       [attribution text to add]
 
 Cite every source in the Space Apps project form.

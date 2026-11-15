@@ -305,6 +305,36 @@ export default function Story() {
             )}
           </div>
         )}
+        {steps.map(
+          ({ index, step }) =>
+            step.figure && (
+              <figure
+                key={step.id}
+                className={`story__figure${index === active ? " is-open" : ""}`}
+                aria-hidden={index !== active}
+              >
+                <img
+                  src={`${import.meta.env.BASE_URL}${step.figure.src}`}
+                  alt={step.figure.alt}
+                  decoding="async"
+                />
+                <figcaption>
+                  <p>{step.figure.caption}</p>
+                  <p className="story__credit">
+                    {step.figure.credit} ·{" "}
+                    <a href={step.figure.licenceUrl} target="_blank" rel="noreferrer">
+                      {step.figure.licence}
+                    </a>{" "}
+                    ·{" "}
+                    <a href={step.figure.sourceUrl} target="_blank" rel="noreferrer">
+                      source
+                    </a>
+                    . Resized.
+                  </p>
+                </figcaption>
+              </figure>
+            ),
+        )}
         {shownComparison && mainIdle && (
           <div className={`story__overlay${comparison && compareReady ? " is-open" : ""}`}>
             <CompareView

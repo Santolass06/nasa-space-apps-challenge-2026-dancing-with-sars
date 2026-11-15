@@ -6,12 +6,25 @@ export type StoryLayerRef = { id: string; caption: string };
 
 export type Comparison = { leftLayerId: string; rightLayerId: string };
 
+/** An image that takes over the map for a step, with the credit its licence asks for. */
+export type Figure = {
+  /** Path under `public/`, e.g. "figures/x.jpg". */
+  src: string;
+  alt: string;
+  caption: string;
+  credit: string;
+  licence: string;
+  licenceUrl: string;
+  sourceUrl: string;
+};
+
 export type Step = {
   id: string;
   text: string;
   layers: StoryLayerRef[];
   mapView?: { bounds: Bounds };
   comparisons?: Comparison[];
+  figure?: Figure;
   sources?: string[];
 };
 

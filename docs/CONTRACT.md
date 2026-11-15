@@ -93,6 +93,10 @@ A app não conhece nomes de ficheiros: lê `web/public/layers/manifest.json` e d
 - `source` é obrigatório: é a proveniência que o júri pode verificar.
 - `range` e `colormap` alimentam a legenda; a app não adivinha escalas.
 
+## Passos da história com figura
+
+Um passo de `story.en.json` pode ter `figure`: uma imagem que ocupa o mapa nesse passo (por exemplo, uma imagem de satélite com o fumo). Campos: `src` (caminho em `web/public/`), `alt`, `caption`, `credit`, `licence`, `licenceUrl` e `sourceUrl`. A app mostra sempre o crédito, a licença e a ligação à fonte por baixo da imagem, e só entram figuras com licença aberta que o permita (a licença é verificada e registada em `NOTICE` e `docs/data-sources.md`). Um passo com figura pode ter `layers: []`.
+
 ## Dentro dos HDF5
 
 Caminhos do GUNW confirmados no primeiro ficheiro real (tarefa A1, 14 nov 2026) e do GCOV no primeiro GCOV (tarefa B1, 14 nov 2026).

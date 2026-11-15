@@ -81,6 +81,32 @@
           ]
         },
         {
+          "id": "smoke",
+          "text": "The next day a Copernicus satellite photographed the smoke from the fire near Vouzela, drifting out over the Atlantic Ocean.",
+          "layers": [],
+          "mapView": {
+            "bounds": [
+              -8.5,
+              40.45,
+              -7.95,
+              40.85
+            ]
+          },
+          "comparisons": [],
+          "figure": {
+            "src": "figures/sentinel3_smoke_20260703.jpg",
+            "alt": "Satellite image of north-west Portugal. A long plume of grey smoke rises near Viseu and stretches west across the Atlantic Ocean.",
+            "caption": "Copernicus Sentinel-3, 3 July 2026, 10:38 UTC. At that moment the plume was about 620 km long.",
+            "credit": "© European Union, 2026, Copernicus Sentinel-3 imagery (EC – DG DEFIS)",
+            "licence": "CC BY 4.0",
+            "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+            "sourceUrl": "https://commons.wikimedia.org/wiki/File:Portugal_wildfires_send_smoke_over_the_Atlantic_Ocean_(P-070474-00-06).jpg"
+          },
+          "sources": [
+            "https://commons.wikimedia.org/wiki/File:Portugal_wildfires_send_smoke_over_the_Atlantic_Ocean_(P-070474-00-06).jpg"
+          ]
+        },
+        {
           "id": "evacuations",
           "text": "During the wildfire, residents were evacuated from Matadegas and Mançores in Tondela.",
           "layers": [
