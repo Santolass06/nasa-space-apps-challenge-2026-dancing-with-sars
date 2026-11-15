@@ -674,6 +674,13 @@ h1 {
   inset: 0.75rem 0.75rem auto;
   display: grid;
   gap: 0.4rem;
+  /* The strip spans the map: only the panels inside it take the pointer, so the
+     map can still be dragged through the empty space around them. */
+  pointer-events: none;
+}
+
+.explorer__hud .picker,
+.explorer__hud .legend {
   pointer-events: auto;
 }
 
