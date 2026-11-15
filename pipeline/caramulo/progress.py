@@ -36,6 +36,7 @@ from caramulo.grid import CRS, EXTENT_3857
 
 LAYERS_DIR = Path("../web/public/layers")
 DURING_LAYER = "coh_A116_20260622_20260704"
+DURING_FILE = export.lod_files(DURING_LAYER)[1]  # full grid: areas are traced here (C7)
 BEFORE_DATES = ["2026-06-17", "2026-06-29"]
 DURING_DATES = ["2026-06-22", "2026-07-04"]
 AFTER_DATES = ["2026-06-29", "2026-07-11"]
@@ -113,7 +114,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--during",
         type=Path,
         default=None,
-        help=f"A116 layer (default: layers/{DURING_LAYER}.png)",
+        help=f"A116 layer (default: layers/{DURING_FILE})",
     )
     parser.add_argument(
         "--out",
@@ -127,7 +128,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
     scar_path = args.scar or args.layers / "burn_nisar.geojson"
-    during_path = args.during or args.layers / f"{DURING_LAYER}.png"
+    during_path = args.during or args.layers / DURING_FILE
     out_path = args.out or args.layers / "progress.geojson"
 
     scar = _scar_mask(scar_path, _read_layer(during_path)[0].shape)

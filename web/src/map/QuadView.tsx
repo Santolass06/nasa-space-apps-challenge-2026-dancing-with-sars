@@ -12,6 +12,8 @@ type Props = {
   /** One layer id per quarter: top-left, top-right, bottom-left, bottom-right. */
   ids: string[];
   onChange: (quarter: number, id: string) => void;
+  /** Passed to every map (#82): see MapView. */
+  cooperativeGestures?: boolean;
 };
 
 /** Each quarter of the picture is the part of its own map the point leaves to it. */
@@ -34,7 +36,7 @@ const clip = (quarter: number, x: number, y: number): string => {
  * room and the others less. Four synchronised maps lie on top of each other and
  * each shows only its quarter; panning or zooming any of them moves all four.
  */
-export default function QuadView({ manifest, ids, onChange }: Props) {
+export default function QuadView({ manifest, ids, onChange, cooperativeGestures }: Props) {
   const [maps, setMaps] = useState<Array<MapLibreMap | null>>([null, null, null, null]);
   const [point, setPoint] = useState({ x: 50, y: 50 });
   const managers = useRef<Array<LayerManager | null>>([null, null, null, null]);
@@ -85,7 +87,7 @@ export default function QuadView({ manifest, ids, onChange }: Props) {
           key={quarter}
           style={{ clipPath: clip(quarter, point.x, point.y) }}
         >
-          <MapView className="quad__map" onReady={makeReady(quarter)} />
+          <MapView className="quad__map" onReady={makeReady(quarter)} cooperativeGestures={cooperativeGestures} />
         </div>
       ))}
       <div className="quad__line quad__line--v" style={{ left: `${point.x}%` }} aria-hidden="true" />
