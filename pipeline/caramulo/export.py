@@ -294,6 +294,19 @@ def downsample2(array: np.ndarray) -> np.ndarray:
     return mean.astype("float32")
 
 
+def lod_files(layer_id: str) -> tuple[str, str]:
+    """File names of one layer at its two sizes: the half grid (the contract's
+    1000 px layer, always loaded) and the full grid (`@2x`, loaded when the
+    reader zooms in)."""
+    return f"{layer_id}.png", f"{layer_id}@2x.png"
+
+
+def lod_fields(field: np.ndarray, layer_id: str) -> list[tuple[np.ndarray, str]]:
+    """(array, file name) for the half-grid layer and then the full-grid one."""
+    half, full = lod_files(layer_id)
+    return [(downsample2(field), half), (np.asarray(field, dtype="float32"), full)]
+
+
 def downsample_rgba(rgba: np.ndarray) -> np.ndarray:
     """Halve an RGBA image with an alpha-weighted 2x2 mean (transparent pixels stay neutral)."""
     rgba = np.asarray(rgba, dtype=np.uint8)
@@ -390,9 +403,10 @@ def layer_entry(
     colormap: str,
     source: str,
     caveat: str,
+    hires: str | None = None,
 ) -> dict:
     """Build one manifest entry with exactly the fields of docs/CONTRACT.md."""
-    return {
+    entry = {
         "id": layer_id,
         "kind": kind,
         "file": file,
@@ -405,6 +419,9 @@ def layer_entry(
         "source": source,
         "caveat": caveat,
     }
+    if hires is not None:
+        entry["hires"] = hires  # the full-grid version, loaded when the reader zooms in
+    return entry
 
 
 def write_manifest(path: Path | str, layers: list[dict]) -> Path:
@@ -499,6 +516,28 @@ if __name__ == "__main__":
     assert back[0, 0, 3] == 0 and back[0, 2, 3] == 255
     assert tuple(back[0, 2, :3]) == tuple(colormap_lut("viridis")[255])
 
+    # lod_fields: the half grid first, then the full grid, with the contract's names
+    field = np.arange(24, dtype="float32").reshape(4, 6)
+    (small, small_name), (big, big_name) = lod_fields(field, "x_D52_20260101")
+    assert small.shape == (2, 3) and big.shape == (4, 6), (small.shape, big.shape)
+    assert (small_name, big_name) == ("x_D52_20260101.png", "x_D52_20260101@2x.png")
+    assert (
+        layer_entry(
+            layer_id="a",
+            kind="hh",
+            file="a.png",
+            hires="a@2x.png",
+            orbit=None,
+            dates=[],
+            title="",
+            units="",
+            value_range=[0, 1],
+            colormap="gray",
+            source="",
+            caveat="",
+        )["hires"]
+        == "a@2x.png"
+    )
     # downsample2 averages 2x2 blocks and ignores NaN
     field = np.array([[1.0, 3.0, np.nan, np.nan], [2.0, 4.0, np.nan, np.nan]], dtype="float32")
     small = downsample2(field)

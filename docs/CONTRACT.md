@@ -46,7 +46,7 @@ Todas as camadas raster saem exatamente com a mesma caixa, projeção e tamanho,
 
 - Caixa: lon −8,50 a −7,95; lat 40,45 a 40,85 (estendida a oeste em 14 nov para cobrir a cicatriz inteira; ver `DOSSIER.md` e `DECISIONS.md`).
 - Projeção de saída: Web Mercator (EPSG:3857), a do mapa.
-- Tamanho: metade da grelha — 1000 px de largura (cerca de 46 m por píxel; 1000 × 958), para cada camada ficar abaixo de 1 MB e a primeira vista em menos de 3 s (C7). A grelha de análise continua a 2000 px (~23 m/px) em `grid.py`.
+- Tamanho: metade da grelha — 1000 px de largura (cerca de 46 m por píxel; 1000 × 958), para cada camada ficar abaixo de 1 MB e a primeira vista em menos de 3 s (C7). A grelha de análise continua a 2000 px (~23 m/px) em `grid.py`. Níveis de detalhe: cada camada tem também uma versão na grelha inteira (2000 px), `{id}@2x.png`, que a app só descarrega quando o leitor faz zoom (campo `hires` do manifest).
 - `grid.py` é a única fonte destes valores. Ninguém os escreve à mão noutro ficheiro.
 
 ## Nomes dos ficheiros
@@ -92,6 +92,7 @@ A app não conhece nomes de ficheiros: lê `web/public/layers/manifest.json` e d
 - `title` e `caveat` em inglês, porque aparecem na app.
 - `source` é obrigatório: é a proveniência que o júri pode verificar.
 - `range` e `colormap` alimentam a legenda; a app não adivinha escalas.
+- `hires` (opcional): nome do ficheiro da camada na grelha inteira (2000 px, `{id}@2x.png`). Sem ele, a app usa só o `file`.
 
 ## Passos da história com figura
 
