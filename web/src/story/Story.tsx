@@ -18,6 +18,11 @@ import {
 } from "./story";
 import { hectares, loadStats, type Polarization, type Stats } from "./stats";
 
+/** How long scrolling must rest on a step before the map follows it. */
+const APPLY_DELAY_MS = 260;
+/** Steps applied closer together than this count as fast scrolling. */
+const FAST_SCROLL_MS = 1500;
+
 const layerTitle = (manifest: Manifest | null, id: string): string =>
   manifest?.layers.find((layer: Layer) => layer.id === id)?.title ?? OVERLAY_TITLES[id] ?? id;
 
@@ -109,7 +114,12 @@ function Act4Panel({ act4 }: { act4: Stats["act4"] }) {
  */
 export default function Story() {
   const steps = useMemo(flatten, []);
+  // `active` is the step under the middle of the screen (it lights the text at once);
+  // `applied` is the one the map shows, which follows `active` only once scrolling
+  // has paused on it, so a quick scroll doesn't flash every step in between.
   const [active, setActive] = useState(0);
+  const [applied, setApplied] = useState(0);
+  const lastApplied = useRef(0);
   const [picked, setPicked] = useState<string | null>(null);
   const [manifest, setManifest] = useState<Manifest | null>(null);
   const [stats, setStats] = useState<Stats | null>(null);
@@ -207,7 +217,15 @@ export default function Story() {
     return () => observer.disconnect();
   }, [steps]);
 
-  const current = steps[active] ?? steps[0];
+  useEffect(() => {
+    if (active === applied) {
+      return;
+    }
+    const timer = window.setTimeout(() => setApplied(active), APPLY_DELAY_MS);
+    return () => window.clearTimeout(timer);
+  }, [active, applied]);
+
+  const current = steps[applied] ?? steps[0];
   const comparison = current?.step.comparisons?.[0];
   // The comparison maps are built once and kept: the overlay fades in and out,
   // and switching pairs is a cross-fade inside it. Until the reader reaches the
@@ -237,9 +255,12 @@ export default function Story() {
     if (!manager || comparison || !current) {
       return;
     }
+    const now = performance.now();
+    manager.setPace(now - lastApplied.current < FAST_SCROLL_MS);
+    lastApplied.current = now;
     applyStep(manager, current.step);
     setPicked(null);
-  }, [active, comparison, applyStep, current]);
+  }, [applied, comparison, applyStep, current]);
 
   return (
     <div className={`story${current?.step.focus ? " is-wide" : ""}`}>
@@ -321,8 +342,8 @@ export default function Story() {
             step.figure && (
               <figure
                 key={step.id}
-                className={`story__figure${index === active ? " is-open" : ""}`}
-                aria-hidden={index !== active}
+                className={`story__figure${index === applied ? " is-open" : ""}`}
+                aria-hidden={index !== applied}
               >
                 <img
                   src={`${import.meta.env.BASE_URL}${step.figure.src}`}

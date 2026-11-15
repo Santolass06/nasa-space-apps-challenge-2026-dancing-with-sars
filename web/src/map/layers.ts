@@ -11,7 +11,7 @@ const OPACITY = 0.85;
 // shows through), and the camera eases rather than snapping or swooping.
 const FADE_MS = 650;
 const FADE_OUT_DELAY_MS = 120;
-const CAMERA_MS = 1400;
+const CAMERA_MS = 1200;
 const CAMERA_DEBOUNCE_MS = 150;
 // The layers are 46 m per pixel; past this zoom they are magnified more than
 // about 2x and look smeared, so the story's close-ups stop here.
@@ -20,10 +20,13 @@ const MAX_ZOOM = 12.4;
 const reducedMotion = (): boolean =>
   typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-const fadeMs = (): number => (reducedMotion() ? 0 : FADE_MS);
+// While the reader is scrolling fast, steps change faster than animations last.
+// Animations shorten to this share so they can finish (or be cut short) cleanly.
+const FAST_PACE = 0.4;
 
-const easeInOutCubic = (t: number): number =>
-  t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+// Ease-out: the camera starts at speed and settles, so being interrupted by the
+// next step never leaves it crawling from a standstill.
+const easeOutCubic = (t: number): number => 1 - Math.pow(1 - t, 3);
 
 /** The vector layers that ship with the manifest (docs/CONTRACT.md). */
 export type VectorId = "burn_nisar" | "burn_official";
@@ -55,6 +58,7 @@ export class LayerManager {
   private readonly markers: Marker[] = [];
   private placesLoading: Promise<void> | undefined;
   private placesVisible = false;
+  private pace = 1;
   private lastFit = "";
   private lastView: { bounds: Bounds; padding: number } | undefined;
   private cameraTimer: number | undefined;
@@ -92,6 +96,15 @@ export class LayerManager {
       window.clearTimeout(this.refitTimer);
       this.refitTimer = window.setTimeout(() => this.refit(), 250);
     });
+  }
+
+  /** Shorten fades and camera moves while the reader is scrolling quickly. */
+  setPace(fast: boolean): void {
+    this.pace = fast ? FAST_PACE : 1;
+  }
+
+  private fade(): number {
+    return reducedMotion() ? 0 : FADE_MS * this.pace;
   }
 
   get bounds(): Bounds {
@@ -180,7 +193,7 @@ export class LayerManager {
     this.lastFit = key;
     this.lastView = { bounds, padding };
     window.clearTimeout(this.cameraTimer);
-    const go = () => this.fit(bounds, padding, options.instant || reducedMotion() ? 0 : CAMERA_MS);
+    const go = () => this.fit(bounds, padding, options.instant || reducedMotion() ? 0 : CAMERA_MS * this.pace);
     if (options.instant) {
       go();
     } else {
@@ -189,7 +202,7 @@ export class LayerManager {
   }
 
   private fit(bounds: Bounds, padding: number, duration: number): void {
-    this.map.fitBounds(bounds, { padding, duration, easing: easeInOutCubic, maxZoom: MAX_ZOOM });
+    this.map.fitBounds(bounds, { padding, duration, easing: easeOutCubic, maxZoom: MAX_ZOOM });
   }
 
   private refit(): void {
@@ -237,7 +250,7 @@ export class LayerManager {
     if (this.added.has("focus")) {
       return;
     }
-    const fade = { duration: fadeMs(), delay: 0 };
+    const fade = { duration: this.fade(), delay: 0 };
     this.map.addSource("focus", {
       type: "geojson",
       data: { type: "FeatureCollection", features: [] },
@@ -280,7 +293,7 @@ export class LayerManager {
     } else {
       this.shown.delete("focus");
     }
-    const transition = { duration: fadeMs(), delay: visible ? 0 : FADE_OUT_DELAY_MS };
+    const transition = { duration: this.fade(), delay: visible ? 0 : FADE_OUT_DELAY_MS };
     this.map.setPaintProperty("focus-fill", "fill-opacity-transition", transition);
     this.map.setPaintProperty("focus-fill", "fill-opacity", visible ? 0.07 : 0);
     this.map.setPaintProperty("focus-line", "line-opacity-transition", transition);
@@ -383,7 +396,7 @@ export class LayerManager {
       this.shown.delete(id);
     }
     this.map.setPaintProperty(id, "raster-opacity-transition", {
-      duration: fadeMs(),
+      duration: this.fade(),
       delay: visible || reducedMotion() ? 0 : FADE_OUT_DELAY_MS,
     });
     this.map.setPaintProperty(id, "raster-opacity", visible ? rasterOpacity(layer) : 0);
@@ -444,7 +457,7 @@ export class LayerManager {
       return;
     }
     const style = VECTOR_STYLE[id];
-    const fade = { duration: fadeMs(), delay: 0 };
+    const fade = { duration: this.fade(), delay: 0 };
     this.map.addSource(id, { type: "geojson", data: `${layersBase()}${id}.geojson` });
     this.map.addLayer({
       id: `${id}-fill`,
@@ -485,7 +498,7 @@ export class LayerManager {
     }
     const style = VECTOR_STYLE[id];
     const transition = {
-      duration: fadeMs(),
+      duration: this.fade(),
       delay: visible || reducedMotion() ? 0 : FADE_OUT_DELAY_MS,
     };
     this.map.setPaintProperty(`${id}-fill`, "fill-opacity-transition", transition);
