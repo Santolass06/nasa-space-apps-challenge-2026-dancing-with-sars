@@ -201,8 +201,6 @@ h1 {
   position: relative;
   height: min(70vh, 640px);
   overflow: hidden;
-  cursor: ew-resize;
-  touch-action: none;
 }
 
 .compare-section {
@@ -225,15 +223,29 @@ h1 {
   inset: 0;
 }
 
+/* A 44 px wide hit area above both maps: it captures the pointer, so the maps never see it. */
 .compare__handle {
   position: absolute;
   top: 0;
   bottom: 0;
+  z-index: 5;
+  width: 44px;
+  margin-left: -22px;
+  cursor: ew-resize;
+  touch-action: none;
+  outline-offset: -4px;
+}
+
+.compare__handle::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
   width: 2px;
   margin-left: -1px;
   background: #fff;
   box-shadow: 0 0 6px rgba(0, 0, 0, 0.6);
-  pointer-events: none;
 }
 
 .compare__handle::after {
