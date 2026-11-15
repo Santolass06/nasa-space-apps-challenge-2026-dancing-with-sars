@@ -1176,3 +1176,7 @@ h1 {
 .muted {
   color: var(--muted);
 }
+
+.story-loading {
+  min-height: 70vh;
+}

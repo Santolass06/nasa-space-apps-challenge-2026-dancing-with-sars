@@ -2,8 +2,13 @@ import {
   AttributionControl,
   Map,
   NavigationControl,
+  setWorkerUrl,
 } from "maplibre-gl";
 import { useEffect, useRef } from "react";
+
+// The worker is copied to public/maplibre/ by scripts/copy-maplibre-worker.mjs
+// (see the note there: Vite cannot see maplibre's runtime worker URL).
+setWorkerUrl(`${import.meta.env.BASE_URL}maplibre/maplibre-gl-worker.mjs`);
 
 // Vouzela, the fire's starting point (the grid bounds come from the manifest in C1).
 export const VOUZELA: [number, number] = [-8.1117, 40.7237];

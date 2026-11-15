@@ -186,8 +186,11 @@ export default function Story() {
           applyStep(manager, steps[activeRef.current].step);
           // Once the first view has drawn, fetch the rest in story order.
           map.once("idle", () => {
-            setMainIdle(true);
-            void manager.preload(preloadOrder(steps, activeRef.current, manager.ids()));
+            // The comparison maps are built once the layers are in (or sooner, if the
+            // reader reaches a comparison first), so they don't compete for the network.
+            void manager
+              .preload(preloadOrder(steps, activeRef.current, manager.ids()))
+              .finally(() => setMainIdle(true));
           });
         })
         .catch((error: unknown) => console.error("story", error));
@@ -394,7 +397,7 @@ export default function Story() {
               </figure>
             ),
         )}
-        {shownComparison && mainIdle && (
+        {shownComparison && (mainIdle || comparison) && (
           <div className={`story__overlay${comparison && compareReady ? " is-open" : ""}`}>
             <CompareView
               before={shownComparison.leftLayerId}
