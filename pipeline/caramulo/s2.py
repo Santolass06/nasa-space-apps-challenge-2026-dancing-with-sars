@@ -89,10 +89,10 @@ def render_scene(catalog, day: date) -> np.ndarray:
     return rgb_rgba(rgb, covered)
 
 
-def main() -> None:
+def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--out", type=Path, default=DEFAULT_OUT)
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
 
     if BBOX[0] > -8.4456:
         parser.error("Update grid.py from PR #28 before exporting Sentinel-2 layers.")

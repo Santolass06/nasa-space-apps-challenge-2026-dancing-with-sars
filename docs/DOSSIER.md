@@ -157,18 +157,19 @@ O sinal do incêndio existe nos dados NISAR reais e vê-se melhor pela coerênci
 
 **Primeira leitura (pré-visualizações ASF, 14 nov):** as cores são a fase do interferograma; o que interessa é a textura. À esquerda (29 jun → 11 jul, as duas datas "abraçam" o fogo) via-se uma mancha granulada de cerca de 14 × 10 km — o radar deixou de reconhecer aquele terreno, porque ardeu. À direita (11 → 23 jul, ambas já depois do fogo) a mesma zona voltava a ser lisa. A georreferência das pré-visualizações era aproximada, e a posição da mancha veio a revelar-se deslocada.
 
-**Medição nos dados completos (14 nov, tarefas A1/A2):** com os GUNW reais na grelha comum, o diferencial de coerência entre o par do fogo (29 jun → 11 jul) e o par de controlo (11 → 23 jul), suavizado a 1 km, mostra:
+**Medição nos dados completos (14 nov, tarefas A1/A2/A4, números atualizados com C7/B4/B5):** com os GUNW reais na grelha comum, o diferencial de coerência entre o par do fogo (29 jun → 11 jul) e o par de controlo (11 → 23 jul), suavizado a 1 km, mostra:
 
-- a maior região ligada abaixo de −0,25 tem **13.687 ha** em lon −8,398..−8,130, lat 40,557..40,682 (centroide −8,27, 40,62); a um limiar mais exigente (−0,30) fica com 12.063 ha. O polígono final (A4, após morfologia) tem **13.501 ha** — é o número que a app mostra (`stats.json`). O ICNF reporta **12.828,9 ha** (REE_2026_004, p. 6): a nossa medição fica +5,2% acima; a imprensa da época falava em 12.804 ha (provisório) e 13–15 mil ha;
-- dentro da cicatriz, a coerência do par do fogo é **0,24** contra **0,69** no par de controlo (queda de 0,45) — o sinal é forte e localizado;
+- a maior região ligada abaixo de −0,25 tem **13.517,9 ha** em lon −8,40..−8,13, lat 40,56..40,68 (centroide −8,27, 40,62; 2.564 vértices); a um limiar mais exigente (−0,30) fica com 12.063 ha. É o número que a app mostra (`stats.json` e `burn_nisar.geojson`);
+- o perímetro oficial do ICNF, calculado a partir do GeoJSON que o E1 publicou, mede **12.819,8 ha**; o próprio documento REE_2026_004 (p. 6) reporta **12.828,9 ha** — os 9 ha de diferença são o método de área, não um erro de dados. Sobreposição: **12.127,8 ha, 94,6% do perímetro oficial** (89,7% do nosso);
+- dentro da cicatriz, a coerência do par do fogo é **0,28** contra **0,70** no par de controlo; fora da cicatriz são 0,53 e 0,63 — a queda é dentro, não é sazonalidade;
 - os pares das duas geometrias de observação — A15 e A116 (ascendente) e D52 e D124 (descendente) — mostram todos a mesma queda de coerência dentro da cicatriz (**−0,21 a −0,25**), e o par pré-fogo (17 → 29 jun) não mostra queda (**+0,02**): o sinal não depende da geometria de observação nem da sazonalidade;
 - a mancha é maior do que a elipse das pré-visualizações (caixa de ~22 × 13 km) e está mais a **oeste**: a vertente NW da serra, de Tourelhe (ignição, perto de Cambra) na direção de Águeda. As notícias registam que o fogo atingiu o concelho de Águeda (lon ≈ −8,45), o que é consistente com o que os dados mostram.
 
 **Consequência:** a grelha comum foi estendida a oeste, de −8,35 para −8,50 (pixel de ~17 m para ~23 m), para não cortar a ponta ocidental da cicatriz. Ver `docs/CONTRACT.md` e `docs/DECISIONS.md`.
 
-**A surpresa:** na imagem de brilho HV (antes vs. depois) a cicatriz quase não se nota. A explicação provável é física: os pinheiros queimados ficam de pé e a banda L continua a receber eco dos troncos. Para o fogo, o indicador principal deve ser a coerência; o brilho serve para acompanhar o que acontece depois (queda e corte das árvores, regeneração). Isto é bom material para o júri: mostra que percebemos o sensor.
+**A surpresa, agora medida (B4/B5):** entre 29 jun e 11 jul, dentro da cicatriz o **HV cai 0,67 dB** (fora, 0,27) e o **HH cai 0,27 dB** (fora, 0,14). O HV mexe **2,5× mais** que o HH: a cicatriz vê-se no HV e quase não se vê no HH — que era o que a B2 já mostrava nas duas imagens de brilho, e que agora tem número. A explicação física mais provável continua a ser uma **hipótese**: os pinheiros queimados ficam de pé e a banda L ainda recebe eco dos troncos, o que explicaria o HH quase intacto; o HV, mais sensível ao volume e à orientação dos ramos, é o que perde coerência. Não está medido — diz-se como hipótese. Para o fogo, o indicador principal é a **coerência**; o brilho serve para acompanhar o que acontece depois (queda e corte das árvores, regeneração).
 
-**Por confirmar:** o polígono oficial (E1), para medir a sobreposição exata, e a comparação com o brilho HV nos GCOV (B).
+**Por confirmar:** a localização exata da ignição (o ICNF indica Chamusqueiros; a app marca Tourelhe como aproximação) e a interpretação física da queda em HV.
 
 ## A ideia do projeto
 

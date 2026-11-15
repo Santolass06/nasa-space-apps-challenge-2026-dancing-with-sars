@@ -43,7 +43,7 @@
       ],
       "colormap": "gray",
       "source": "NISAR_L2_PR_GUNW_025_052_D_068_026_2000_SH_20260711T193423_20260711T193458_20260723T193423_20260723T193458_P05023_N_F_J_001.h5",
-      "caveat": "Low coherence also occurs over water and dense forest; this pair brackets the fire (2-5 Jul 2026)."
+      "caveat": "Low coherence also occurs over water and dense forest; both acquisitions are after the fire (2-5 Jul 2026)."
     },
     {
       "id": "s2_20260629",
@@ -98,7 +98,7 @@
       ],
       "colormap": "gray",
       "source": "NISAR_L2_PR_GUNW_023_052_D_068_024_2000_SH_20260617T193425_20260617T193500_20260629T193424_20260629T193459_P05023_N_F_J_001.h5",
-      "caveat": "Low coherence also occurs over water and dense forest; this pair brackets the fire (2-5 Jul 2026)."
+      "caveat": "Low coherence also occurs over water and dense forest; both acquisitions are before the fire (2-5 Jul 2026)."
     },
     {
       "id": "coh_A15_20260627_20260709",
@@ -136,7 +136,7 @@
       ],
       "colormap": "gray",
       "source": "NISAR_L2_PR_GUNW_023_116_A_022_024_2000_SH_20260622T054039_20260622T054111_20260704T054038_20260704T054111_P05023_N_F_J_001.h5",
-      "caveat": "Low coherence also occurs over water and dense forest; this pair brackets the fire (2-5 Jul 2026)."
+      "caveat": "Low coherence also occurs over water and dense forest; the second acquisition falls during the fire (2-5 Jul 2026)."
     },
     {
       "id": "coh_D124_20260622_20260704",
@@ -155,7 +155,7 @@
       ],
       "colormap": "gray",
       "source": "NISAR_L2_PR_GUNW_023_124_D_068_024_2000_SH_20260622T192605_20260622T192640_20260704T192605_20260704T192639_P05023_N_F_J_001.h5",
-      "caveat": "Low coherence also occurs over water and dense forest; this pair brackets the fire (2-5 Jul 2026)."
+      "caveat": "Low coherence also occurs over water and dense forest; the second acquisition falls during the fire (2-5 Jul 2026)."
     },
     {
       "id": "hh_D52_20260629",
@@ -246,7 +246,7 @@
       ],
       "colormap": "gray",
       "source": "NISAR_L2_PR_GUNW_032_052_D_068_033_2000_SH_20261003T193421_20261003T193456_20261015T193421_20261015T193456_P05023_N_F_J_001.h5",
-      "caveat": "Low coherence also occurs over water and dense forest; this pair brackets the fire (2-5 Jul 2026)."
+      "caveat": "Low coherence also occurs over water and dense forest; both acquisitions are after the fire (2-5 Jul 2026)."
     },
     {
       "id": "hh_D52_20260816",

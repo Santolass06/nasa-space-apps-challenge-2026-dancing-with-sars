@@ -13,10 +13,13 @@ setWorkerUrl(`${import.meta.env.BASE_URL}maplibre/maplibre-gl-worker.mjs`);
 // Vouzela, the fire's starting point (the grid bounds come from the manifest in C1).
 export const VOUZELA: [number, number] = [-8.1117, 40.7237];
 
-// CARTO's dark basemap style. Note: maplibre-gl 6.18 silently ignores a style
-// object passed to the constructor (verified in the browser: getStyle() stays
-// undefined while a URL style loads), so the basemap comes as a URL.
-const BASEMAP_STYLE = "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json";
+// OpenFreeMap's dark style: free, no API key, no request limit (openfreemap.org),
+// and its attribution travels in the tile JSON, so MapLibre shows it by itself.
+// (CARTO's basemaps now need an API key for the free tier — their 2026 terms.)
+// Note: maplibre-gl 6.18 silently ignores a style object passed to the
+// constructor (getStyle() stays undefined while a URL style loads), so the
+// basemap comes as a URL.
+const BASEMAP_STYLE = "https://tiles.openfreemap.org/styles/dark";
 
 type Props = {
   /** Called once the map has loaded, so the caller can add layers (C1). */

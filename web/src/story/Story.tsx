@@ -6,7 +6,7 @@ import Explorer, { type ExploreMode } from "../map/Explorer";
 import LayerPicker from "../map/LayerPicker";
 import Legend from "../map/Legend";
 import MapView from "../map/MapView";
-import { LayerManager } from "../map/layers";
+import { LayerManager, type OverlayId } from "../map/layers";
 import { loadManifest, type Layer, type Manifest } from "../map/manifest";
 import {
   flatten,
@@ -164,20 +164,18 @@ export default function Story() {
 
   const applyStep = useCallback((manager: LayerManager, step: Step) => {
     const rasters: string[] = [];
-    const vectors: Array<"burn_nisar" | "burn_official"> = [];
-    let places = false;
+    const overlays: OverlayId[] = [];
     for (const ref of step.layers) {
       if (ref.id === PLACES_ID) {
-        places = true;
+        overlays.push("places");
       } else if (isVector(ref.id)) {
-        vectors.push(ref.id);
+        overlays.push(ref.id);
       } else {
         rasters.push(ref.id);
       }
     }
     manager.showLayers(rasters);
-    manager.showVector(vectors);
-    manager.showPlaces(places);
+    manager.showVector(overlays);
     manager.showFocus(step.focus ?? null);
     // A focus step frames its zone with room around it; any other step frames its view.
     const target = step.focus?.view ?? step.focus?.bounds ?? step.mapView?.bounds;
