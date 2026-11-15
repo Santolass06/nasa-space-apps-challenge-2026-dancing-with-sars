@@ -95,7 +95,7 @@
           "comparisons": [],
           "figure": {
             "src": "figures/sentinel3_smoke_20260703.jpg",
-            "alt": "Satellite image of north-west Portugal. A long plume of grey smoke rises near Viseu and stretches west across the Atlantic Ocean.",
+            "alt": "Satellite image of north-west Portugal. A long plume of grey smoke rises near Vouzela and stretches west across the Atlantic Ocean.",
             "caption": "Copernicus Sentinel-3, 3 July 2026, 10:38 UTC. At that moment the plume was about 620 km long.",
             "credit": "© European Union, 2026, Copernicus Sentinel-3 imagery (EC – DG DEFIS)",
             "licence": "CC BY 4.0",
@@ -108,11 +108,11 @@
         },
         {
           "id": "speed",
-          "text": "Overnight the fire was spreading at an average of 765 metres an hour, about 600 hectares an hour, according to the head of the national civil protection authority.",
+          "text": "On 4 July the national civil protection commander said the fire was spreading at an average of 765 metres an hour, about 600 hectares an hour.",
           "layers": [
             {
               "id": "places",
-              "caption": "Tourelhe, where the fire began, is marked on the map."
+              "caption": "The marker shows Tourelhe, the name given to the fire. Lusa placed the ignition there; the ICNF report lists Chamusqueiros as the place where it started."
             }
           ],
           "mapView": {
@@ -125,16 +125,18 @@
           },
           "comparisons": [],
           "sources": [
-            "https://www.sabado.pt/portugal/amp/incendios-fogo-em-vouzela-ja-queimou-13-mil-hectares-e-e-o-mais-preocupante"
+            "https://www.sabado.pt/portugal/amp/incendios-fogo-em-vouzela-ja-queimou-13-mil-hectares-e-e-o-mais-preocupante",
+            "https://executivedigest.sapo.pt/?p=788227",
+            "https://www.icnf.pt/api/file/doc/d305b338642255f3"
           ]
         },
         {
           "id": "evacuations",
-          "text": "On the morning of 3 July the fire was out of control on the slope of the Serra do Caramulo. Matadegas had been evacuated overnight and Mançores was being evacuated; a local fire commander said the resources were few and some villages had none.",
+          "text": "On the morning of 3 July the fire was reported out of control on the slope of the Serra do Caramulo. A local fire commander told Lusa that Matadegas had been evacuated overnight and Mançores was being evacuated, and that resources were few, with some villages having none. Reports differ: on 4 July Lusa wrote that vulnerable residents of both villages had been taken from their homes, and the mayor of Tondela said no village was evacuated.",
           "layers": [
             {
               "id": "places",
-              "caption": "The map locates the two communities reported evacuated."
+              "caption": "The map locates the two communities named in the reports."
             }
           ],
           "mapView": {
@@ -153,7 +155,7 @@
         },
         {
           "id": "daires",
-          "text": "On 4 July the flames reached Daires, in the Caramulo area, and kept burning with intensity near several villages. The mayor of Tondela said Daires was not evacuated, and that no injuries or destroyed property had been reported in the municipality.",
+          "text": "On 4 July the flames reached Daires, in the Caramulo area, and kept burning with intensity near several villages. The mayor of Tondela said Daires was not evacuated, and that she had received no reports of injured people or destroyed property in the municipality.",
           "layers": [
             {
               "id": "places",
@@ -256,7 +258,10 @@
               40.68
             ]
           },
-          "comparisons": []
+          "comparisons": [],
+          "sources": [
+            "https://doi.org/10.1109/36.175330"
+          ]
         },
         {
           "id": "compare-fire-and-control",
@@ -284,6 +289,9 @@
               "leftLayerId": "coh_D52_20260629_20260711",
               "rightLayerId": "coh_D52_20260711_20260723"
             }
+          ],
+          "sources": [
+            "https://doi.org/10.1109/36.175330"
           ]
         },
         {
@@ -307,7 +315,10 @@
               40.85
             ]
           },
-          "comparisons": []
+          "comparisons": [],
+          "sources": [
+            "https://doi.org/10.1109/36.175330"
+          ]
         }
       ]
     },
@@ -400,6 +411,9 @@
               "leftLayerId": "hh_D52_20260711",
               "rightLayerId": "coh_D52_20260629_20260711"
             }
+          ],
+          "sources": [
+            "https://doi.org/10.1109/36.175330"
           ]
         }
       ]
@@ -410,15 +424,15 @@
       "steps": [
         {
           "id": "compare-july-and-august",
-          "text": "Compare July and August radar returns to see which parts of the landscape changed after the fire.",
+          "text": "Compare the 11 July and 16 August HV images and look inside the burned area: on average it gets slightly darker over the summer, while the land around it hardly changes.",
           "layers": [
             {
-              "id": "hh_D52_20260711",
-              "caption": "The 11 July image shows the strength of the radar return shortly after the fire."
+              "id": "hv_D52_20260711",
+              "caption": "The 11 July HV image shows the radar return shortly after the fire."
             },
             {
-              "id": "hh_D52_20260816",
-              "caption": "The 16 August image shows the radar return over the same landscape later in the summer."
+              "id": "hv_D52_20260816",
+              "caption": "The 16 August HV image shows the radar return over the same landscape later in the summer."
             }
           ],
           "mapView": {
@@ -431,22 +445,22 @@
           },
           "comparisons": [
             {
-              "leftLayerId": "hh_D52_20260711",
-              "rightLayerId": "hh_D52_20260816"
+              "leftLayerId": "hv_D52_20260711",
+              "rightLayerId": "hv_D52_20260816"
             }
           ]
         },
         {
           "id": "compare-july-and-october",
-          "text": "Compare coherence in July and October to see where the radar signals were more consistent between successive passes.",
+          "text": "Compare the pair that spans the fire with a pair from October. Both cover 12 days. In October the burned area no longer shows low coherence, which means little changed between those two passes, not that the land has recovered.",
           "layers": [
             {
-              "id": "coh_D52_20260711_20260723",
-              "caption": "The July pair shows how similar the radar signals were during the first weeks after the fire."
+              "id": "coh_D52_20260629_20260711",
+              "caption": "This pair spans the fire: the signal changed across the burned area between 29 June and 11 July."
             },
             {
               "id": "coh_D52_20261003_20261015",
-              "caption": "The October pair shows how similar the radar signals were during a later 12-day period."
+              "caption": "In October, three months after the fire, both passes are after the fire and the burned area no longer shows low coherence."
             }
           ],
           "mapView": {
@@ -459,9 +473,12 @@
           },
           "comparisons": [
             {
-              "leftLayerId": "coh_D52_20260711_20260723",
+              "leftLayerId": "coh_D52_20260629_20260711",
               "rightLayerId": "coh_D52_20261003_20261015"
             }
+          ],
+          "sources": [
+            "https://doi.org/10.1109/36.175330"
           ]
         }
       ]
@@ -472,7 +489,7 @@
       "steps": [
         {
           "id": "local-recovery",
-          "text": "Tondela and the University of Aveiro began preparing measures to address the effects of the fire in the Serra do Caramulo.",
+          "text": "Tondela's town council began working with a University of Aveiro researcher on a package of measures to reduce the effects of the fire on the slope of the Serra do Caramulo.",
           "layers": [
             {
               "id": "burn_official",
@@ -487,7 +504,10 @@
               40.85
             ]
           },
-          "comparisons": []
+          "comparisons": [],
+          "sources": [
+            "https://www.noticiasaominuto.com/pais/3029882/tondela-prepara-plano-para-mitigar-efeitos-do-fogo-na-serra-do-caramulo"
+          ]
         },
         {
           "id": "explore-the-map",
@@ -510,7 +530,10 @@
               40.85
             ]
           },
-          "comparisons": []
+          "comparisons": [],
+          "sources": [
+            "https://doi.org/10.1109/36.175330"
+          ]
         }
       ]
     }
