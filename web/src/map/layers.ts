@@ -1,9 +1,24 @@
 import { Marker, type Map as MapLibreMap } from "maplibre-gl";
 
-import { layerUrl, layersBase, type Bounds, type Layer, type Manifest } from "./manifest";
-import { recolourCoherence } from "./style";
+import { layerImage } from "./images";
+import { layersBase, type Bounds, type Layer, type Manifest } from "./manifest";
 
 const OPACITY = 0.85;
+
+// Motion. Layers cross-fade (the outgoing one waits a beat so the basemap never
+// shows through), and the camera eases rather than snapping or swooping.
+const FADE_MS = 650;
+const FADE_OUT_DELAY_MS = 120;
+const CAMERA_MS = 1400;
+const CAMERA_DEBOUNCE_MS = 150;
+
+const reducedMotion = (): boolean =>
+  typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+const fadeMs = (): number => (reducedMotion() ? 0 : FADE_MS);
+
+const easeInOutCubic = (t: number): number =>
+  t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
 /** The vector layers that ship with the manifest (docs/CONTRACT.md). */
 export type VectorId = "burn_nisar" | "burn_official";
@@ -29,13 +44,25 @@ export class LayerManager {
   private readonly manifest: Manifest;
   private readonly byId: Map<string, Layer>;
   private readonly added = new Set<string>();
+  private readonly loading = new Map<string, Promise<void>>();
+  private readonly shown = new Set<string>();
   private wanted = new Set<string>();
   private readonly markers: Marker[] = [];
+  private placesLoading: Promise<void> | undefined;
+  private placesVisible = false;
+  private lastFit = "";
+  private cameraTimer: number | undefined;
 
   constructor(map: MapLibreMap, manifest: Manifest) {
     this.map = map;
     this.manifest = manifest;
     this.byId = new Map(manifest.layers.map((layer) => [layer.id, layer]));
+    // A reader who pans or zooms has left the framing: the next step must re-frame.
+    map.on("movestart", (event) => {
+      if ((event as { originalEvent?: unknown }).originalEvent) {
+        this.lastFit = "";
+      }
+    });
   }
 
   get bounds(): Bounds {
@@ -51,13 +78,18 @@ export class LayerManager {
     return this.manifest.layers.map((layer) => layer.id);
   }
 
-  /** Show exactly these raster layers; every other manifest layer is hidden. */
+  /**
+   * Show exactly these raster layers; every other manifest layer fades out.
+   *
+   * Layers stay in the map at opacity 0 once loaded (MapLibre skips drawing
+   * them), so bringing one back is a fade, never a reload or a texture upload.
+   */
   showLayers(ids: string[]): void {
     const wanted = new Set(ids);
     this.wanted = wanted;
     for (const layer of this.manifest.layers) {
       if (!wanted.has(layer.id)) {
-        this.hide(layer.id);
+        this.fadeRaster(layer.id, false);
       }
     }
     for (const id of ids) {
@@ -66,40 +98,69 @@ export class LayerManager {
         console.warn(`showLayers: unknown layer ${id}`);
         continue;
       }
-      this.ensureRaster(layer);
-      if (this.map.getLayer(layer.id)) {
-        this.map.setLayoutProperty(layer.id, "visibility", "visible");
-      }
+      this.fadeRaster(layer.id, true);
+      void this.ensureRaster(layer, true);
     }
   }
 
-  /** Show exactly these vector layers (perimeters); the others are hidden. */
+  /**
+   * Fetch and add rasters ahead of the story reaching them, two at a time and
+   * only once the map is idle, so the first view of each step is already there.
+   */
+  async preload(ids: string[], concurrency = 2): Promise<void> {
+    this.ensureVector("burn_official");
+    this.ensureVector("burn_nisar");
+    void this.loadPlaces();
+    const queue = ids.filter((id) => this.byId.has(id));
+    const worker = async () => {
+      for (let id = queue.shift(); id !== undefined; id = queue.shift()) {
+        await this.ensureRaster(this.byId.get(id) as Layer, false).catch(() => undefined);
+      }
+    };
+    await Promise.all(Array.from({ length: concurrency }, worker));
+  }
+
+  /** Show exactly these vector layers (perimeters); the others fade out. */
   showVector(ids: VectorId[]): void {
     const wanted = new Set(ids);
     for (const id of Object.keys(VECTOR_STYLE) as VectorId[]) {
-      if (!wanted.has(id)) {
-        this.setVectorVisible(id, false);
-      }
-    }
-    for (const id of ids) {
-      this.ensureVector(id);
-      this.setVectorVisible(id, true);
+      this.fadeVector(id, wanted.has(id));
     }
   }
 
   /** Toggle the place labels (HTML markers, so no glyph server is needed). */
   showPlaces(visible: boolean): void {
-    if (!visible) {
-      for (const marker of this.markers) {
-        marker.remove();
-      }
-      this.markers.length = 0;
+    this.placesVisible = visible;
+    void this.loadPlaces().then(() => this.applyPlaces());
+  }
+
+  /**
+   * Frame the map on the manifest bounds (or on a given box) with an eased
+   * move. Repeated calls for the same box are ignored, and quick scrolling
+   * through several steps only moves the camera for the last one.
+   */
+  flyTo(bounds: Bounds = this.manifest.bounds, options: { instant?: boolean } = {}): void {
+    const key = bounds.join(",");
+    if (key === this.lastFit) {
       return;
     }
-    if (this.markers.length > 0) {
-      return;
+    this.lastFit = key;
+    window.clearTimeout(this.cameraTimer);
+    const go = () =>
+      this.map.fitBounds(bounds, {
+        padding: 24,
+        duration: options.instant || reducedMotion() ? 0 : CAMERA_MS,
+        easing: easeInOutCubic,
+      });
+    if (options.instant) {
+      go();
+    } else {
+      this.cameraTimer = window.setTimeout(go, CAMERA_DEBOUNCE_MS);
     }
-    fetch(`${layersBase()}places.geojson`)
+  }
+
+  private loadPlaces(): Promise<void> {
+    this.placesLoading ??= fetch(`${layersBase()}places.geojson`)
       .then((response) => {
         if (!response.ok) {
           throw new Error(`places: HTTP ${response.status}`);
@@ -109,33 +170,63 @@ export class LayerManager {
         }>;
       })
       .then((data) => {
-        for (const feature of data.features) {
+        data.features.forEach((feature, index) => {
+          // MapLibre writes inline opacity on the marker element itself, so the
+          // fade lives on an inner label instead.
           const element = document.createElement("div");
-          element.className = "place-marker";
-          element.textContent = feature.properties.name;
           element.title = feature.properties.description;
-          const marker = new Marker({ element }).setLngLat(feature.geometry.coordinates).addTo(this.map);
-          this.markers.push(marker);
-        }
+          const label = document.createElement("span");
+          label.className = "place-marker is-hidden";
+          label.style.transitionDelay = `${index * 70}ms`;
+          label.textContent = feature.properties.name;
+          element.append(label);
+          this.markers.push(
+            new Marker({ element }).setLngLat(feature.geometry.coordinates).addTo(this.map),
+          );
+        });
+        this.applyPlaces();
       })
-      .catch((error: unknown) => console.error("places", error));
+      .catch((error: unknown) => {
+        this.placesLoading = undefined;
+        console.error("places", error);
+      });
+    return this.placesLoading;
   }
 
-  /** Centre the map on the manifest bounds (or on a given box). */
-  flyTo(bounds: Bounds = this.manifest.bounds): void {
-    this.map.fitBounds(bounds, { padding: 24, duration: 800 });
+  private applyPlaces(): void {
+    for (const marker of this.markers) {
+      marker.getElement().firstElementChild?.classList.toggle("is-hidden", !this.placesVisible);
+    }
   }
 
-  private ensureRaster(layer: Layer): void {
-    if (this.added.has(layer.id)) {
+  private fadeRaster(id: string, visible: boolean): void {
+    const layer = this.byId.get(id);
+    if (!layer || !this.map.getLayer(id)) {
       return;
     }
-    this.added.add(layer.id);
-    // Coherence is recoloured in the browser (transparent where it is high); the other layers load as they are.
-    const url = layer.kind === "coh" ? recolourCoherence(layerUrl(layer)) : Promise.resolve(layerUrl(layer));
-    url
+    if (visible === this.shown.has(id)) {
+      return;
+    }
+    if (visible) {
+      this.shown.add(id);
+    } else {
+      this.shown.delete(id);
+    }
+    this.map.setPaintProperty(id, "raster-opacity-transition", {
+      duration: fadeMs(),
+      delay: visible || reducedMotion() ? 0 : FADE_OUT_DELAY_MS,
+    });
+    this.map.setPaintProperty(id, "raster-opacity", visible ? rasterOpacity(layer) : 0);
+  }
+
+  private ensureRaster(layer: Layer, urgent: boolean): Promise<void> {
+    const pending = this.loading.get(layer.id);
+    if (pending) {
+      return pending;
+    }
+    const [west, south, east, north] = this.manifest.bounds;
+    const result = layerImage(layer, urgent)
       .then((source) => {
-        const [west, south, east, north] = this.manifest.bounds;
         this.map.addSource(layer.id, {
           type: "image",
           url: source,
@@ -153,19 +244,29 @@ export class LayerManager {
             id: layer.id,
             type: "raster",
             source: layer.id,
-            layout: { visibility: this.wanted.has(layer.id) ? "visible" : "none" },
             paint: {
-              "raster-opacity": layer.kind === "coh" ? 1 : OPACITY,
+              "raster-opacity": 0,
               "raster-fade-duration": 0,
             },
           },
           labels,
         );
+        if (this.wanted.has(layer.id)) {
+          // Let the invisible layer render once, so the fade has a start to run from.
+          this.map.once("render", () => {
+            if (this.wanted.has(layer.id)) {
+              this.fadeRaster(layer.id, true);
+            }
+          });
+          this.map.triggerRepaint();
+        }
       })
       .catch((error: unknown) => {
-        this.added.delete(layer.id);
+        this.loading.delete(layer.id);
         console.error(`layer ${layer.id}`, error);
       });
+    this.loading.set(layer.id, result);
+    return result;
   }
 
   private ensureVector(id: VectorId): void {
@@ -173,12 +274,17 @@ export class LayerManager {
       return;
     }
     const style = VECTOR_STYLE[id];
+    const fade = { duration: fadeMs(), delay: 0 };
     this.map.addSource(id, { type: "geojson", data: `${layersBase()}${id}.geojson` });
     this.map.addLayer({
       id: `${id}-fill`,
       type: "fill",
       source: id,
-      paint: { "fill-color": style.color, "fill-opacity": style.fill },
+      paint: {
+        "fill-color": style.color,
+        "fill-opacity": 0,
+        "fill-opacity-transition": fade,
+      },
     });
     this.map.addLayer({
       id: `${id}-line`,
@@ -187,24 +293,38 @@ export class LayerManager {
       paint: {
         "line-color": style.color,
         "line-width": style.width,
+        "line-opacity": 0,
+        "line-opacity-transition": fade,
         ...(style.dash ? { "line-dasharray": style.dash } : {}),
       },
     });
     this.added.add(id);
   }
 
-  private setVectorVisible(id: VectorId, visible: boolean): void {
-    for (const suffix of ["fill", "line"]) {
-      const layerId = `${id}-${suffix}`;
-      if (this.map.getLayer(layerId)) {
-        this.map.setLayoutProperty(layerId, "visibility", visible ? "visible" : "none");
-      }
+  private fadeVector(id: VectorId, visible: boolean): void {
+    if (visible) {
+      this.ensureVector(id);
     }
+    if (!this.added.has(id) || visible === this.shown.has(id)) {
+      return;
+    }
+    if (visible) {
+      this.shown.add(id);
+    } else {
+      this.shown.delete(id);
+    }
+    const style = VECTOR_STYLE[id];
+    const transition = {
+      duration: fadeMs(),
+      delay: visible || reducedMotion() ? 0 : FADE_OUT_DELAY_MS,
+    };
+    this.map.setPaintProperty(`${id}-fill`, "fill-opacity-transition", transition);
+    this.map.setPaintProperty(`${id}-fill`, "fill-opacity", visible ? style.fill : 0);
+    this.map.setPaintProperty(`${id}-line`, "line-opacity-transition", transition);
+    this.map.setPaintProperty(`${id}-line`, "line-opacity", visible ? 1 : 0);
   }
+}
 
-  private hide(id: string): void {
-    if (this.map.getLayer(id)) {
-      this.map.setLayoutProperty(id, "visibility", "none");
-    }
-  }
+function rasterOpacity(layer: Layer): number {
+  return layer.kind === "coh" ? 1 : OPACITY;
 }

@@ -7,11 +7,29 @@ import Legend from "../map/Legend";
 import MapView from "../map/MapView";
 import { LayerManager } from "../map/layers";
 import { loadManifest, type Layer, type Manifest } from "../map/manifest";
-import { flatten, isVector, PLACES_ID, story, type Step } from "./story";
+import { flatten, isVector, PLACES_ID, story, type FlatStep, type Step } from "./story";
 import { hectares, loadStats, type Polarization, type Stats } from "./stats";
 
 const layerTitle = (manifest: Manifest | null, id: string): string =>
   manifest?.layers.find((layer: Layer) => layer.id === id)?.title ?? id;
+
+/** Raster ids in the order the story will want them, starting after `from`, then the rest. */
+function preloadOrder(steps: FlatStep[], from: number, all: string[]): string[] {
+  const ordered: string[] = [];
+  for (let offset = 0; offset < steps.length; offset++) {
+    const { step } = steps[(from + offset) % steps.length];
+    const ids = [
+      ...step.layers.map((ref) => ref.id),
+      ...(step.comparisons ?? []).flatMap((c) => [c.leftLayerId, c.rightLayerId]),
+    ];
+    for (const id of ids) {
+      if (all.includes(id) && !ordered.includes(id)) {
+        ordered.push(id);
+      }
+    }
+  }
+  return [...ordered, ...all.filter((id) => !ordered.includes(id))];
+}
 
 /** Our area next to the official one (D4), straight from stats.json. */
 function StatsPanel({ stats }: { stats: Stats }) {
@@ -88,6 +106,8 @@ export default function Story() {
   const [manifest, setManifest] = useState<Manifest | null>(null);
   const [stats, setStats] = useState<Stats | null>(null);
   const managerRef = useRef<LayerManager | null>(null);
+  const [compareReady, setCompareReady] = useState(false);
+  const [mainIdle, setMainIdle] = useState(false);
   const activeRef = useRef(0);
   const stepRefs = useRef<Array<HTMLElement | null>>([]);
 
@@ -99,6 +119,8 @@ export default function Story() {
       .then(setStats)
       .catch((error: unknown) => console.error("stats", error));
   }, []);
+
+  const framed = useRef(false);
 
   const applyStep = useCallback((manager: LayerManager, step: Step) => {
     const rasters: string[] = [];
@@ -117,7 +139,8 @@ export default function Story() {
     manager.showVector(vectors);
     manager.showPlaces(places);
     if (step.mapView?.bounds) {
-      manager.flyTo(step.mapView.bounds);
+      manager.flyTo(step.mapView.bounds, { instant: !framed.current });
+      framed.current = true;
     }
   }, []);
 
@@ -129,6 +152,11 @@ export default function Story() {
           managerRef.current = manager;
           (window as unknown as { __layers?: LayerManager }).__layers = manager;
           applyStep(manager, steps[activeRef.current].step);
+          // Once the first view has drawn, fetch the rest in story order.
+          map.once("idle", () => {
+            setMainIdle(true);
+            void manager.preload(preloadOrder(steps, activeRef.current, manager.ids()));
+          });
         })
         .catch((error: unknown) => console.error("story", error));
     },
@@ -162,6 +190,15 @@ export default function Story() {
 
   const current = steps[active] ?? steps[0];
   const comparison = current?.step.comparisons?.[0];
+  // The comparison maps are built once and kept: the overlay fades in and out,
+  // and switching pairs is a cross-fade inside it. Until the reader reaches the
+  // first comparison they are built in the background from the first one.
+  const lastComparison = useRef(steps.find((item) => item.step.comparisons?.length));
+  if (comparison && current) {
+    lastComparison.current = current;
+  }
+  const shownComparison = lastComparison.current?.step.comparisons?.[0];
+  const shownBounds = lastComparison.current?.step.mapView?.bounds;
 
   // C3: one legend per raster layer the step shows (at most two), or the one
   // the reader picked in the final step.
@@ -260,14 +297,15 @@ export default function Story() {
             )}
           </div>
         )}
-        {comparison && (
-          <div className="story__overlay">
+        {shownComparison && mainIdle && (
+          <div className={`story__overlay${comparison && compareReady ? " is-open" : ""}`}>
             <CompareView
-              key={`${comparison.leftLayerId}-${comparison.rightLayerId}`}
-              before={comparison.leftLayerId}
-              after={comparison.rightLayerId}
-              beforeLabel={layerTitle(manifest, comparison.leftLayerId)}
-              afterLabel={layerTitle(manifest, comparison.rightLayerId)}
+              before={shownComparison.leftLayerId}
+              after={shownComparison.rightLayerId}
+              beforeLabel={layerTitle(manifest, shownComparison.leftLayerId)}
+              afterLabel={layerTitle(manifest, shownComparison.rightLayerId)}
+              bounds={shownBounds}
+              onReady={() => setCompareReady(true)}
             />
           </div>
         )}
