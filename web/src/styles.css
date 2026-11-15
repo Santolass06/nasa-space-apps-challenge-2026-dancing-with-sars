@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  /* --bg (the page's dark base) is set per act in moods.css */
+  --bg: #05070f;
   --bg-soft: #0b1020;
   --card: rgba(255, 255, 255, 0.04);
   --border: rgba(255, 255, 255, 0.1);
@@ -372,10 +372,8 @@ h1 {
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--act-accent);
-  /* The page's own background, so the band is invisible and hides what scrolls under it. */
-  background-color: var(--bg);
-  background-image: var(--mood-glow);
-  background-attachment: fixed;
+  /* Its background (the page's own mood, so the band is invisible and hides what scrolls
+     under it) is painted in moods.css. */
 }
 
 .story__step {
