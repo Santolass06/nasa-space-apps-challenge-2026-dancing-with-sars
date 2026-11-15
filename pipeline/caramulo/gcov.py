@@ -288,7 +288,7 @@ def act4_numbers(layers_dir: Path, data_dir: Path) -> dict:
     quantisation does not leak into the numbers. Writes the table into
     stats.json and returns it.
     """
-    manifest = json.loads((layers_dir / "manifest.json").read_text(encoding="utf-8"))
+    manifest = export.read_manifest(layers_dir / "manifest.json")
     by_id = {layer["id"]: layer for layer in manifest["layers"]}
     scar = _scar_mask(layers_dir)
     dates = {"before": "2026-06-29", "after": "2026-07-11"}

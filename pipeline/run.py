@@ -450,18 +450,17 @@ def run_real(args: argparse.Namespace) -> int:
     if args.plan:
         print("--plan: nothing was written.")
         return 0
-    # The run rebuilds the manifest: every entry must come from this run, not from
-    # whatever was there before (upserts never prune, so a stale entry would stay).
+    # The run rebuilds the manifest, but never in place (#92): each step writes to a
+    # staging file and the live manifest is swapped in only when the whole run succeeds.
+    # An aborted run — a failing step, Ctrl-C, a kill — leaves the app with the manifest
+    # it already had, never an empty or half-built one.
     manifest_path = args.out / "manifest.json"
-    if manifest_path.exists():
-        backup = manifest_path.with_suffix(".json.prev")
-        manifest_path.replace(backup)
-        print(f"  previous manifest kept as {backup.name}; this run rebuilds it")
-    for index, (label, run) in enumerate(steps, start=1):
-        print(f"[{index}/{len(steps)}] {label}")
-        code = run()
-        if code not in (None, 0):
-            raise SystemExit(f"step {index} ({label}) failed with {code}")
+    with export.staged_manifest(manifest_path):
+        for index, (label, run) in enumerate(steps, start=1):
+            print(f"[{index}/{len(steps)}] {label}")
+            code = run()
+            if code not in (None, 0):
+                raise SystemExit(f"step {index} ({label}) failed with {code}")
     print(f"Done: {args.out}")
     return 0
 
