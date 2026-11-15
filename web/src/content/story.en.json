@@ -530,6 +530,7 @@
               40.85
             ]
           },
+          "wide": true,
           "comparisons": [],
           "sources": [
             "https://doi.org/10.1109/36.175330"

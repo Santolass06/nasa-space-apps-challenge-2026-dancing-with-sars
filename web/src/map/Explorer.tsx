@@ -209,8 +209,8 @@ export default function Explorer({ manifest, mode: wanted, onModeChange, full, o
             </button>
           </div>
         </div>
-        {mode === 1 && legend}
       </div>
+      {mode === 1 && legend && <div className="explorer__legend">{legend}</div>}
     </div>
   );
 }
