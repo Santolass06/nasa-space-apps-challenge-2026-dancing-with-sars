@@ -10,7 +10,7 @@ export default function App() {
         <div className="hero__glow" aria-hidden="true" />
         <p className="eyebrow">NASA Space Apps Challenge 2026 · Dancing with the SARs</p>
         <h1>
-          Caramulo <span className="flame"><span className="accent">em chamas</span></span>
+          Caramulo <span className="flame"><span className="accent">on fire</span></span>
         </h1>
         <p className="lede">
           The largest wildfire of Portugal&apos;s 2026 season (Vouzela, 2–5 July), told with

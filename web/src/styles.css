@@ -80,7 +80,7 @@ h1 {
   letter-spacing: -0.03em;
 }
 
-/* "em chamas": flame colours, with an ember glow behind the letters (only its opacity moves). */
+/* "on fire": flame colours, with an ember glow behind the letters (only its opacity moves). */
 .flame {
   position: relative;
   isolation: isolate;
