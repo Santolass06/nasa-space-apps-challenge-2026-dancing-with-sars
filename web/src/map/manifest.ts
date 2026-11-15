@@ -30,6 +30,7 @@ let cached: Promise<Manifest> | undefined;
 
 export async function loadManifest(): Promise<Manifest> {
   // One fetch per page: the map, the compare view and the story all share it.
+  // A rejection is NOT cached: one dropped request must not poison the session.
   cached ??= (async () => {
     const url = `${layersBase()}manifest.json`;
     const response = await fetch(url);
@@ -37,7 +38,10 @@ export async function loadManifest(): Promise<Manifest> {
       throw new Error(`manifest: HTTP ${response.status} at ${url}`);
     }
     return (await response.json()) as Manifest;
-  })();
+  })().catch((error: unknown) => {
+    cached = undefined;
+    throw error;
+  });
   return cached;
 }
 
