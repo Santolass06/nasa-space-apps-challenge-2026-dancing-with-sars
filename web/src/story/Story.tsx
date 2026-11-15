@@ -18,6 +18,7 @@ import {
   type Step,
 } from "./storyTypes";
 import Embers from "./Embers";
+import StoryIndex from "./StoryIndex";
 import { hectares, loadStats, type Polarization, type Stats } from "./stats";
 
 /**
@@ -372,6 +373,7 @@ export default function Story() {
   return (
     <div className={`story${current?.step.focus || current?.step.wide ? " is-wide" : ""}`}>
       <Embers active={activeAct === "fire"} />
+      <StoryIndex acts={story.acts} activeAct={activeAct} />
       <div className="story__text">
         {story.acts.map((act) => (
           <section className="story__act" key={act.id} id={`act-${act.id}`}>
@@ -381,6 +383,7 @@ export default function Story() {
               .map((item) => (
                 <article
                   key={item.step.id}
+                  id={`step-${item.step.id}`}
                   data-step={item.index}
                   ref={(element) => {
                     stepRefs.current[item.index] = element;

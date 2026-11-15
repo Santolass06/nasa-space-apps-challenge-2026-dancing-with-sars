@@ -1448,11 +1448,18 @@ h1 {
 }
 
 @media (max-width: 640px) {
+  /* The right end is left free for the story index button (fixed at the top right). */
   .map-hud {
     top: 0.5rem;
-    right: 0.5rem;
+    right: 3.75rem;
     left: 0.5rem;
     max-width: none;
+  }
+
+  .explorer__hud,
+  .explorer__bar {
+    right: 3.75rem;
+    max-width: calc(100% - 4.25rem);
   }
 
   /* The bar wraps to two lines on a phone. */
@@ -1498,4 +1505,58 @@ h1 {
   width: 100%;
   height: 100%;
   pointer-events: none;
+}
+
+/* --- Story index: a fixed button at the top right that lists the acts --- */
+.story__index {
+  position: fixed;
+  top: 0.75rem;
+  right: 0.75rem;
+  z-index: 20;
+}
+
+.story__index-toggle,
+.story__index nav {
+  color: var(--text);
+  background: var(--bg-soft, #0b1020);
+  border: 1px solid var(--border);
+  border-radius: 0.6rem;
+}
+
+.story__index-toggle {
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  margin-inline-start: auto;
+  place-items: center;
+  cursor: pointer;
+}
+
+.story__index nav {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  width: min(16rem, calc(100vw - 2rem));
+  padding: 0.5rem;
+}
+
+.story__index nav[hidden] {
+  display: none;
+}
+
+.story__index nav a {
+  display: block;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.35rem;
+}
+
+.story__index nav a:hover,
+.story__index nav a:focus-visible {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* The act the reader is in. */
+.story__index nav a[aria-current="location"] {
+  color: var(--act-accent);
+  font-weight: 600;
 }
