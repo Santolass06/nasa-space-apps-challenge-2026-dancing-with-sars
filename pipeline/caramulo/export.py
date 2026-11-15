@@ -521,10 +521,23 @@ if __name__ == "__main__":
     (small, small_name), (big, big_name) = lod_fields(field, "x_D52_20260101")
     assert small.shape == (2, 3) and big.shape == (4, 6), (small.shape, big.shape)
     assert (small_name, big_name) == ("x_D52_20260101.png", "x_D52_20260101@2x.png")
-    assert layer_entry(
-        layer_id="a", kind="hh", file="a.png", hires="a@2x.png", orbit=None, dates=[],
-        title="", units="", value_range=[0, 1], colormap="gray", source="", caveat="",
-    )["hires"] == "a@2x.png"
+    assert (
+        layer_entry(
+            layer_id="a",
+            kind="hh",
+            file="a.png",
+            hires="a@2x.png",
+            orbit=None,
+            dates=[],
+            title="",
+            units="",
+            value_range=[0, 1],
+            colormap="gray",
+            source="",
+            caveat="",
+        )["hires"]
+        == "a@2x.png"
+    )
     # downsample2 averages 2x2 blocks and ignores NaN
     field = np.array([[1.0, 3.0, np.nan, np.nan], [2.0, 4.0, np.nan, np.nan]], dtype="float32")
     small = downsample2(field)
