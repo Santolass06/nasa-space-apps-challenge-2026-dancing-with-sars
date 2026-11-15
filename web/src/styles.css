@@ -712,8 +712,21 @@ h1 {
 }
 
 .explorer__hud .picker,
-.explorer__hud .legend {
+.explorer__legend .legend {
   pointer-events: auto;
+}
+
+/* The legend sits at the bottom left, above the attribution, so the controls at the top
+   and the legend do not stack over the middle of the map. */
+.explorer__legend {
+  position: absolute;
+  left: 0.75rem;
+  bottom: 2.75rem;
+  pointer-events: none;
+}
+
+.explorer__hud .picker {
+  max-width: 30rem;
 }
 
 .explorer__controls {

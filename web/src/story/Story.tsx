@@ -184,7 +184,8 @@ export default function Story() {
     // does, the data waits until the frame is most of the way there, so it fades in as the
     // camera starts and not on top of a half-grown frame at the old zoom; the camera then
     // waits for the frame to be done.
-    const widthChanges = framed.current && wasWide.current !== Boolean(step.focus);
+    const wide = Boolean(step.focus || step.wide);
+    const widthChanges = framed.current && wasWide.current !== wide;
     const show = () => {
       manager.showLayers(rasters);
       manager.showVector(overlays);
@@ -205,7 +206,7 @@ export default function Story() {
         delay: widthChanges ? MAP_CAMERA_DELAY_MS : undefined,
       });
       framed.current = true;
-      wasWide.current = Boolean(step.focus);
+      wasWide.current = wide;
     }
   }, []);
 
@@ -369,7 +370,7 @@ export default function Story() {
   );
 
   return (
-    <div className={`story${current?.step.focus ? " is-wide" : ""}`}>
+    <div className={`story${current?.step.focus || current?.step.wide ? " is-wide" : ""}`}>
       <Embers active={activeAct === "fire"} />
       <div className="story__text">
         {story.acts.map((act) => (
