@@ -3,16 +3,16 @@
     "kind": "coherence difference (fire pair minus control pair)",
     "threshold": -0.25,
     "smoothing_m": 1000.0,
-    "components": 12,
-    "dropped_ha": 1905.3
+    "components": 13,
+    "dropped_ha": 1974.9
   },
   "fire_layer": "coh_D52_20260629_20260711",
   "control_layer": "coh_D52_20260711_20260723",
-  "our_area_ha": 13517.9,
+  "our_area_ha": 13501.0,
   "official_area_ha": 12819.8,
-  "overlap_ha": 12127.8,
-  "overlap_pct_of_official": 94.6,
-  "overlap_pct_of_ours": 89.7,
+  "overlap_ha": 12153.4,
+  "overlap_pct_of_official": 94.8,
+  "overlap_pct_of_ours": 90.0,
   "act4": {
     "method": "mean inside the burn polygon vs the rest of the grid, computed from the products, not from the PNG layers",
     "dates": {
@@ -34,20 +34,20 @@
       },
       "hv": {
         "before": {
-          "inside": -12.453,
+          "inside": -12.456,
           "outside": -12.961
         },
         "after": {
-          "inside": -13.123,
-          "outside": -13.234
+          "inside": -13.127,
+          "outside": -13.233
         },
-        "change_inside_db": -0.67,
-        "change_outside_db": -0.273
+        "change_inside_db": -0.671,
+        "change_outside_db": -0.272
       }
     },
     "coherence": {
       "fire": {
-        "inside": 0.284,
+        "inside": 0.283,
         "outside": 0.531
       },
       "control": {
@@ -55,6 +55,6 @@
         "outside": 0.631
       }
     },
-    "answer": "Between 2026-06-29 and 2026-07-11, HV changes -0.67 dB inside the scar and -0.27 dB outside; HH -0.27 and -0.14 dB. Net of the change outside, that is -0.40 dB in HV and -0.13 dB in HH: small, a few tenths of a dB, with speckle dominating at pixel level. It fits the standing-trunk hypothesis (HH, sensitive to trunk echo, hardly moves; the HV volume signal drops a little), but that explanation is not tested. Coherence, not brightness, is the fire signal: inside the scar it is 0.28 in the fire pair against 0.70 in the control pair (a drop of 0.41); outside it is 0.53 and 0.63."
+    "answer": "Between 2026-06-29 and 2026-07-11, HV changes -0.67 dB inside the scar and -0.27 dB outside; HH -0.27 and -0.14 dB. Net of the change outside, that is -0.40 dB in HV and -0.13 dB in HH: small, a few tenths of a dB, with speckle dominating at pixel level. It fits the standing-trunk hypothesis (HH, sensitive to trunk echo, hardly moves; the HV volume signal drops a little), but that explanation is not tested. Coherence, not brightness, is the fire signal: inside the scar it is 0.28 in the fire pair against 0.70 in the control pair (a drop of 0.42); outside it is 0.53 and 0.63."
   }
 }
