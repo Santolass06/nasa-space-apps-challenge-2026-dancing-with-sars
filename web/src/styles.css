@@ -177,6 +177,14 @@ h1 {
   filter: invert(1);
 }
 
+.map-caption {
+  margin: 0;
+  padding: 0.6rem 1rem;
+  font-size: 0.78rem;
+  color: var(--muted);
+  border-top: 1px solid var(--border);
+}
+
 .placeholder h2 {
   margin: 0 0 0.5rem;
   font-size: 1.3rem;

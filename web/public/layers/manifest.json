@@ -8,42 +8,6 @@
   ],
   "layers": [
     {
-      "id": "s2_20260628",
-      "kind": "s2",
-      "file": "s2_20260628.png",
-      "orbit": null,
-      "dates": [
-        "2026-06-28"
-      ],
-      "title": "Sentinel-2 true color, 28 Jun",
-      "units": "RGB",
-      "range": [
-        0.0,
-        255.0
-      ],
-      "colormap": "rgb",
-      "source": "run.py --mock (synthetic, task T2b)",
-      "caveat": "Synthetic mock layer for development; not real satellite data. Colors are invented, not Sentinel-2 data."
-    },
-    {
-      "id": "s2_20260712",
-      "kind": "s2",
-      "file": "s2_20260712.png",
-      "orbit": null,
-      "dates": [
-        "2026-07-12"
-      ],
-      "title": "Sentinel-2 true color, 12 Jul",
-      "units": "RGB",
-      "range": [
-        0.0,
-        255.0
-      ],
-      "colormap": "rgb",
-      "source": "run.py --mock (synthetic, task T2b)",
-      "caveat": "Synthetic mock layer for development; not real satellite data. Colors are invented, not Sentinel-2 data."
-    },
-    {
       "id": "coh_D52_20260629_20260711",
       "kind": "coh",
       "file": "coh_D52_20260629_20260711.png",
