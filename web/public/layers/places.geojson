@@ -25,8 +25,8 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -8.266248,
-          40.599333
+          -8.269465,
+          40.602782
         ]
       },
       "properties": {
@@ -34,25 +34,25 @@
         "kind": "evacuation",
         "description": "This village in Tondela was reported evacuated.",
         "source": "https://www.sabado.pt/portugal/amp/duas-aldeias-evacuadas-em-tondela-por-causa-do-incendio-de-vouzela",
-        "coordinateSource": "https://www.codigo-postal.pt/tondela/sao-joao-do-monte/2.html"
+        "coordinateSource": "https://www.openstreetmap.org/node/5347012983"
       }
     },
     {
       "type": "Feature",
-      "id": "mansores",
+      "id": "mancores",
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -8.232618,
-          40.598694
+          -8.28762,
+          40.580675
         ]
       },
       "properties": {
-        "name": "Mansores",
+        "name": "Mançores",
         "kind": "evacuation",
-        "description": "This village in Tondela was reported evacuated.",
+        "description": "This village in Tondela was reported evacuated (some news reports spell it Mansores).",
         "source": "https://www.sabado.pt/portugal/amp/duas-aldeias-evacuadas-em-tondela-por-causa-do-incendio-de-vouzela",
-        "coordinateSource": "https://www.codigo-postal.pt/tondela/sao-joao-do-monte/2.html"
+        "coordinateSource": "https://www.openstreetmap.org/node/4187904717"
       }
     },
     {
@@ -71,6 +71,24 @@
         "description": "The marker shows the reserve's walking trail starting point.",
         "source": "https://executivedigest.sapo.pt/?p=788227",
         "coordinateSource": "https://www.visitviseudaolafoes.pt/wp-content/uploads/2024/07/Folheto_A4_PR-Cambarinho-VZL-5Jun-1.pdf"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "daires",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -8.254616,
+          40.580389
+        ]
+      },
+      "properties": {
+        "name": "Daires",
+        "kind": "front",
+        "description": "The fire reached this village on 4 July; it was not evacuated.",
+        "source": "https://cnnportugal.iol.pt/incendios/aldeia/frentes-de-incendio-mantem-se-ativas-e-chegam-a-aldeia-do-caramulo-em-tondela/20260704/6a497614d34edcee7c66119c",
+        "coordinateSource": "https://www.openstreetmap.org/node/5347012985"
       }
     }
   ]

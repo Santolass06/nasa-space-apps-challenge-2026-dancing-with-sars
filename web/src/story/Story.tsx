@@ -2,16 +2,65 @@ import type { Map as MapLibreMap } from "maplibre-gl";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import CompareView from "../map/CompareView";
+import Explorer, { type ExploreMode } from "../map/Explorer";
 import LayerPicker from "../map/LayerPicker";
 import Legend from "../map/Legend";
 import MapView from "../map/MapView";
-import { LayerManager } from "../map/layers";
+import { LayerManager, type OverlayId } from "../map/layers";
 import { loadManifest, type Layer, type Manifest } from "../map/manifest";
-import { flatten, isVector, PLACES_ID, story, type Step } from "./story";
+import {
+  flatten,
+  isVector,
+  OVERLAY_TITLES,
+  PLACES_ID,
+  story,
+  type FlatStep,
+  type Step,
+} from "./story";
 import { hectares, loadStats, type Polarization, type Stats } from "./stats";
 
+/**
+ * Portrait phones and tablets: the map is pinned on top and the step's text sits
+ * in a sheet at the bottom of the screen (landscape keeps the two columns).
+ */
+const STACKED = "(max-width: 900px) and (orientation: portrait)";
+
+function useStacked(): boolean {
+  const [stacked, setStacked] = useState(() => window.matchMedia(STACKED).matches);
+  useEffect(() => {
+    const query = window.matchMedia(STACKED);
+    const onChange = () => setStacked(query.matches);
+    query.addEventListener("change", onChange);
+    return () => query.removeEventListener("change", onChange);
+  }, []);
+  return stacked;
+}
+
+/** How long scrolling must rest on a step before the map follows it. */
+const APPLY_DELAY_MS = 260;
+/** Steps applied closer together than this count as fast scrolling. */
+const FAST_SCROLL_MS = 1500;
+
 const layerTitle = (manifest: Manifest | null, id: string): string =>
-  manifest?.layers.find((layer: Layer) => layer.id === id)?.title ?? id;
+  manifest?.layers.find((layer: Layer) => layer.id === id)?.title ?? OVERLAY_TITLES[id] ?? id;
+
+/** Raster ids in the order the story will want them, starting after `from`, then the rest. */
+function preloadOrder(steps: FlatStep[], from: number, all: string[]): string[] {
+  const ordered: string[] = [];
+  for (let offset = 0; offset < steps.length; offset++) {
+    const { step } = steps[(from + offset) % steps.length];
+    const ids = [
+      ...step.layers.map((ref) => ref.id),
+      ...(step.comparisons ?? []).flatMap((c) => [c.leftLayerId, c.rightLayerId]),
+    ];
+    for (const id of ids) {
+      if (all.includes(id) && !ordered.includes(id)) {
+        ordered.push(id);
+      }
+    }
+  }
+  return [...ordered, ...all.filter((id) => !ordered.includes(id))];
+}
 
 /** Our area next to the official one (D4), straight from stats.json. */
 function StatsPanel({ stats }: { stats: Stats }) {
@@ -83,11 +132,21 @@ function Act4Panel({ act4 }: { act4: Stats["act4"] }) {
  */
 export default function Story() {
   const steps = useMemo(flatten, []);
+  // `active` is the step under the middle of the screen (it lights the text at once);
+  // `applied` is the one the map shows, which follows `active` only once scrolling
+  // has paused on it, so a quick scroll doesn't flash every step in between.
   const [active, setActive] = useState(0);
+  const [applied, setApplied] = useState(0);
+  const lastApplied = useRef(0);
   const [picked, setPicked] = useState<string | null>(null);
   const [manifest, setManifest] = useState<Manifest | null>(null);
   const [stats, setStats] = useState<Stats | null>(null);
   const managerRef = useRef<LayerManager | null>(null);
+  const [compareReady, setCompareReady] = useState(false);
+  const [exploreMode, setExploreMode] = useState<ExploreMode>(1);
+  const [exploreFull, setExploreFull] = useState(false);
+  const stacked = useStacked();
+  const [mainIdle, setMainIdle] = useState(false);
   const activeRef = useRef(0);
   const stepRefs = useRef<Array<HTMLElement | null>>([]);
 
@@ -100,24 +159,36 @@ export default function Story() {
       .catch((error: unknown) => console.error("stats", error));
   }, []);
 
+  const framed = useRef(false);
+  const wasWide = useRef(false);
+
   const applyStep = useCallback((manager: LayerManager, step: Step) => {
     const rasters: string[] = [];
-    const vectors: Array<"burn_nisar" | "burn_official"> = [];
-    let places = false;
+    const overlays: OverlayId[] = [];
     for (const ref of step.layers) {
       if (ref.id === PLACES_ID) {
-        places = true;
+        overlays.push("places");
       } else if (isVector(ref.id)) {
-        vectors.push(ref.id);
+        overlays.push(ref.id);
       } else {
         rasters.push(ref.id);
       }
     }
     manager.showLayers(rasters);
-    manager.showVector(vectors);
-    manager.showPlaces(places);
-    if (step.mapView?.bounds) {
-      manager.flyTo(step.mapView.bounds);
+    manager.showVector(overlays);
+    manager.showFocus(step.focus ?? null);
+    // A focus step frames its zone with room around it; any other step frames its view.
+    const target = step.focus?.view ?? step.focus?.bounds ?? step.mapView?.bounds;
+    if (target) {
+      // When the map is about to widen or narrow, let that finish before the camera moves.
+      const widthChanges = wasWide.current !== Boolean(step.focus);
+      manager.flyTo(target, {
+        instant: !framed.current,
+        padding: step.focus ? 90 : 24,
+        delay: widthChanges ? 750 : undefined,
+      });
+      framed.current = true;
+      wasWide.current = Boolean(step.focus);
     }
   }, []);
 
@@ -129,6 +200,14 @@ export default function Story() {
           managerRef.current = manager;
           (window as unknown as { __layers?: LayerManager }).__layers = manager;
           applyStep(manager, steps[activeRef.current].step);
+          // Once the first view has drawn, fetch the rest in story order.
+          map.once("idle", () => {
+            // The comparison maps are built once the layers are in (or sooner, if the
+            // reader reaches a comparison first), so they don't compete for the network.
+            void manager
+              .preload(preloadOrder(steps, activeRef.current, manager.ids()))
+              .finally(() => setMainIdle(true));
+          });
         })
         .catch((error: unknown) => console.error("story", error));
     },
@@ -160,8 +239,26 @@ export default function Story() {
     return () => observer.disconnect();
   }, [steps]);
 
-  const current = steps[active] ?? steps[0];
+  useEffect(() => {
+    if (active === applied) {
+      return;
+    }
+    const timer = window.setTimeout(() => setApplied(active), APPLY_DELAY_MS);
+    return () => window.clearTimeout(timer);
+  }, [active, applied]);
+
+  const current = steps[applied] ?? steps[0];
   const comparison = current?.step.comparisons?.[0];
+  const exploring = current?.step.id === "explore-the-map";
+  // The comparison maps are built once and kept: the overlay fades in and out,
+  // and switching pairs is a cross-fade inside it. Until the reader reaches the
+  // first comparison they are built in the background from the first one.
+  const lastComparison = useRef(steps.find((item) => item.step.comparisons?.length));
+  if (comparison && current) {
+    lastComparison.current = current;
+  }
+  const shownComparison = lastComparison.current?.step.comparisons?.[0];
+  const shownBounds = lastComparison.current?.step.mapView?.bounds;
 
   // C3: one legend per raster layer the step shows (at most two), or the one
   // the reader picked in the final step.
@@ -175,18 +272,68 @@ export default function Story() {
           .slice(0, 2)
       : [];
 
+  // Leaving the explore step closes the expanded view; while it is open the page behind stays put.
+  useEffect(() => {
+    if (!exploring) {
+      setExploreFull(false);
+    }
+  }, [exploring]);
+  useEffect(() => {
+    document.body.style.overflow = exploreFull ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [exploreFull]);
+
   // Drive the single map. Comparison steps draw their own pair instead.
   useEffect(() => {
     const manager = managerRef.current;
     if (!manager || comparison || !current) {
       return;
     }
+    const now = performance.now();
+    manager.setPace(now - lastApplied.current < FAST_SCROLL_MS);
+    lastApplied.current = now;
     applyStep(manager, current.step);
     setPicked(null);
-  }, [active, comparison, applyStep, current]);
+  }, [applied, comparison, applyStep, current]);
+
+  /** The text of a step: its sentence, one caption per layer, sources, and the numbers panels. */
+  const stepContent = (item: FlatStep) => (
+    <>
+          <p className="story__step-text">{item.step.text}</p>
+          <ul className="story__captions">
+            {item.step.layers.map((ref) => (
+              <li key={ref.id}>
+                <span className="story__layer-name">{layerTitle(manifest, ref.id)}</span>{" "}
+                {ref.caption}
+              </li>
+            ))}
+          </ul>
+          {item.step.sources && item.step.sources.length > 0 && (
+            <p className="story__sources">
+              Sources:{" "}
+              {item.step.sources.map((url, position) => (
+                <span key={url}>
+                  <a href={url} target="_blank" rel="noreferrer">
+                    {new URL(url).hostname}
+                  </a>
+                  {position < item.step.sources!.length - 1 ? ", " : ""}
+                </span>
+              ))}
+            </p>
+          )}
+          {item.index === active && item.act.id === "scar" && !item.step.focus && stats && (
+            <StatsPanel stats={stats} />
+          )}
+          {item.index === active && item.act.id === "radar" && !item.step.focus && stats?.act4 && (
+            <Act4Panel act4={stats.act4} />
+          )}
+    </>
+  );
 
   return (
-    <div className="story">
+    <div className={`story${current?.step.focus ? " is-wide" : ""}`}>
       <div className="story__text">
         {story.acts.map((act) => (
           <section className="story__act" key={act.id} id={`act-${act.id}`}>
@@ -202,45 +349,30 @@ export default function Story() {
                   }}
                   className={`story__step${item.index === active ? " is-active" : ""}`}
                 >
-                  <p className="story__step-text">{item.step.text}</p>
-                  <ul className="story__captions">
-                    {item.step.layers.map((ref) => (
-                      <li key={ref.id}>
-                        <span className="story__layer-name">{layerTitle(manifest, ref.id)}</span>{" "}
-                        {ref.caption}
-                      </li>
-                    ))}
-                  </ul>
-                  {item.step.sources && item.step.sources.length > 0 && (
-                    <p className="story__sources">
-                      Sources:{" "}
-                      {item.step.sources.map((url, position) => (
-                        <span key={url}>
-                          <a href={url} target="_blank" rel="noreferrer">
-                            {new URL(url).hostname}
-                          </a>
-                          {position < item.step.sources!.length - 1 ? ", " : ""}
-                        </span>
-                      ))}
-                    </p>
-                  )}
-                  {item.index === active && act.id === "scar" && stats && (
-                    <StatsPanel stats={stats} />
-                  )}
-                  {item.index === active && act.id === "radar" && stats?.act4 && (
-                    <Act4Panel act4={stats.act4} />
-                  )}
+                  <div className="story__step-body">
+                    {!stacked && stepContent(item)}
+                  </div>
                 </article>
               ))}
           </section>
         ))}
       </div>
 
-      <div className="story__map">
+      <div className={`story__map${exploreFull ? " story__map--full" : ""}`}>
         <MapView className="story__map-view" onReady={onMapReady} />
-        {(legendLayers.length > 0 || (current?.step.id === "explore-the-map" && manifest)) && (
-          <div className="map-hud">
-            {current?.step.id === "explore-the-map" && manifest && (
+        {exploring && manifest && (
+          <Explorer
+            manifest={manifest}
+            mode={exploreMode}
+            onModeChange={setExploreMode}
+            full={exploreFull}
+            onFullChange={setExploreFull}
+          />
+        )}
+        {(!exploring || exploreMode === 1) &&
+          (legendLayers.length > 0 || (exploring && manifest)) && (
+          <div className={`map-hud${exploring ? " map-hud--explore" : ""}`}>
+            {exploring && manifest && (
               <LayerPicker
                 manifest={manifest}
                 onPick={(id) => {
@@ -258,18 +390,58 @@ export default function Story() {
             )}
           </div>
         )}
-        {comparison && (
-          <div className="story__overlay">
+        {steps.map(
+          ({ index, step }) =>
+            step.figure && (
+              <figure
+                key={step.id}
+                className={`story__figure${index === applied ? " is-open" : ""}`}
+                aria-hidden={index !== applied}
+              >
+                <img
+                  src={`${import.meta.env.BASE_URL}${step.figure.src}`}
+                  alt={step.figure.alt}
+                  decoding="async"
+                />
+                <figcaption>
+                  <p>{step.figure.caption}</p>
+                  <p className="story__credit">
+                    {step.figure.credit} ·{" "}
+                    <a href={step.figure.licenceUrl} target="_blank" rel="noreferrer">
+                      {step.figure.licence}
+                    </a>{" "}
+                    ·{" "}
+                    <a href={step.figure.sourceUrl} target="_blank" rel="noreferrer">
+                      source
+                    </a>
+                    . Resized.
+                  </p>
+                </figcaption>
+              </figure>
+            ),
+        )}
+        {shownComparison && (mainIdle || comparison) && (
+          <div className={`story__overlay${comparison && compareReady ? " is-open" : ""}`}>
             <CompareView
-              key={`${comparison.leftLayerId}-${comparison.rightLayerId}`}
-              before={comparison.leftLayerId}
-              after={comparison.rightLayerId}
-              beforeLabel={layerTitle(manifest, comparison.leftLayerId)}
-              afterLabel={layerTitle(manifest, comparison.rightLayerId)}
+              before={shownComparison.leftLayerId}
+              after={shownComparison.rightLayerId}
+              beforeLabel={layerTitle(manifest, shownComparison.leftLayerId)}
+              afterLabel={layerTitle(manifest, shownComparison.rightLayerId)}
+              bounds={shownBounds}
+              onReady={() => setCompareReady(true)}
             />
           </div>
         )}
       </div>
+
+      {stacked && (
+        <div className="story__sheet" role="region" aria-live="polite" aria-label="About this view">
+          <p className="story__sheet-act">{steps[active].act.title}</p>
+          <div className="story__sheet-body" key={steps[active].step.id}>
+            {stepContent(steps[active])}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

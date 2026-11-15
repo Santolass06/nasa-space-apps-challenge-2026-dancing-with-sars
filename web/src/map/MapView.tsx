@@ -2,8 +2,13 @@ import {
   AttributionControl,
   Map,
   NavigationControl,
+  setWorkerUrl,
 } from "maplibre-gl";
 import { useEffect, useRef } from "react";
+
+// The worker is copied to public/maplibre/ by scripts/copy-maplibre-worker.mjs
+// (see the note there: Vite cannot see maplibre's runtime worker URL).
+setWorkerUrl(`${import.meta.env.BASE_URL}maplibre/maplibre-gl-worker.mjs`);
 
 // Vouzela, the fire's starting point (the grid bounds come from the manifest in C1).
 export const VOUZELA: [number, number] = [-8.1117, 40.7237];
@@ -39,6 +44,9 @@ export default function MapView({ onReady, className }: Props) {
       center: VOUZELA,
       zoom: 10.5,
       attributionControl: false,
+      // Render at least at 2x and let the browser scale down: labels and edges
+      // come out smoother on ordinary (1x) screens.
+      pixelRatio: Math.max(window.devicePixelRatio || 1, 2),
     });
     map.addControl(new NavigationControl({ showCompass: false }), "bottom-right");
     map.addControl(new AttributionControl({ compact: true }), "bottom-left");

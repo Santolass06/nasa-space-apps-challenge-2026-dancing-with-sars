@@ -1,4 +1,7 @@
-import Story from "./story/Story";
+import { lazy, Suspense } from "react";
+
+// The story (and with it the map library) loads after the page has painted.
+const Story = lazy(() => import("./story/Story"));
 
 export default function App() {
   return (
@@ -21,7 +24,9 @@ export default function App() {
       </header>
 
       <main>
-        <Story />
+        <Suspense fallback={<div className="story-loading" aria-busy="true" />}>
+          <Story />
+        </Suspense>
       </main>
 
       <footer className="footer">

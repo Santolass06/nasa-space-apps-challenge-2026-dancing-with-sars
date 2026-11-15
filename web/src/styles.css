@@ -186,6 +186,7 @@ h1 {
 }
 
 .place-marker {
+  display: inline-block;
   padding: 0.1rem 0.45rem;
   font-size: 0.72rem;
   font-weight: 600;
@@ -195,14 +196,18 @@ h1 {
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
   white-space: nowrap;
   cursor: default;
+  transition: opacity 0.5s ease;
+}
+
+.place-marker.is-hidden {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .compare {
   position: relative;
   height: min(70vh, 640px);
   overflow: hidden;
-  cursor: ew-resize;
-  touch-action: none;
 }
 
 .compare-section {
@@ -225,15 +230,29 @@ h1 {
   inset: 0;
 }
 
+/* A 44 px wide hit area above both maps: it captures the pointer, so the maps never see it. */
 .compare__handle {
   position: absolute;
   top: 0;
   bottom: 0;
+  z-index: 5;
+  width: 44px;
+  margin-left: -22px;
+  cursor: ew-resize;
+  touch-action: none;
+  outline-offset: -4px;
+}
+
+.compare__handle::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
   width: 2px;
   margin-left: -1px;
   background: #fff;
   box-shadow: 0 0 6px rgba(0, 0, 0, 0.6);
-  pointer-events: none;
 }
 
 .compare__handle::after {
@@ -279,6 +298,37 @@ h1 {
   margin-top: 2.5rem;
 }
 
+/* A focus step widens the map: the text column narrows, the map grows. */
+.story {
+  transition: grid-template-columns 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.story.is-wide {
+  grid-template-columns: minmax(0, 0.6fr) minmax(0, 1.9fr);
+}
+
+.story.is-wide .story__map {
+  --map-height: min(80vh, 780px);
+}
+
+.focus-label {
+  display: inline-block;
+  padding: 0.15rem 0.55rem;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #0b1020;
+  background: #fff;
+  border-radius: 999px;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
+  white-space: nowrap;
+  transition: opacity 0.5s ease;
+}
+
+.focus-label.is-hidden {
+  opacity: 0;
+}
+
 .story__act {
   margin-bottom: 2rem;
 }
@@ -298,14 +348,64 @@ h1 {
 }
 
 .story__step {
-  padding: 1.25rem 0 1.5rem;
+  /* The step is a scroll runway: its text stays pinned (see the body) while
+     the map state holds, then the next step takes over. */
+  min-height: 80vh;
   border-top: 1px solid var(--border);
-  opacity: 0.5;
-  transition: opacity 0.25s ease;
+  opacity: 0.4;
+  transition: opacity 0.6s ease;
+}
+
+.story__step-body {
+  position: sticky;
+  top: 34vh;
+  padding: 1.25rem 0 1.5rem;
+  transform: translateY(14px);
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .story__step.is-active {
   opacity: 1;
+}
+
+.story__step.is-active .story__step-body {
+  transform: none;
+}
+
+/* The legend and the stats panels settle in instead of popping in. */
+.legend,
+.stats,
+.act4 {
+  animation: settle 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes settle {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .story,
+  .story__map,
+  .focus-label,
+  .story__step,
+  .story__step-body,
+  .story__overlay,
+  .story__overlay.is-open,
+  .story__figure,
+  .story__figure.is-open,
+  .place-marker {
+    transition-duration: 0s;
+    transition-delay: 0s;
+  }
+
+  .legend,
+  .stats,
+  .act4 {
+    animation: none;
+  }
 }
 
 .story__step-text {
@@ -337,9 +437,13 @@ h1 {
 }
 
 .story__map {
+  --map-height: min(72vh, 680px);
   position: sticky;
-  top: 1.5rem;
-  height: min(72vh, 680px);
+  top: calc((100vh - var(--map-height)) / 2);
+  height: var(--map-height);
+  transition:
+    height 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    top 0.7s cubic-bezier(0.22, 1, 0.36, 1);
   border: 1px solid var(--border);
   border-radius: 20px;
   overflow: hidden;
@@ -355,6 +459,68 @@ h1 {
   position: absolute;
   inset: 0;
   z-index: 2;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  /* Fade out, then drop out of hit-testing and the accessibility tree. */
+  transition:
+    opacity 0.6s ease,
+    visibility 0s linear 0.6s;
+}
+
+.story__figure {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.9rem;
+  margin: 0;
+  padding: 1rem;
+  background: var(--bg-soft);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity 0.6s ease,
+    visibility 0s linear 0.6s;
+}
+
+.story__figure.is-open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition: opacity 0.6s ease;
+}
+
+.story__figure img {
+  width: 100%;
+  height: auto;
+  max-height: 70%;
+  object-fit: contain;
+  border-radius: 12px;
+}
+
+.story__figure figcaption {
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.story__figure p {
+  margin: 0 0 0.35rem;
+}
+
+.story__figure .story__credit {
+  font-size: 0.68rem;
+  color: var(--muted);
+}
+
+.story__overlay.is-open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition: opacity 0.6s ease;
 }
 
 .story__overlay .compare {
@@ -362,8 +528,9 @@ h1 {
 }
 
 .picker {
-  display: flex;
-  gap: 0.5rem;
+  position: relative;
+  z-index: 5; /* its tooltips open over the legends below it */
+  max-width: 24rem;
   padding: 0.5rem;
   background: rgba(11, 16, 32, 0.88);
   border: 1px solid var(--border);
@@ -371,17 +538,95 @@ h1 {
   backdrop-filter: blur(6px);
 }
 
-.picker__field {
+.chooser {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.chooser__kinds {
   display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-  font-size: 0.68rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.chooser__chip-wrap {
+  position: relative;
+}
+
+.chooser__chip {
+  padding: 0.25rem 0.6rem;
+  font: inherit;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.chooser__chip:hover,
+.chooser__chip:focus-visible {
+  border-color: var(--accent);
+}
+
+.chooser__chip.is-selected {
+  color: #0b1020;
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+/* What this kind of layer usually reveals: shown on hover and on keyboard focus. */
+.chooser__tip {
+  position: absolute;
+  top: calc(100% + 0.4rem);
+  left: 0;
+  z-index: 20;
+  display: grid;
+  gap: 0.3rem;
+  width: 17rem;
+  padding: 0.6rem 0.7rem;
+  font-size: 0.74rem;
+  line-height: 1.4;
+  color: var(--text);
+  background: rgba(11, 16, 32, 0.97);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-4px);
+  pointer-events: none;
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease,
+    visibility 0s linear 0.2s;
+}
+
+.chooser__tip--above {
+  top: auto;
+  bottom: calc(100% + 0.4rem);
+  transform: translateY(4px);
+}
+
+.chooser__tip em {
+  font-style: normal;
   color: var(--muted);
 }
 
-.picker__field select {
+.chooser__chip-wrap:hover .chooser__tip,
+.chooser__chip-wrap:focus-within .chooser__tip {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition-delay: 0.12s, 0.12s, 0s;
+}
+
+.chooser select {
+  width: 100%;
   min-width: 9rem;
   padding: 0.3rem 0.4rem;
   font-size: 0.8rem;
@@ -389,6 +634,326 @@ h1 {
   background: var(--bg-soft);
   border: 1px solid var(--border);
   border-radius: 8px;
+}
+
+/* --- Explorer: one, two or four maps ---------------------------------- */
+
+.explorer {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.explorer__stage {
+  position: absolute;
+  inset: 0;
+  background: var(--bg-soft);
+  pointer-events: auto;
+}
+
+.explorer__stage .compare {
+  height: 100%;
+}
+
+.explorer__bar {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  z-index: 6;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.4rem;
+  max-width: calc(100% - 1.5rem);
+  pointer-events: auto;
+}
+
+.explorer__modes {
+  display: flex;
+  padding: 0.2rem;
+  background: rgba(11, 16, 32, 0.88);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  backdrop-filter: blur(6px);
+}
+
+.explorer__mode,
+.explorer__full {
+  padding: 0.25rem 0.7rem;
+  font: inherit;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--text);
+  background: transparent;
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.explorer__mode.is-selected {
+  color: #0b1020;
+  background: var(--accent);
+}
+
+.explorer__full {
+  background: rgba(11, 16, 32, 0.88);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(6px);
+}
+
+.explorer__recipes {
+  max-width: 14rem;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.74rem;
+  color: var(--text);
+  background: rgba(11, 16, 32, 0.88);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+}
+
+/* Two and four maps: the bar gets its own strip above them. */
+.explorer--multi .explorer__stage {
+  top: 2.9rem;
+}
+
+.explorer--multi .explorer__bar {
+  top: 0;
+  right: 0;
+  left: 0;
+  max-width: none;
+  padding: 0.45rem 0.75rem;
+  background: var(--bg-soft);
+  border-bottom: 1px solid var(--border);
+  border-radius: 20px 20px 0 0;
+}
+
+.compare__label.is-interactive {
+  bottom: 2.6rem;
+  max-width: 46%;
+  padding: 0;
+  background: none;
+  pointer-events: auto;
+}
+
+.quad {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg-soft);
+}
+
+.quad__pane {
+  position: absolute;
+  inset: 0;
+}
+
+.quad__map {
+  width: 100%;
+  height: 100%;
+}
+
+.quad__line {
+  position: absolute;
+  z-index: 4;
+  background: rgba(255, 255, 255, 0.9);
+  pointer-events: none;
+}
+
+.quad__line--v {
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  margin-left: -1px;
+}
+
+.quad__line--h {
+  left: 0;
+  right: 0;
+  height: 2px;
+  margin-top: -1px;
+}
+
+.quad__handle {
+  position: absolute;
+  z-index: 6;
+  width: 44px;
+  height: 44px;
+  margin: -22px 0 0 -22px;
+  cursor: grab;
+  touch-action: none;
+}
+
+.quad__handle:active {
+  cursor: grabbing;
+}
+
+.quad__handle::after {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  background: rgba(11, 16, 32, 0.85);
+  border: 2px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+.quad__handle:focus-visible::after {
+  border-color: var(--accent);
+}
+
+.quad__chooser {
+  position: absolute;
+  z-index: 5;
+  max-width: 48%;
+  padding: 0.4rem;
+  background: rgba(11, 16, 32, 0.88);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  backdrop-filter: blur(6px);
+}
+
+.quad__chooser--tl {
+  top: 0.5rem;
+  left: 0.5rem;
+}
+
+.quad__chooser--tr {
+  top: 0.5rem;
+  right: 0.5rem;
+}
+
+.quad__chooser--bl {
+  bottom: 2rem;
+  left: 0.5rem;
+}
+
+.quad__chooser--br {
+  right: 3.4rem; /* clear of the zoom buttons */
+  bottom: 2rem;
+}
+
+/* Collapsed to the date menu; the layer types (with their tips) open on hover or focus. */
+.quad__chooser {
+  width: min(17rem, 46%);
+}
+
+.quad__chooser:hover,
+.quad__chooser:focus-within {
+  width: min(27rem, 48%);
+}
+
+.quad__chooser .chooser__kinds {
+  display: none;
+}
+
+.quad__chooser:hover .chooser__kinds,
+.quad__chooser:focus-within .chooser__kinds {
+  display: flex;
+}
+
+.quad__chooser .chooser__chip {
+  padding: 0.12rem 0.45rem;
+  font-size: 0.64rem;
+}
+
+.quad__chooser .chooser {
+  gap: 0.25rem;
+}
+
+.quad__chooser .chooser select {
+  padding: 0.15rem 0.3rem;
+  font-size: 0.72rem;
+}
+
+.grid4 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 2px;
+  height: 100%;
+  background: var(--border);
+}
+
+.grid4__panel {
+  position: relative;
+  min-height: 0;
+  background: var(--bg-soft);
+}
+
+.grid4__map {
+  width: 100%;
+  height: 100%;
+}
+
+.grid4__chooser {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 5;
+  width: min(17rem, 80%);
+  padding: 0.4rem;
+  background: rgba(11, 16, 32, 0.88);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  backdrop-filter: blur(6px);
+}
+
+.grid4__chooser:hover,
+.grid4__chooser:focus-within {
+  width: min(27rem, 96%);
+}
+
+.grid4__chooser .chooser__kinds {
+  display: none;
+}
+
+.grid4__chooser:hover .chooser__kinds,
+.grid4__chooser:focus-within .chooser__kinds {
+  display: flex;
+}
+
+.grid4__chooser .chooser__chip {
+  padding: 0.12rem 0.45rem;
+  font-size: 0.64rem;
+}
+
+.grid4__chooser .chooser select {
+  padding: 0.15rem 0.3rem;
+  font-size: 0.72rem;
+}
+
+.explorer__style {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  color: var(--text);
+  background: rgba(11, 16, 32, 0.88);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.explorer__style:hover,
+.explorer__style:focus-visible {
+  border-color: var(--accent);
+}
+
+.chooser__tip--right {
+  right: 0;
+  left: auto;
+}
+
+/* Almost full screen: the map frame leaves the page and covers most of the window. */
+.story__map.story__map--full {
+  position: fixed;
+  inset: 1rem;
+  z-index: 100;
+  height: auto;
+  box-shadow: 0 0 0 100vmax rgba(3, 5, 12, 0.82);
+  transition: none;
 }
 
 .legend-stack {
@@ -451,6 +1016,31 @@ h1 {
   color: var(--muted);
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
+}
+
+.legend__caveat.is-open {
+  display: block;
+  -webkit-line-clamp: unset;
+}
+
+.legend__more {
+  margin: 0.2rem 0 0;
+  padding: 0;
+  font: inherit;
+  font-size: 0.62rem;
+  color: var(--accent);
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+.legend__scale {
+  gap: 0.5rem;
+}
+
+.legend__scale em {
+  font-style: normal;
+  opacity: 0.85;
 }
 
 .stats {
@@ -518,16 +1108,210 @@ h1 {
   color: var(--muted);
 }
 
-@media (max-width: 900px) {
-  .story {
+/* The sheet only exists on portrait phones and tablets. */
+.story__sheet {
+  display: none;
+}
+
+/* --- Portrait phones and tablets: map on top, the step's text in a sheet below --- */
+@media (max-width: 900px) and (orientation: portrait) {
+  .story,
+  .story.is-wide {
     grid-template-columns: 1fr;
+    gap: 0;
+    margin-top: 1rem;
   }
 
   .story__map {
-    position: relative;
-    top: auto;
+    position: sticky;
+    top: 0;
+    z-index: 3;
     order: -1;
-    height: 55vh;
+    height: 56vh;
+    border-radius: 0 0 18px 18px;
+  }
+
+  /* The steps are only room to scroll through; their text lives in the sheet. */
+  .story__act-title,
+  .story__step-body {
+    display: none;
+  }
+
+  .story__step {
+    min-height: 62vh;
+    border-top: 0;
+    opacity: 1;
+  }
+
+  .story__sheet {
+    position: sticky;
+    bottom: 0;
+    z-index: 4;
+    display: block;
+    max-height: 42vh;
+    margin: 0 -1.25rem;
+    padding: 0.9rem 1.25rem calc(1rem + env(safe-area-inset-bottom, 0px));
+    overflow-y: auto;
+    background: var(--bg-soft);
+    border-top: 1px solid var(--border);
+    border-radius: 18px 18px 0 0;
+    box-shadow: 0 -12px 30px rgba(0, 0, 0, 0.45);
+  }
+
+  .story__sheet-act {
+    margin: 0 0 0.35rem;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .story__sheet-body {
+    animation: settle 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .story__sheet .story__step-text {
+    margin-bottom: 0.5rem;
+    font-size: 0.98rem;
+    line-height: 1.5;
+  }
+
+  .story__sheet .story__captions {
+    font-size: 0.78rem;
+  }
+
+  .story__sheet .story__sources {
+    font-size: 0.68rem;
+  }
+
+  /* In the explore step the layout bar runs along the top; the picker goes below it. */
+  .map-hud--explore {
+    top: 3rem;
+  }
+}
+
+/* --- Landscape phones: the two columns stay, tightened to a short screen --- */
+@media (orientation: landscape) and (max-height: 520px) {
+  .page {
+    padding-top: 1.5rem;
+  }
+
+  .hero {
+    padding-bottom: 1.5rem;
+  }
+
+  .story {
+    gap: 1.25rem;
+    margin-top: 1rem;
+  }
+
+  .story__map,
+  .story.is-wide .story__map {
+    --map-height: calc(100vh - 1.5rem);
+  }
+
+  .story__step {
+    min-height: 90vh;
+  }
+
+  .story__step-body {
+    top: 8vh;
+    padding: 0.5rem 0 0.75rem;
+  }
+
+  .story__step-text {
+    font-size: 0.9rem;
+    line-height: 1.45;
+  }
+
+  .story__captions,
+  .story__sources {
+    font-size: 0.72rem;
+  }
+
+  .story__act-title {
+    padding: 0.4rem 0;
+  }
+}
+
+/* --- Compact controls on phones, in either orientation --- */
+@media (max-width: 640px), (orientation: landscape) and (max-height: 520px) {
+  .explorer__bar {
+    gap: 0.3rem;
+  }
+
+  .explorer__recipes {
+    flex: 1;
+    min-width: 0;
+    max-width: none;
+  }
+
+  /* One slim legend: title, ramp and the two ends. The caveat opens on demand. */
+  .legend {
+    width: auto;
+    padding: 0.4rem 0.55rem;
+  }
+
+  .legend-stack .legend + .legend {
+    display: none;
+  }
+
+  .legend__caveat:not(.is-open),
+  .legend__note {
+    display: none;
+  }
+
+  .legend__caveat.is-open {
+    display: block;
+    -webkit-line-clamp: unset;
+  }
+
+  /* Layer types: one scrolling row in the picker; hidden in the split views, where
+     the date menu is enough (a phone has no hover to open their tips). */
+  .picker {
+    max-width: none;
+  }
+
+  .picker .chooser__kinds {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .picker .chooser__chip-wrap {
+    flex: none;
+  }
+
+  .picker .chooser__tip {
+    display: none;
+  }
+
+  .compare__label.is-interactive .chooser__kinds,
+  .quad__chooser .chooser__kinds {
+    display: none !important;
+  }
+
+  /* At the top of the picture: the bottom edge belongs to the attribution and zoom buttons. */
+  .compare__label.is-interactive {
+    top: 0.5rem;
+    bottom: auto;
+    max-width: 47%;
+  }
+
+  .compare__label.is-interactive .chooser select {
+    min-width: 0;
+    font-size: 0.7rem;
+  }
+
+  .story__figure {
+    padding: 0.6rem;
+    gap: 0.5rem;
+  }
+
+  /* The layer names above the attribution and the zoom buttons, not under them. */
+  .compare__label:not(.is-interactive) {
+    bottom: 2.7rem;
   }
 }
 
@@ -539,26 +1323,13 @@ h1 {
     max-width: none;
   }
 
-  .picker {
-    flex-wrap: wrap;
+  .map-hud.map-hud--explore {
+    top: 3rem;
   }
 
-  .picker__field {
-    flex: 1;
-    min-width: 8rem;
-  }
-
-  .picker__field select {
-    min-width: 0;
-    width: 100%;
-  }
-
-  .legend {
-    width: auto;
-  }
-
-  .legend__caveat {
-    -webkit-line-clamp: 2;
+  /* The bar wraps to two lines on a phone. */
+  .explorer--multi .explorer__stage {
+    top: 5.6rem;
   }
 }
 
@@ -583,4 +1354,8 @@ h1 {
 
 .muted {
   color: var(--muted);
+}
+
+.story-loading {
+  min-height: 70vh;
 }
