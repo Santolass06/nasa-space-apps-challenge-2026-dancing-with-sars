@@ -92,7 +92,7 @@ Todas as camadas raster saem exatamente com a mesma caixa, projeção e tamanho,
 | `rgb` | Composição de cor HH, HV, HH/HV | GCOV | `rgb_D52_20260711.png` |
 | `s2` | Sentinel-2 em cor verdadeira | Sentinel-2 L2A | `s2_20260628.png` |
 
-Vetores e números: `burn_nisar.geojson` (o nosso polígono), `burn_official.geojson` (EFFIS ou ICNF), `progress.geojson` (área ardida até cada data), `places.geojson` (lugares da história), `stats.json` (áreas e sobreposição) e `series.json` (série temporal).
+Vetores e números: `burn_nisar.geojson` (o nosso polígono), `burn_official.geojson` (EFFIS ou ICNF), `progress.geojson` (área ardida até cada data), `places.geojson` (lugares da história) e `stats.json` (áreas e sobreposição). A série temporal (`series.json`) foi cortada — ver `docs/DECISIONS.md`.
 
 ### manifest.json
 
@@ -139,7 +139,7 @@ Cinco frentes, uma pessoa por frente, cada uma dona de uma pasta: quase não há
 | Frente | Foco | Pasta | Entrega | Recebe de |
 | --- | --- | --- | --- | --- |
 | A — Coerência | GUNW: coerência de todos os pares, polígono e área ardida, progressão do fogo | `pipeline/` (`fetch`, `gunw`, `burn`) | Camadas `coh`, `burn_nisar.geojson`, `progress.geojson`, `stats.json` | E (perímetro oficial) |
-| B — Brilho | GCOV: HH e HV em dB, diferenças, composição de cor, série julho–outubro; Sentinel-2 | `pipeline/` (`gcov`, `s2`, `series`) | Camadas `hh`, `hv`, `dhv`, `rgb`, `s2`, `series.json` | A (polígono, para a série) |
+| B — Brilho | GCOV: HH e HV em dB, diferenças, composição de cor, série julho–outubro; Sentinel-2 | `pipeline/` (`gcov`, `s2`) | Camadas `hh`, `hv`, `dhv`, `rgb`, `s2` (a série temporal foi cortada) | A (polígono, para a série) |
 | C — Mapa | Motor do mapa: leitura do manifest, camadas, slider, legenda, seletor de datas, exploração livre | `web/src/map`, `web/src/explore` | Componentes de mapa que a história comanda | A e B (camadas reais) |
 | D — História | Scrollytelling dos seis atos, design visual, gráficos, versão móvel | `web/src/story` | A experiência guiada de ponta a ponta | C (API do mapa), E (textos) |
 | E — Conteúdo e integração | Textos em inglês, validação científica, perímetro oficial e lugares, documentação, vídeo e página do projeto; conduz os portões | `web/src/content`, `docs/` | `story.en.json`, `burn_official.geojson`, `places.geojson`, README, demo | Todos |
@@ -223,11 +223,11 @@ Se A1 não estiver feito às 18:30, B pára o que está a fazer e ajuda A: sem c
 | ID | Dono | Tarefa | Depende de | Feito quando |
 | --- | --- | --- | --- | --- |
 | A6 | A | Progressão do fogo: área ardida até 4 jul (pares A116 e D124) e até 9 e 11 jul | A5, A4 | `progress.geojson` com um polígono por data |
-| B6 | B | Série julho–outubro numa órbita: camadas `hv` por data e média de HH e HV dentro do polígono e numa zona de controlo | B2, A4 | `series.json` e pelo menos quatro datas no manifest |
+| B6 | B | Série julho–outubro numa órbita: camadas `hv` por data e média de HH e HV dentro do polígono e numa zona de controlo | B2, A4 | Quatro datas no manifest (a série temporal foi cortada — ver DECISIONS) |
 | C6 | C | Exploração livre: todas as camadas, todas as datas, slider entre quaisquer duas | C5 | Um utilizador sem guia consegue comparar duas camadas à escolha |
 | C7 | C | Desempenho: comprimir os PNG e carregar cada camada só quando é precisa | C1 | A primeira vista abre em menos de 3 s numa ligação normal |
 | D6 | D | Ato 2 — O fogo: cronologia, lugares e progressão | E2, A6, C4 | A cronologia avança e o polígono cresce com ela |
-| D7 | D | Ato 5 — Depois: as datas da série e o gráfico | B6 | O gráfico lê `series.json` e destaca a data mostrada no mapa |
+| D7 | D | Ato 5 — Depois: as datas da série e o gráfico | B6 | O gráfico lê a série — **cortada** (ver DECISIONS); o ato 5 usa as camadas por data |
 | D8 | D | Ato 6 — E agora: aplicações futuras e entrada na exploração livre | C6, E5 | O fim da história leva à exploração |
 | E6 | E | Textos finais dos seis atos e explicações curtas dos termos de radar | E4, E5 | Nenhum texto provisório em `story.en.json` |
 | E7 | E | Guião do vídeo de 30 s, plano a plano | P2 | Guião em `docs/`, com os ecrãs a gravar |

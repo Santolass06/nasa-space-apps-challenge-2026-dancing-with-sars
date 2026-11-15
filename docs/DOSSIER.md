@@ -252,7 +252,7 @@ Nomeamos cada órbita pela direção + número do track: **D52** = descendente, 
 
 Estas questões não estão confirmadas. Quem as esclarecer atualiza esta lista.
 
-- **A mancha coincide com o perímetro oficial?** O tamanho é da mesma ordem (13.501 ha medidos por nós vs 12.828,9 ha do ICNF, +5,2%), mas o polígono oficial ainda não foi comparado — falta o perímetro (E1).
+- **A mancha coincide com o perímetro oficial?** Sim, em grande parte: o nosso polígono tem 13.517,9 ha, o do ICNF 12.819,8 ha (área calculada do GeoJSON do E1; o próprio REE reporta 12.828,9 ha) e a sobreposição é de 12.127,8 ha — **94,6% do oficial** e 89,7% do nosso. Os hectares são medidos em UTM 29N (o CRS da grelha); numa projeção de área igual dão +0,07%, que é menos do que a incerteza da digitalização do perímetro.
 - **O fumo tapou mesmo os satélites óticos entre 2 e 5 de julho?** Faz sentido, mas ainda não verificámos as imagens Sentinel-2 desses dias. Em Leiria, durante a Kristin, confirmámos que o ótico ficou \~3 semanas sem imagens limpas.
 - **Quanto cai a coerência fora da área ardida no verão?** Vegetação seca também muda; o par de controlo (11 → 23 jul) ajuda a separar.
 - **O brilho HV mostra algo ao longo de julho–outubro?** Hipótese: sim, à medida que as árvores queimadas caem ou são cortadas. Por testar.

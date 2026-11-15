@@ -61,7 +61,7 @@ Todas as camadas raster saem exatamente com a mesma caixa, projeção e tamanho,
 | `rgb` | Composição de cor HH, HV, HH/HV | GCOV | `rgb_D52_20260711.png` |
 | `s2` | Sentinel-2 em cor verdadeira | Sentinel-2 L2A | `s2_20260628.png` |
 
-Vetores e números: `burn_nisar.geojson` (o nosso polígono), `burn_official.geojson` (EFFIS ou ICNF), `progress.geojson` (área ardida até cada data), `places.geojson` (lugares da história), `stats.json` (áreas e sobreposição) e `series.json` (série temporal).
+Vetores e números: `burn_nisar.geojson` (o nosso polígono), `burn_official.geojson` (EFFIS ou ICNF), `progress.geojson` (área ardida até cada data), `places.geojson` (lugares da história) e `stats.json` (áreas e sobreposição). A série temporal (`series.json`) foi cortada — ver `docs/DECISIONS.md`.
 
 ## manifest.json
 
