@@ -27,8 +27,7 @@ export default function App() {
       .then((manifest) => {
         const layers = new LayerManager(map, manifest);
         layers.showLayers([INITIAL_LAYER]);
-        layers.showVector(["burn_official"]);
-        layers.showPlaces(true);
+        layers.showVector(["burn_official", "places"]);
         layers.flyTo();
         layersRef.current = layers;
         (window as unknown as { __layers?: LayerManager }).__layers = layers;
