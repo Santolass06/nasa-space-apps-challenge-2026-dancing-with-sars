@@ -82,7 +82,7 @@ h1 {
   letter-spacing: -0.03em;
 }
 
-/* "em chamas": flame colours, with an ember glow behind the letters (only its opacity moves). */
+/* "on fire": flame colours, with an ember glow behind the letters (only its opacity moves). */
 .flame {
   position: relative;
   isolation: isolate;
@@ -337,7 +337,7 @@ h1 {
   grid-template-columns: minmax(0, 0.6fr) minmax(0, 1.9fr);
 }
 
-.story.is-wide .story__map {
+.story.is-wide .story__map-column {
   --map-height: min(82vh, 840px);
 }
 
@@ -471,13 +471,14 @@ h1 {
 }
 
 .story__map {
-  --map-height: min(74vh, 760px);
-  position: sticky;
-  top: calc((100vh - var(--map-height)) / 2);
+  position: relative;
+  flex: 0 1 var(--map-height);
+  min-height: 200px;
   height: var(--map-height);
+  /* In a column the flex basis, not the height, sets the size: it is what has to animate. */
   transition:
-    height 0.7s cubic-bezier(0.22, 1, 0.36, 1),
-    top 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    flex-basis 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    height 0.7s cubic-bezier(0.22, 1, 0.36, 1);
   border: 1px solid var(--border);
   border-radius: 20px;
   overflow: hidden;
@@ -693,19 +694,20 @@ h1 {
 .explorer__bar {
   position: absolute;
   top: 0.75rem;
-  right: 0.75rem;
+  /* The top right of the window is the story index button's: the controls stop short of it. */
+  right: 3.75rem;
   z-index: 6;
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-end;
   gap: 0.4rem;
-  max-width: calc(100% - 1.5rem);
+  max-width: calc(100% - 4.5rem);
   pointer-events: auto;
 }
 
 .explorer__hud {
   position: absolute;
-  inset: 0.75rem 0.75rem auto;
+  inset: 0.75rem 3.75rem auto 0.75rem;
   display: grid;
   gap: 0.4rem;
   /* The strip spans the map: only the panels inside it take the pointer, so the
@@ -713,21 +715,8 @@ h1 {
   pointer-events: none;
 }
 
-.explorer__hud .picker,
-.explorer__legend .legend {
-  pointer-events: auto;
-}
-
-/* The legend sits at the bottom left, above the attribution, so the controls at the top
-   and the legend do not stack over the middle of the map. */
-.explorer__legend {
-  position: absolute;
-  left: 0.75rem;
-  bottom: 2.75rem;
-  pointer-events: none;
-}
-
 .explorer__hud .picker {
+  pointer-events: auto;
   max-width: 30rem;
 }
 
@@ -1022,11 +1011,13 @@ h1 {
 }
 
 /* Almost full screen: the map frame leaves the page and covers most of the window. */
-.story__map.story__map--full {
+.story__map-column.story__map-column--full {
   position: fixed;
   inset: 1rem;
   z-index: 100;
-  height: auto;
+  height: calc(100vh - 2rem);
+  max-height: none;
+  background: var(--bg);
   box-shadow: 0 0 0 100vmax rgba(3, 5, 12, 0.82);
   transition: none;
 }
@@ -1034,16 +1025,6 @@ h1 {
 .legend-stack {
   display: grid;
   gap: 0.4rem;
-}
-
-.map-hud {
-  position: absolute;
-  top: 0.75rem;
-  left: 0.75rem;
-  z-index: 3;
-  display: grid;
-  gap: 0.4rem;
-  max-width: calc(100% - 1.5rem);
 }
 
 .legend {
@@ -1252,6 +1233,47 @@ h1 {
   display: none;
 }
 
+/* The sticky column owns both the image and its legends, including Expand. */
+.story__map-column {
+  --map-height: min(74vh, 760px);
+  position: sticky;
+  top: 1rem;
+  align-self: start;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  max-height: calc(100vh - 2rem);
+}
+
+.story__map-column--full .story__map {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.story__legend-strip {
+  /* The legends keep their height; it is the map that gives way on a short window. */
+  flex: 0 0 auto;
+  max-height: 35vh;
+  overflow-y: auto;
+}
+
+.story__legend-strip:not(:empty) {
+  padding-top: 0.5rem;
+}
+
+.story__legend-strip .legend-stack {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+  align-items: start;
+  gap: 0.5rem;
+}
+
+.story__legend-strip .legend {
+  width: auto;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
 /* --- Portrait phones and tablets: map on top, the step's text in a sheet below --- */
 @media (max-width: 900px) and (orientation: portrait) {
   .story,
@@ -1261,12 +1283,21 @@ h1 {
     margin-top: 1rem;
   }
 
-  .story__map {
-    position: sticky;
+  .story__map-column {
     top: 0;
     z-index: 3;
     order: -1;
     height: 56vh;
+    max-height: none;
+  }
+
+  .story__legend-strip {
+    max-height: 24vh;
+  }
+
+  .story__map-column .story__map {
+    flex: 1 1 auto;
+    min-height: 0;
     border-radius: 0 0 18px 18px;
   }
 
@@ -1340,8 +1371,8 @@ h1 {
     margin-top: 1rem;
   }
 
-  .story__map,
-  .story.is-wide .story__map {
+  .story__map-column,
+  .story.is-wide .story__map-column {
     --map-height: calc(100vh - 1.5rem);
   }
 
@@ -1461,19 +1492,6 @@ h1 {
 }
 
 @media (max-width: 640px) {
-  /* The right end is left free for the story index button (fixed at the top right). */
-  .map-hud {
-    top: 0.5rem;
-    right: 3.75rem;
-    left: 0.5rem;
-    max-width: none;
-  }
-
-  .explorer__hud,
-  .explorer__bar {
-    right: 3.75rem;
-    max-width: calc(100% - 4.25rem);
-  }
 
   /* The bar wraps to two lines on a phone. */
   .explorer--multi .explorer__stage {
