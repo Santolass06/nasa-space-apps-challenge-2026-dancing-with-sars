@@ -32,7 +32,7 @@ from shapely.geometry import shape
 from shapely.ops import unary_union
 
 from caramulo import export
-from caramulo.grid import CRS, EXTENT_3857, HEIGHT, WIDTH
+from caramulo.grid import CRS, EXTENT_3857
 
 LAYERS_DIR = Path("../web/public/layers")
 DURING_LAYER = "coh_A116_20260622_20260704"
@@ -48,17 +48,18 @@ def _read_layer(path: Path) -> tuple[np.ndarray, np.ndarray]:
     return coh, rgba[..., 3] >= 128
 
 
-def _grid_transform():
-    return from_bounds(*EXTENT_3857, WIDTH, HEIGHT)
+def _grid_transform(shape: tuple[int, int]):
+    """Affine for the layer's own resolution: (height, width) from the array (C7)."""
+    return from_bounds(*EXTENT_3857, shape[1], shape[0])
 
 
-def _scar_mask(burn_geojson: Path) -> np.ndarray:
+def _scar_mask(burn_geojson: Path, shape: tuple[int, int]) -> np.ndarray:
     feature = json.loads(burn_geojson.read_text())["features"][0]
     geom_merc = transform_geom(WGS84, CRS, feature["geometry"])
     grid = rasterize(
         [(geom_merc, 1)],
-        out_shape=(HEIGHT, WIDTH),
-        transform=_grid_transform(),
+        out_shape=shape,
+        transform=_grid_transform(shape),
         fill=0,
         dtype="uint8",
     )
@@ -85,7 +86,9 @@ def during_mask(layer_path: Path, scar: np.ndarray) -> np.ndarray:
 def _polygon_wgs84(mask: np.ndarray):
     geoms = [
         shape(geom)
-        for geom, _value in shapes(mask.astype("uint8"), mask=mask, transform=_grid_transform())
+        for geom, _value in shapes(
+            mask.astype("uint8"), mask=mask, transform=_grid_transform(mask.shape)
+        )
     ]
     return transform_geom(CRS, WGS84, unary_union(geoms).__geo_interface__)
 
@@ -127,7 +130,7 @@ def main(argv: list[str] | None = None) -> int:
     during_path = args.during or args.layers / f"{DURING_LAYER}.png"
     out_path = args.out or args.layers / "progress.geojson"
 
-    scar = _scar_mask(scar_path)
+    scar = _scar_mask(scar_path, _read_layer(during_path)[0].shape)
     after_feature = json.loads(scar_path.read_text())["features"][0]
     after_area = float(after_feature["properties"]["area_ha"])
 

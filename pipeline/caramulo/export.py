@@ -52,6 +52,15 @@ _COLORMAP_ANCHORS: dict[str, list[tuple[int, int, int]]] = {
         (254, 194, 135),
         (252, 253, 191),
     ],
+    "rdbu": [
+        (33, 102, 172),
+        (103, 169, 207),
+        (209, 229, 240),
+        (247, 247, 247),
+        (253, 219, 199),
+        (239, 138, 98),
+        (178, 24, 43),
+    ],
 }
 
 
@@ -111,24 +120,26 @@ def rgb_rgba(rgb: np.ndarray, mask: np.ndarray | None = None) -> np.ndarray:
     return rgba
 
 
-def write_png(path: Path | str, rgba: np.ndarray) -> Path:
-    """Write an (h, w, 4) uint8 array as an 8-bit RGBA PNG (zlib only, no image library)."""
+def write_png(path: Path | str, rgba: np.ndarray, filter_type: int = 0) -> Path:
+    """Write an (h, w, 4) uint8 array as an 8-bit RGBA PNG (zlib only, no image library).
+
+    ``filter_type`` is the PNG row filter: 0 (None) or 2 (Up, each row minus the
+    previous one). "Up" compresses noisy imagery ~20% better.
+    """
     rgba = np.ascontiguousarray(np.asarray(rgba, dtype=np.uint8))
     if rgba.ndim != 3 or rgba.shape[-1] != 4:
         raise ValueError(f"rgba must be (h, w, 4); got shape {rgba.shape}")
     height, width = rgba.shape[:2]
     if height <= 0 or width <= 0:
         raise ValueError(f"PNG dimensions must be positive; got {width}x{height}")
+    if filter_type not in (0, 2):
+        raise ValueError(f"filter_type must be 0 or 2; got {filter_type}")
 
     def chunk(tag: bytes, payload: bytes) -> bytes:
-        return (
-            struct.pack(">I", len(payload))
-            + tag
-            + payload
-            + struct.pack(">I", zlib.crc32(tag + payload))
-        )
+        return _chunk(tag, payload)
 
-    scanlines = b"".join(b"\x00" + row.tobytes() for row in rgba)
+    rows = rgba.reshape(height, width * 4)
+    scanlines = _scanlines(rows, filter_type)
     png = (
         b"\x89PNG\r\n\x1a\n"
         + chunk(b"IHDR", struct.pack(">IIBBBBB", width, height, 8, 6, 0, 0, 0))
@@ -141,10 +152,174 @@ def write_png(path: Path | str, rgba: np.ndarray) -> Path:
     return path
 
 
-def read_png(path: Path | str) -> np.ndarray:
-    """Read an 8-bit RGBA PNG written by write_png back into an (h, w, 4) uint8 array.
+def _scanlines(rows: np.ndarray, filter_type: int) -> bytes:
+    """Encode byte rows (h, n) into PNG scanlines with filter 0 or 2 (Up)."""
+    if filter_type == 0:
+        return b"".join(b"\x00" + row.tobytes() for row in rows)
+    previous = np.zeros(rows.shape[1], dtype=np.uint8)
+    parts = []
+    for row in rows:
+        delta = (row.astype(np.uint16) - previous.astype(np.uint16)) % 256
+        parts.append(b"\x02" + delta.astype(np.uint8).tobytes())
+        previous = row
+    return b"".join(parts)
 
-    Only our own outputs are supported (filter byte 0 per scanline, no interlace).
+
+def _chunk(tag: bytes, payload: bytes) -> bytes:
+    body = struct.pack(">I", len(payload)) + tag + payload
+    return body + struct.pack(">I", zlib.crc32(tag + payload))
+
+
+def write_gray_png(path: Path | str, gray: np.ndarray, alpha: np.ndarray | None = None) -> Path:
+    """Write an (h, w) uint8 gray image with an alpha channel (PNG colour type 4, filter Up)."""
+    gray = np.ascontiguousarray(np.asarray(gray, dtype=np.uint8))
+    if gray.ndim != 2:
+        raise ValueError(f"gray must be (h, w); got shape {gray.shape}")
+    height, width = gray.shape
+    if height <= 0 or width <= 0:
+        raise ValueError(f"PNG dimensions must be positive; got {width}x{height}")
+    if alpha is None:
+        alpha = np.full_like(gray, 255)
+    alpha = np.ascontiguousarray(np.asarray(alpha, dtype=np.uint8))
+    if alpha.shape != gray.shape:
+        raise ValueError(f"alpha must match gray; got {alpha.shape} vs {gray.shape}")
+    rows = np.stack([gray, alpha], axis=-1).reshape(height, width * 2)
+    png = (
+        b"\x89PNG\r\n\x1a\n"
+        + _chunk(b"IHDR", struct.pack(">IIBBBBB", width, height, 8, 4, 0, 0, 0))
+        + _chunk(b"IDAT", zlib.compress(_scanlines(rows, 2), 9))
+        + _chunk(b"IEND", b"")
+    )
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(png)
+    return path
+
+
+def scalar_index(
+    data: np.ndarray,
+    colormap: str,
+    vmin: float,
+    vmax: float,
+    mask: np.ndarray | None = None,
+) -> np.ndarray:
+    """Map a float grid to palette indices 0-254 over vmin..vmax; 255 means transparent.
+
+    The 256th palette slot is reserved for nodata, so the colormap is sampled at
+    255 steps. Same normalisation as ``scalar_rgba``.
+    """
+    data = np.asarray(data, dtype=float)
+    if vmax <= vmin:
+        raise ValueError(f"vmax must be greater than vmin; got vmin={vmin}, vmax={vmax}")
+    finite = np.isfinite(data)
+    mask = finite if mask is None else np.asarray(mask, dtype=bool) & finite
+    data = np.where(finite, data, vmin)
+    scaled = np.clip((data - vmin) / (vmax - vmin), 0.0, 1.0)
+    index = np.round(scaled * 254.0).astype(np.uint8)
+    index[~mask] = 255
+    return index
+
+
+def write_palette_png(path: Path | str, index: np.ndarray, palette: str | np.ndarray) -> Path:
+    """Write an (h, w) uint8 index image as a 256-colour PNG (colour type 3, filter Up).
+
+    ``palette`` is a colormap name (see ``colormap_lut``) or an explicit (n, 3)
+    uint8 palette; index 255 is transparent.
+    """
+    index = np.ascontiguousarray(np.asarray(index, dtype=np.uint8))
+    if index.ndim != 2:
+        raise ValueError(f"index must be (h, w); got shape {index.shape}")
+    height, width = index.shape
+    if height <= 0 or width <= 0:
+        raise ValueError(f"PNG dimensions must be positive; got {width}x{height}")
+    if isinstance(palette, str):
+        lut = colormap_lut(palette)
+        colours = np.zeros((256, 3), dtype=np.uint8)
+        colours[:255] = lut[np.round(np.linspace(0.0, 255.0, 255)).astype(int)]
+    else:
+        colours = np.asarray(palette, dtype=np.uint8)
+        if colours.ndim != 2 or colours.shape[1] != 3 or colours.shape[0] > 255:
+            raise ValueError(f"palette must be (n, 3) with n <= 255; got {colours.shape}")
+        colours = np.vstack([colours, np.zeros((256 - colours.shape[0], 3), np.uint8)])
+    trns = np.full(256, 255, dtype=np.uint8)
+    trns[255] = 0
+    png = (
+        b"\x89PNG\r\n\x1a\n"
+        + _chunk(b"IHDR", struct.pack(">IIBBBBB", width, height, 8, 3, 0, 0, 0))
+        + _chunk(b"PLTE", colours.tobytes())
+        + _chunk(b"tRNS", trns.tobytes())
+        + _chunk(b"IDAT", zlib.compress(_scanlines(index, 2), 9))
+        + _chunk(b"IEND", b"")
+    )
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(png)
+    return path
+
+
+def rgb_index(rgb: np.ndarray, levels: int = 6) -> tuple[np.ndarray, np.ndarray]:
+    """Quantise an (h, w, 3) uint8 image to a levels^3 RGB cube.
+
+    Returns (index, palette) for ``write_palette_png``; index 255 is left free
+    for transparency. ``levels`` must be at most 6 (6^3 = 216 colours).
+    """
+    rgb = np.asarray(rgb, dtype=np.uint8)
+    if rgb.ndim != 3 or rgb.shape[-1] != 3:
+        raise ValueError(f"rgb must be (h, w, 3); got shape {rgb.shape}")
+    if not 2 <= levels <= 6:
+        raise ValueError(f"levels must be between 2 and 6; got {levels}")
+    step = 255 // (levels - 1)
+    quantised = np.round(rgb.astype("float32") / step).astype(np.uint8)
+    index = (
+        quantised[..., 0].astype(np.uint16) * levels * levels
+        + quantised[..., 1].astype(np.uint16) * levels
+        + quantised[..., 2].astype(np.uint16)
+    ).astype(np.uint8)
+    ramp = np.arange(levels) * step
+    palette = np.stack(np.meshgrid(ramp, ramp, ramp, indexing="ij"), axis=-1)
+    return index, palette.reshape(-1, 3).astype(np.uint8)
+
+
+def downsample2(array: np.ndarray) -> np.ndarray:
+    """Halve both dimensions with a NaN-aware 2x2 mean (odd edges are dropped)."""
+    array = np.asarray(array, dtype="float32")
+    height = array.shape[0] // 2 * 2
+    width = array.shape[1] // 2 * 2
+    blocks = array[:height, :width].reshape(height // 2, 2, width // 2, 2)
+    valid = np.isfinite(blocks)
+    total = np.where(valid, blocks, 0.0).sum(axis=(1, 3))
+    count = valid.sum(axis=(1, 3))
+    with np.errstate(invalid="ignore", divide="ignore"):
+        mean = np.where(count > 0, total / count, np.nan)
+    return mean.astype("float32")
+
+
+def downsample_rgba(rgba: np.ndarray) -> np.ndarray:
+    """Halve an RGBA image with an alpha-weighted 2x2 mean (transparent pixels stay neutral)."""
+    rgba = np.asarray(rgba, dtype=np.uint8)
+    if rgba.ndim != 3 or rgba.shape[-1] != 4:
+        raise ValueError(f"rgba must be (h, w, 4); got shape {rgba.shape}")
+    height = rgba.shape[0] // 2 * 2
+    width = rgba.shape[1] // 2 * 2
+    rgb = rgba[..., :3].astype("float32")
+    alpha = rgba[..., 3].astype("float32") / 255.0
+
+    def blocks(array: np.ndarray) -> np.ndarray:
+        return array[:height, :width].reshape(height // 2, 2, width // 2, 2, *array.shape[2:])
+
+    weight = blocks(alpha).sum(axis=(1, 3))
+    weighted = blocks(rgb * alpha[..., None]).sum(axis=(1, 3)) / np.maximum(weight, 1e-6)[..., None]
+    out = np.empty((height // 2, width // 2, 4), dtype=np.uint8)
+    out[..., :3] = np.clip(weighted, 0, 255).astype(np.uint8)
+    out[..., 3] = np.where(weight / 4.0 > 0.5, 255, 0).astype(np.uint8)
+    return out
+
+
+def read_png(path: Path | str) -> np.ndarray:
+    """Read one of our PNGs back into an (h, w, 4) uint8 RGBA array.
+
+    Supports colour types 6 (RGBA), 4 (gray+alpha) and 3 (palette + tRNS), 8-bit,
+    row filters 0 (None) and 2 (Up), no interlace.
     """
     data = Path(path).read_bytes()
     if data[:8] != b"\x89PNG\r\n\x1a\n":
@@ -160,11 +335,46 @@ def read_png(path: Path | str) -> np.ndarray:
             chunks[tag] = payload
         pos += 12 + length
     width, height, depth, color = struct.unpack(">IIBB", chunks[b"IHDR"][:10])
-    if (depth, color) != (8, 6):
-        raise ValueError(f"{path}: only 8-bit RGBA PNGs are supported ({depth=}, {color=})")
+    if depth != 8 or color not in (3, 4, 6):
+        raise ValueError(
+            f"{path}: only 8-bit RGBA, gray+alpha and palette PNGs are supported "
+            f"({depth=}, {color=})"
+        )
+    bytes_per_pixel = {6: 4, 4: 2, 3: 1}[color]
     raw = zlib.decompress(b"".join(idat))
-    rows = np.frombuffer(raw, np.uint8).reshape(height, 1 + 4 * width)
-    return rows[:, 1:].reshape(height, width, 4)
+    rows = np.frombuffer(raw, np.uint8).reshape(height, 1 + bytes_per_pixel * width)
+    out = np.empty((height, bytes_per_pixel * width), dtype=np.uint8)
+    previous = np.zeros(bytes_per_pixel * width, dtype=np.uint8)
+    for y in range(height):
+        filter_byte = int(rows[y, 0])
+        line = rows[y, 1:]
+        if filter_byte == 0:
+            current = line
+        elif filter_byte == 2:  # Up: add the row above, modulo 256
+            current = (line.astype(np.uint16) + previous).astype(np.uint8)
+        else:
+            raise ValueError(f"{path}: unsupported PNG row filter {filter_byte}")
+        out[y] = current
+        previous = current
+    if color == 6:
+        return out.reshape(height, width, 4)
+    if color == 4:
+        pixels = out.reshape(height, width, 2)
+        rgba = np.empty((height, width, 4), dtype=np.uint8)
+        rgba[..., 0] = rgba[..., 1] = rgba[..., 2] = pixels[..., 0]
+        rgba[..., 3] = pixels[..., 1]
+        return rgba
+    palette = np.frombuffer(chunks[b"PLTE"], np.uint8).reshape(-1, 3)
+    trns = np.frombuffer(chunks.get(b"tRNS", b""), np.uint8)
+    index = out.reshape(height, width)
+    rgba = np.empty((height, width, 4), dtype=np.uint8)
+    rgba[..., :3] = palette[index]
+    alpha = np.full((height, width), 255, dtype=np.uint8)
+    if trns.size:
+        transparent = index < trns.size
+        alpha[transparent] = trns[index[transparent]]
+    rgba[..., 3] = alpha
+    return rgba
 
 
 def layer_entry(
@@ -253,11 +463,6 @@ if __name__ == "__main__":
     z = _z.compress(raw)
     cut = len(z) // 2
 
-    def _chunk(tag, payload):
-        return (
-            _st.pack(">I", len(payload)) + tag + payload + _st.pack(">I", _z.crc32(tag + payload))
-        )
-
     two = (
         b"\x89PNG\r\n\x1a\n"
         + _chunk(b"IHDR", _st.pack(">IIBBBBB", 13, 9, 8, 6, 0, 0, 0))
@@ -271,6 +476,22 @@ if __name__ == "__main__":
     # NaN is transparent even inside an explicit mask
     out = scalar_rgba(np.array([[np.nan, 0.5]]), "gray", 0.0, 1.0, mask=np.array([[True, True]]))
     assert out[0, 0, 3] == 0 and out[0, 1, 3] == 255
+
+    # gray+alpha and palette round trips
+    gray = rng.integers(0, 256, size=(7, 5), dtype=np.uint8)
+    alpha = rng.integers(0, 256, size=(7, 5), dtype=np.uint8)
+    back = read_png(write_gray_png(tmp / "g.png", gray, alpha))
+    assert np.array_equal(back[..., 0], gray) and np.array_equal(back[..., 3], alpha)
+
+    index = scalar_index(np.array([[np.nan, 0.0, 1.0]]), "viridis", 0.0, 1.0)
+    back = read_png(write_palette_png(tmp / "p.png", index, "viridis"))
+    assert back[0, 0, 3] == 0 and back[0, 2, 3] == 255
+    assert tuple(back[0, 2, :3]) == tuple(colormap_lut("viridis")[255])
+
+    # downsample2 averages 2x2 blocks and ignores NaN
+    field = np.array([[1.0, 3.0, np.nan, np.nan], [2.0, 4.0, np.nan, np.nan]], dtype="float32")
+    small = downsample2(field)
+    assert small.shape == (1, 2) and small[0, 0] == 2.5 and np.isnan(small[0, 1])
 
     # a PNG needs positive dimensions
     for bad in (
