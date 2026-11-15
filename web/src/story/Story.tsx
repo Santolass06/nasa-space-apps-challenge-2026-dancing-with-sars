@@ -365,7 +365,7 @@ export default function Story() {
       </div>
 
       <div className={`story__map${exploreFull ? " story__map--full" : ""}`}>
-        <MapView className="story__map-view" onReady={onMapReady} />
+        <MapView className="story__map-view" onReady={onMapReady} cooperativeGestures={!exploreFull} />
         {exploring && manifest && (
           <Explorer
             manifest={manifest}
