@@ -13,7 +13,9 @@ deliberately not a dependency for a handful of lookup tables.
 
 from __future__ import annotations
 
+import contextlib
 import json
+import os
 import struct
 import zlib
 from pathlib import Path
@@ -425,12 +427,45 @@ def layer_entry(
 
 
 def write_manifest(path: Path | str, layers: list[dict]) -> Path:
-    """Write manifest.json: version, bounds (single source: caramulo.grid) and layers."""
+    """Write manifest.json: version, bounds (single source: caramulo.grid) and layers.
+
+    Written beside the target and moved into place with os.replace (#92): a crash
+    mid-write leaves the previous manifest intact, never a truncated JSON that the
+    app cannot parse.
+    """
     manifest = {"version": 1, "bounds": list(BBOX), "layers": layers}
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(manifest, indent=2) + "\n")
+    staged = path.with_name(path.name + ".tmp")
+    staged.write_text(json.dumps(manifest, indent=2) + "\n")
+    os.replace(staged, path)
     return path
+
+
+@contextlib.contextmanager
+def guarded_manifest(path: Path | str):
+    """Keep manifest.json exactly as it was if the block raises (#92).
+
+    A --real run rebuilds the manifest, so the old entries go up front. The copy
+    kept beside it is moved back atomically on any exception, which is what stops an
+    aborted run from leaving the app with an empty or half-built manifest.
+    """
+    path = Path(path)
+    backup = path.with_name(path.name + ".prev")
+    had_old = path.exists()
+    if had_old:
+        backup.write_bytes(path.read_bytes())
+    write_manifest(path, [])
+    try:
+        yield path
+    except BaseException:
+        if had_old:
+            os.replace(backup, path)
+        else:
+            path.unlink(missing_ok=True)
+        raise
+    else:
+        backup.unlink(missing_ok=True)
 
 
 def upsert_manifest_entry(path: Path | str, entry: dict) -> Path:
@@ -555,4 +590,31 @@ if __name__ == "__main__":
             pass
         else:
             raise AssertionError(f"write_png accepted shape {bad.shape}")
+    # guarded_manifest (#92): a failed rebuild leaves the manifest byte-for-byte as
+    # it was; a successful one replaces it and leaves no temporaries behind.
+    manifest = tmp / "manifest.json"
+    write_manifest(manifest, [{"id": "keep"}])
+    before = manifest.read_bytes()
+    try:
+        with guarded_manifest(manifest):
+            raise RuntimeError("boom")
+    except RuntimeError:
+        pass
+    assert manifest.read_bytes() == before, "guarded_manifest did not restore the manifest"
+    assert not manifest.with_name("manifest.json.prev").exists()
+    assert not manifest.with_name("manifest.json.tmp").exists()
+    with guarded_manifest(manifest):
+        write_manifest(manifest, [{"id": "new"}])
+    after = manifest.read_bytes()
+    assert b'"new"' in after and b'"keep"' not in after, "a successful run must keep its manifest"
+    assert not manifest.with_name("manifest.json.prev").exists()
+    # a failed first run (no manifest yet) must not create an empty one
+    fresh = tmp / "fresh.json"
+    try:
+        with guarded_manifest(fresh):
+            raise RuntimeError("boom")
+    except RuntimeError:
+        pass
+    assert not fresh.exists(), "guarded_manifest invented a manifest for a run that failed"
+
     print("export self-check ok")
