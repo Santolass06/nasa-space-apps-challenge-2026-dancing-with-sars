@@ -56,6 +56,27 @@ export default function MapView({ onReady, className, cooperativeGestures = true
       pixelRatio: Math.max(window.devicePixelRatio || 1, 2),
       cooperativeGestures,
     });
+    // The story widens and narrows the map frame after frame. A canvas at 2x that is
+    // reallocated every frame makes that stutter, so while the container keeps changing
+    // size the map draws at 1x, and goes back to full sharpness a moment after it stops.
+    const sharp = map.getPixelRatio();
+    let sharpening = false;
+    let quiet = 0;
+    const drawAt = (ratio: number) => {
+      sharpening = true; // setPixelRatio fires "resize" itself
+      map.setPixelRatio(ratio);
+      sharpening = false;
+    };
+    map.on("resize", () => {
+      if (sharpening) {
+        return;
+      }
+      if (map.getPixelRatio() !== 1) {
+        drawAt(1);
+      }
+      window.clearTimeout(quiet);
+      quiet = window.setTimeout(() => drawAt(sharp), 220);
+    });
     map.addControl(new NavigationControl({ showCompass: false }), "bottom-right");
     map.addControl(new AttributionControl({ compact: true }), "bottom-left");
     // "style.load" fires when the style is parsed — before the first tiles are
@@ -66,6 +87,7 @@ export default function MapView({ onReady, className, cooperativeGestures = true
     (window as unknown as { __map?: Map }).__map = map;
 
     return () => {
+      window.clearTimeout(quiet);
       map.remove();
       mapRef.current = null;
     };

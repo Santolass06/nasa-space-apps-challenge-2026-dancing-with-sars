@@ -2,6 +2,25 @@
 
 Uma linha por uso relevante: data, tarefa, ferramenta, o que fez. Entra na submissão (página do projeto).
 
+## Summary for the project page (English)
+
+AI tools were used throughout the event as coding and research assistants, directed and
+reviewed by the team. Each use is logged in the table below (in Portuguese, one row per use).
+
+- **Claude / Claude Code (Anthropic):** background research and the team dossier and plan;
+  repository scaffold and restructuring; web app work (map layers, before/after slider, guided
+  story, multi-map explorer, legends, mobile layout, performance and level of detail); the
+  generated layer captions; and review fixes.
+- **Hermes agent (models GLM-5.3 and DeepSeek, via OpenCode Go):** the Python pipeline (export,
+  coherence, backscatter, burn polygon, fire progression, `run.py`), the first version of the web
+  app, the licence verification, and an audit of the stacked pull requests.
+- **Antigravity:** one automated review of one pull request (#78), requested by a team member.
+
+What AI did not do: the measurements. Areas, overlap and the backscatter and coherence numbers
+are computed by pipeline code from the NISAR products and written to `stats.json`; the app
+reads them. Scientific claims were checked against the data by the team
+([`STORY-VALIDATION.md`](STORY-VALIDATION.md)). Pull requests were reviewed by team members.
+
 | Data | Tarefa | Ferramenta | O que fez |
 | --- | --- | --- | --- |
 | 2026-11-14 | Pesquisa sobre o desafio e dossier da equipa | Claude (agente de pesquisa) | Leu o enunciado e as regras, redigiu o dossier e o plano de trabalho |
@@ -41,8 +60,11 @@ Uma linha por uso relevante: data, tarefa, ferramenta, o que fez. Entra na submi
 | 2026-11-15 | D2: layouts para telemóvel, tablet e telemóvel na horizontal | Claude Code | O André achou o telemóvel mau e pediu o texto mais em baixo: em ecrã vertical (até 900 px) o mapa fica fixo em cima e o texto de cada passo vai para uma folha fixa em baixo; na horizontal (altura até 520 px) mantêm-se as duas colunas, apertadas; as legendas e seletores ficam compactos (os tipos de camada passam a uma linha com scroll, sem dicas por não haver rato) e o modo de 4 camadas só existe fora dos telemóveis; verifiquei 390x844, 768x1024, 844x390 e 1024x768, sem scroll horizontal
 | 2026-11-15 | C4: revisão do Cristiano ao #64 | Claude Code | `showVector` passou a aceitar `progress` e `places` (reutiliza `showPlaces`); verificado no build com a visibilidade de cada camada e as duas fases desenhadas |
 | 2026-11-15 | A2: legendas (caveats) das camadas de coerência | Claude Code | Escreveu o `caveats.py`, que gera o texto a partir das datas do par e da janela do fogo (2 a 5 de julho), e corrigiu as 5 legendas erradas do manifest, a partir da revisão do Cristiano ao #54 |
+| 2026-11-15 | Revisão do estado após os PRs e correções pequenas (favicon, faixa de controlos do Explore, índice do README) | Claude Code | Juntou os PRs abertos numa branch descartável, correu `make check` e testou no browser; encontrou o 404 do favicon e a faixa de controlos que bloqueava o arrasto do mapa, e corrigiu-os; cada correção verificada no browser |
 | 2026-11-15 | D6: cortar a progressão do fogo no ato 2 | Hermes (agente, deepseek-v4.1-flash) | Leu o `progress.geojson` e o `showVector` e mostrou que só há duas geometrias e ambas desenham juntas; registou a decisão de corte em DECISIONS.md com o motivo |
 | 2026-11-15 | #82: a roda do rato sobre o mapa rola a página | Hermes (agente, deepseek-v4.1-flash) | Ligou `cooperativeGestures` no MapView (roda rola a página, Ctrl+roda faz zoom, dois dedos movem o mapa), propagou-a às vistas do explorador e desligou-a em ecrã inteiro; mediu no browser que a roda deixa de ser cancelada |
 | 2026-11-15 | #82: a roda no ecrã expandido de 1 camada | Claude Code | Medi no browser que, com 1 camada e o ecrã expandido, a roda simples já não fazia zoom nem rolava (o mapa da história ficava sempre cooperativo); o modo passou a ligar-se e desligar-se no `MapView` com `map.cooperativeGestures.enable()/disable()`, sem reconstruir o mapa (a reconstrução repunha a câmara e as camadas), e a história passa `!exploreFull`; verifiquei 1, 2 e 4 camadas, em linha e expandido, e que o mapa da história é o mesmo depois de expandir e fechar |
+| 2026-11-15 | E9: README final, créditos e checklist de submissão | Claude Code | Verificou o README, o NOTICE, o `data-sources.md` e o repositório contra o que a app usa; reescreveu o estado do README com o raciocínio científico, acrescentou o resumo em inglês deste ficheiro e marcou na checklist só o que está verificado |
 | 2026-11-15 | C7: áreas medidas na grelha completa | Claude Code | Sugerido pelo André (traçar na imagem de maior resolução e mostrar a reduzida, como no nível de detalhe). Corri `burn`, `progress` e `gcov --act4` nos `@2x` num checkout limpo, verifiquei que o controlo com os ficheiros de metade da grelha reproduz o `main` (13.517,9 ha) e que a grelha completa dá 13.501,0 ha; atualizou os números derivados e re-mediu o −0,30 (12.165,0 ha), a área equivalente (+0,071%) e os vértices (2.564) |
 | 2026-11-15 | V4: tabela de números para a página do projeto | Claude Code | Gerou `docs/PROJECT-PAGE-NUMBERS.md` a partir de `stats.json`, `progress.geojson` e `manifest.json` (nenhum valor escrito à mão) e confirmou que nenhum documento tem números antigos fora das linhas de histórico |
+| 2026-11-15 | UX: tom por ato, título em chama, cinza do fogo, legendas recolhíveis, transição do mapa | Claude Code | A ideia e as escolhas (tom por ato, brasas, legendas) foram do André e da equipa; escreveu o `moods.css`, o `Embers.tsx` e o resto, mediu no navegador o contraste das cores sobre cada fundo, a proporção de partículas que o canvas desenha com e sem «reduzir movimento» e, fotograma a fotograma, a transição do mapa (encontrou e corrigiu um custo de estilos que o próprio fundo por ato tinha criado) |
