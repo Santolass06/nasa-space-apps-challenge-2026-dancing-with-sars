@@ -1288,11 +1288,13 @@ h1 {
     z-index: 3;
     order: -1;
     height: 56vh;
+    height: 56dvh;
     max-height: none;
   }
 
   .story__legend-strip {
     max-height: 24vh;
+    max-height: 24dvh;
   }
 
   .story__map-column .story__map {
@@ -1309,6 +1311,7 @@ h1 {
 
   .story__step {
     min-height: 62vh;
+    min-height: 62dvh;
     border-top: 0;
     opacity: 1;
   }
@@ -1319,6 +1322,7 @@ h1 {
     z-index: 4;
     display: block;
     max-height: 42vh;
+    max-height: 42dvh;
     margin: 0 -1.25rem;
     padding: 0.9rem 1.25rem calc(1rem + env(safe-area-inset-bottom, 0px));
     overflow-y: auto;
@@ -1374,10 +1378,12 @@ h1 {
   .story__map-column,
   .story.is-wide .story__map-column {
     --map-height: calc(100vh - 1.5rem);
+    --map-height: calc(100dvh - 1.5rem);
   }
 
   .story__step {
     min-height: 90vh;
+    min-height: 90dvh;
   }
 
   .story__step-body {
