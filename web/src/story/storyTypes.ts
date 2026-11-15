@@ -37,6 +37,8 @@ export type Step = {
   comparisons?: Comparison[];
   figure?: Figure;
   focus?: Focus;
+  /** Widens the map as a focus step does, without outlining a zone (the explore step). */
+  wide?: boolean;
   sources?: string[];
 };
 

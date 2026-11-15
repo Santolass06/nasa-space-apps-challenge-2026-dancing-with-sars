@@ -36,6 +36,7 @@ build time (check with `pip-licenses` / `npm ls` before a release):
   React, React DOM, Vite             MIT
   MapLibre GL JS                     BSD-3-Clause
   Tailwind CSS                       MIT
+  TypeScript (build time)            Apache-2.0
 
 No API keys are needed to build, run or serve this project.
 

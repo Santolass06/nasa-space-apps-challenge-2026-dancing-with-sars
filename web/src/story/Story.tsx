@@ -17,12 +17,18 @@ import {
   type FlatStep,
   type Step,
 } from "./storyTypes";
+import Embers from "./Embers";
+import StoryIndex from "./StoryIndex";
 import { hectares, loadStats, type Polarization, type Stats } from "./stats";
 
 /**
  * Portrait phones and tablets: the map is pinned on top and the step's text sits
  * in a sheet at the bottom of the screen (landscape keeps the two columns).
  */
+/** Timings of the map frame growing or shrinking (the 0.7 s transition on .story in styles.css). */
+const MAP_DATA_DELAY_MS = 380;
+const MAP_CAMERA_DELAY_MS = 640;
+
 const STACKED = "(max-width: 900px) and (orientation: portrait)";
 
 function useStacked(): boolean {
@@ -149,7 +155,6 @@ export default function Story() {
   const [mainIdle, setMainIdle] = useState(false);
   const activeRef = useRef(0);
   const stepRefs = useRef<Array<HTMLElement | null>>([]);
-  const [indexOpen, setIndexOpen] = useState(false);
 
   useEffect(() => {
     loadManifest()
@@ -162,6 +167,7 @@ export default function Story() {
 
   const framed = useRef(false);
   const wasWide = useRef(false);
+  const dataTimer = useRef<number | undefined>(undefined);
 
   const applyStep = useCallback((manager: LayerManager, step: Step) => {
     const rasters: string[] = [];
@@ -175,21 +181,33 @@ export default function Story() {
         rasters.push(ref.id);
       }
     }
-    manager.showLayers(rasters);
-    manager.showVector(overlays);
-    manager.showFocus(step.focus ?? null);
+    // The map frame widens or narrows over the CSS transition on .story (0.7 s). While it
+    // does, the data waits until the frame is most of the way there, so it fades in as the
+    // camera starts and not on top of a half-grown frame at the old zoom; the camera then
+    // waits for the frame to be done.
+    const wide = Boolean(step.focus || step.wide);
+    const widthChanges = framed.current && wasWide.current !== wide;
+    const show = () => {
+      manager.showLayers(rasters);
+      manager.showVector(overlays);
+      manager.showFocus(step.focus ?? null);
+    };
+    window.clearTimeout(dataTimer.current);
+    if (widthChanges) {
+      dataTimer.current = window.setTimeout(show, MAP_DATA_DELAY_MS);
+    } else {
+      show();
+    }
     // A focus step frames its zone with room around it; any other step frames its view.
     const target = step.focus?.view ?? step.focus?.bounds ?? step.mapView?.bounds;
     if (target) {
-      // When the map is about to widen or narrow, let that finish before the camera moves.
-      const widthChanges = wasWide.current !== Boolean(step.focus);
       manager.flyTo(target, {
         instant: !framed.current,
         padding: step.focus ? 90 : 24,
-        delay: widthChanges ? 750 : undefined,
+        delay: widthChanges ? MAP_CAMERA_DELAY_MS : undefined,
       });
       framed.current = true;
-      wasWide.current = Boolean(step.focus);
+      wasWide.current = wide;
     }
   }, []);
 
@@ -268,9 +286,9 @@ export default function Story() {
     ? [pickedLayer]
     : current
       ? current.step.layers
-        .map((ref) => manifest?.layers.find((layer) => layer.id === ref.id))
-        .filter((layer): layer is Layer => Boolean(layer))
-        .slice(0, 2)
+          .map((ref) => manifest?.layers.find((layer) => layer.id === ref.id))
+          .filter((layer): layer is Layer => Boolean(layer))
+          .slice(0, 2)
       : [];
 
   const legend = legendLayers.length > 0 && (
@@ -278,6 +296,19 @@ export default function Story() {
       {legendLayers.map((layer) => <Legend key={layer.id} layer={layer} />)}
     </div>
   );
+
+  // The page takes the mood of the act being read (colours are CSS variables keyed on this).
+  const activeAct = steps[active]?.act.id;
+  useEffect(() => {
+    if (!activeAct) {
+      return;
+    }
+    const root = document.documentElement;
+    root.dataset.act = activeAct;
+    return () => {
+      delete root.dataset.act;
+    };
+  }, [activeAct]);
 
   // Leaving the explore step closes the expanded view; while it is open the page behind stays put.
   useEffect(() => {
@@ -308,69 +339,41 @@ export default function Story() {
   /** The text of a step: its sentence, one caption per layer, sources, and the numbers panels. */
   const stepContent = (item: FlatStep) => (
     <>
-      <p className="story__step-text">{item.step.text}</p>
-      <ul className="story__captions">
-        {item.step.layers.map((ref) => (
-          <li key={ref.id}>
-            <span className="story__layer-name">{layerTitle(manifest, ref.id)}</span>{" "}
-            {ref.caption}
-          </li>
-        ))}
-      </ul>
-      {item.step.sources && item.step.sources.length > 0 && (
-        <p className="story__sources">
-          Sources:{" "}
-          {item.step.sources.map((url, position) => (
-            <span key={url}>
-              <a href={url} target="_blank" rel="noreferrer">
-                {new URL(url).hostname}
-              </a>
-              {position < item.step.sources!.length - 1 ? ", " : ""}
-            </span>
-          ))}
-        </p>
-      )}
-      {item.index === active && item.act.id === "scar" && !item.step.focus && stats && (
-        <StatsPanel stats={stats} />
-      )}
-      {item.index === active && item.act.id === "radar" && !item.step.focus && stats?.act4 && (
-        <Act4Panel act4={stats.act4} />
-      )}
+          <p className="story__step-text">{item.step.text}</p>
+          <ul className="story__captions">
+            {item.step.layers.map((ref) => (
+              <li key={ref.id}>
+                <span className="story__layer-name">{layerTitle(manifest, ref.id)}</span>{" "}
+                {ref.caption}
+              </li>
+            ))}
+          </ul>
+          {item.step.sources && item.step.sources.length > 0 && (
+            <p className="story__sources">
+              Sources:{" "}
+              {item.step.sources.map((url, position) => (
+                <span key={url}>
+                  <a href={url} target="_blank" rel="noreferrer">
+                    {new URL(url).hostname}
+                  </a>
+                  {position < item.step.sources!.length - 1 ? ", " : ""}
+                </span>
+              ))}
+            </p>
+          )}
+          {item.index === active && item.act.id === "scar" && !item.step.focus && stats && (
+            <StatsPanel stats={stats} />
+          )}
+          {item.index === active && item.act.id === "radar" && !item.step.focus && stats?.act4 && (
+            <Act4Panel act4={stats.act4} />
+          )}
     </>
   );
 
   return (
-    <div className={`story${current?.step.focus ? " is-wide" : ""}`}>
-
-
-      <div className="story__index">
-        <button
-          type="button"
-          className="story__index-toggle"
-          aria-label="Story index"
-          aria-expanded={indexOpen}
-          aria-controls="story-index"
-          onClick={() => setIndexOpen((open) => !open)}
-        >
-          <span aria-hidden="true">☰</span>
-        </button>
-
-        <nav id="story-index" aria-label="Story index" hidden={!indexOpen}>
-          {story.acts.map((act) => (
-            <a
-              key={act.id}
-              href={`#act-${act.id}`}
-              onClick={() => setIndexOpen(false)}
-            >
-              {act.title}
-            </a>
-          ))}
-          <a href="#step-explore-the-map" onClick={() => setIndexOpen(false)}>
-            Explore the map
-          </a>
-        </nav>
-      </div>
-
+    <div className={`story${current?.step.focus || current?.step.wide ? " is-wide" : ""}`}>
+      <Embers active={activeAct === "fire"} />
+      <StoryIndex acts={story.acts} activeAct={activeAct} />
       <div className="story__text">
         {story.acts.map((act) => (
           <section className="story__act" key={act.id} id={`act-${act.id}`}>
