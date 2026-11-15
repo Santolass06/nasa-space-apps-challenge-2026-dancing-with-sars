@@ -16,7 +16,7 @@ import {
   story,
   type FlatStep,
   type Step,
-} from "./story";
+} from "./storyTypes";
 import { hectares, loadStats, type Polarization, type Stats } from "./stats";
 
 /**
