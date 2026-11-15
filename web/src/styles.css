@@ -30,14 +30,11 @@ body {
   margin: 0;
   min-height: 100vh;
   color: var(--text);
-  background:
-    radial-gradient(1200px 600px at 15% -10%, rgba(79, 209, 197, 0.16), transparent 60%),
-    radial-gradient(900px 500px at 90% 0%, rgba(124, 156, 255, 0.16), transparent 55%),
-    var(--bg);
+  background: var(--bg);
 }
 
 a {
-  color: var(--accent);
+  color: var(--act-accent);
 }
 
 code {
@@ -63,7 +60,7 @@ code {
   position: absolute;
   inset: -4rem 20% auto;
   height: 12rem;
-  background: radial-gradient(closest-side, rgba(79, 209, 197, 0.25), transparent);
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--mood-a) 25%, transparent), transparent);
   filter: blur(40px);
   pointer-events: none;
 }
@@ -83,11 +80,42 @@ h1 {
   letter-spacing: -0.03em;
 }
 
+/* "em chamas": flame colours, with an ember glow behind the letters (only its opacity moves). */
+.flame {
+  position: relative;
+  isolation: isolate;
+}
+
 .accent {
-  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  background: linear-gradient(100deg, #ffd166 0%, #ff9f43 34%, #ff5a2a 70%, #e0301e 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+}
+
+.flame::before {
+  content: "";
+  position: absolute;
+  inset: -0.1em -0.15em;
+  z-index: -1;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(255, 96, 40, 0.55), transparent);
+  filter: blur(0.3em);
+  opacity: 0.35;
+  animation: ember 6s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+@keyframes ember {
+  to {
+    opacity: 0.7;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flame::before {
+    animation: none;
+  }
 }
 
 .lede {
@@ -143,7 +171,7 @@ h1 {
 .step-number {
   font-family: ui-monospace, monospace;
   font-size: 0.78rem;
-  color: var(--accent);
+  color: var(--act-accent);
   letter-spacing: 0.15em;
 }
 
@@ -343,8 +371,9 @@ h1 {
   font-weight: 700;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--accent);
-  background: var(--bg);
+  color: var(--act-accent);
+  /* Its background (the page's own mood, so the band is invisible and hides what scrolls
+     under it) is painted in moods.css. */
 }
 
 .story__step {
@@ -387,6 +416,9 @@ h1 {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .legend__chevron,
+  .legend__body,
+  .legend.is-folded .legend__body,
   .story,
   .story__map,
   .focus-label,
@@ -680,8 +712,21 @@ h1 {
 }
 
 .explorer__hud .picker,
-.explorer__hud .legend {
+.explorer__legend .legend {
   pointer-events: auto;
+}
+
+/* The legend sits at the bottom left, above the attribution, so the controls at the top
+   and the legend do not stack over the middle of the map. */
+.explorer__legend {
+  position: absolute;
+  left: 0.75rem;
+  bottom: 2.75rem;
+  pointer-events: none;
+}
+
+.explorer__hud .picker {
+  max-width: 30rem;
 }
 
 .explorer__controls {
@@ -1015,6 +1060,70 @@ h1 {
   color: var(--text);
 }
 
+/* The title is a button: it folds the legend away and opens it again. */
+.legend__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+.legend__head:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.legend__chevron {
+  flex: none;
+  width: 0.42rem;
+  height: 0.42rem;
+  margin-right: 0.15rem;
+  border-right: 2px solid var(--muted);
+  border-bottom: 2px solid var(--muted);
+  transform: translateY(2px) rotate(-135deg);
+  transition: transform 0.25s ease;
+}
+
+.legend__head:hover .legend__chevron {
+  border-color: var(--text);
+}
+
+.legend.is-folded .legend__chevron {
+  transform: translateY(-2px) rotate(45deg);
+}
+
+/* Folding collapses the body smoothly (its height goes to 0, not a jump). */
+.legend__body {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition:
+    grid-template-rows 0.25s ease,
+    visibility 0s linear 0s;
+}
+
+.legend__inner {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.legend.is-folded .legend__body {
+  grid-template-rows: 0fr;
+  visibility: hidden;
+  transition:
+    grid-template-rows 0.25s ease,
+    visibility 0s linear 0.25s;
+}
+
 .legend__ramp {
   height: 8px;
   margin: 0.35rem 0 0.2rem;
@@ -1192,7 +1301,7 @@ h1 {
     font-weight: 700;
     letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: var(--accent);
+    color: var(--act-accent);
   }
 
   .story__sheet-body {
@@ -1364,7 +1473,9 @@ h1 {
 }
 
 .footer {
-  margin-top: 3.5rem;
+  /* The map is sticky inside the story: it stays put until the footer comes up, then the
+     footer pushes it, never over it. This margin is the space left between the two. */
+  margin-top: 2.5rem;
   padding-top: 1.5rem;
   border-top: 1px solid var(--border);
   font-size: 0.8rem;
@@ -1377,4 +1488,14 @@ h1 {
 
 .story-loading {
   min-height: 70vh;
+}
+
+/* Ash falling behind the page in the fire act (Embers.tsx): never over text or maps. */
+.embers {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
 }
