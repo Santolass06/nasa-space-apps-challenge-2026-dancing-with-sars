@@ -1,36 +1,60 @@
 """Runs the pipeline end to end and writes web/public/layers/.
 
-In:  products downloaded by caramulo.fetch into data/raw/ (none yet).
+In:  products downloaded by caramulo.fetch into data/raw/.
 Out: layers, vectors and manifest.json in web/public/layers/ (or --out).
 Reads: GUNW and GCOV (see docs/CONTRACT.md).
 
-Real steps arrive with tasks A2 (gunw.py), B2 (gcov.py) and B3 (s2.py);
-until then only ``--mock`` works (task T2b): deterministic synthetic layers
-on the common grid so the web app (fronts C and D) can be built against the
-manifest contract before any NISAR download exists.
+Two modes:
 
-The mock's burn scar is an invented ellipse of roughly the real one's size
-(14 x 10 km, docs/DOSSIER.md); every entry says in ``source`` and ``caveat``
-that it is synthetic. Mock PNGs are 500 px wide (aspect ratio from
-caramulo.grid) to keep the repository light; real layers use the full
-grid width.
+``--real`` runs every step, in the order the contract expects, reading the
+products in ``data/raw`` (the orbit and dates come from the NISAR file name,
+not from a table):
+
+1. coherence — one layer per GUNW pair (``caramulo.gunw``);
+2. backscatter — HH and HV per GCOV date (``caramulo.gcov``);
+3. change — dhh/dhv and the colour composite for the fire pair
+   (``burn.FIRE_LAYER`` names the pair);
+4. optical — Sentinel-2 true colour (``caramulo.s2``; needs the network,
+   so it only runs with ``--s2``);
+5. perimeter — the coherence difference polygon (``caramulo.burn``);
+6. progression — the "during" mask inside that polygon
+   (``caramulo.progress``);
+7. act-4 numbers — HH, HV and coherence inside/outside the scar, written to
+   ``stats.json`` (``caramulo.gcov --act4``).
+
+``--plan`` prints that list and what each step will read, without touching
+anything — the quickest way to see whether ``data/raw`` has what a full run
+needs.
+
+``--mock`` writes deterministic synthetic layers instead (task T2b): the web
+app can be built against the manifest contract before any NISAR download
+exists. The mock's burn scar is an invented ellipse of roughly the real one's
+size (14 x 10 km, docs/DOSSIER.md); every entry says in ``source`` and
+``caveat`` that it is synthetic. Mock PNGs are 500 px wide (aspect ratio from
+caramulo.grid) to keep the repository light; real layers use the full grid
+width.
 
 Examples (run inside pipeline/):
 
+    uv run python run.py --plan
+    uv run python run.py --real
+    uv run python run.py --real --s2
     uv run python run.py --mock
-    uv run python run.py --mock --out ../data/processed/mock
 """
 
 from __future__ import annotations
 
 import argparse
 import json
+import re
+from collections.abc import Callable
+from functools import partial
 from pathlib import Path
 
 import numpy as np
 from scipy.ndimage import gaussian_filter
 
-from caramulo import export
+from caramulo import burn, export, gcov, gunw, progress, s2
 from caramulo.grid import HEIGHT, WIDTH
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -232,6 +256,27 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         help="write the synthetic layers and manifest.json (task T2b)",
     )
     parser.add_argument(
+        "--real",
+        action="store_true",
+        help="run every step from the products in data/raw (see the module docstring)",
+    )
+    parser.add_argument(
+        "--plan",
+        action="store_true",
+        help="print the real steps and what they read, without writing anything",
+    )
+    parser.add_argument(
+        "--s2",
+        action="store_true",
+        help="also write the Sentinel-2 optical layers (needs the network)",
+    )
+    parser.add_argument(
+        "--data",
+        type=Path,
+        default=REPO_ROOT / "data" / "raw",
+        help="directory with the products (default: data/raw)",
+    )
+    parser.add_argument(
         "--out",
         type=Path,
         default=LAYERS_DIR,
@@ -254,12 +299,174 @@ def _real_layer_count(manifest_path: Path) -> int:
     return sum(1 for layer in layers if "synthetic" not in str(layer.get("source", "")))
 
 
+# --- real mode --------------------------------------------------------------
+
+_DATE_IN_NAME = re.compile(r"\d{8}T\d{6}")
+
+
+def _iso(stamp: str) -> str:
+    """20260629 → 2026-06-29."""
+    return f"{stamp[:4]}-{stamp[4:6]}-{stamp[6:]}"
+
+
+def read_products(data_dir: Path) -> dict[str, list[dict]]:
+    """Group the products in data_dir, with orbit and dates from the file name.
+
+    NISAR names carry everything the steps need:
+
+        NISAR_L2_PR_<KIND>_<track>_<frame>_<D|A>_..._<date>T<time>_..._P#####_...
+
+    The orbit label used everywhere else (D52, A15, ...) is the direction plus
+    the frame, which is what docs/PRODUCTS.md lists.
+    """
+    products: dict[str, list[dict]] = {"gunw": [], "gcov": []}
+    for path in sorted(data_dir.glob("NISAR_L2_PR_*.h5")):
+        parts = path.name.split("_")
+        if len(parts) < 7 or parts[3] not in ("GUNW", "GCOV"):
+            continue
+        orbit = f"{parts[6]}{int(parts[5])}"
+        # Every acquisition carries its start and stop time, so the dates repeat.
+        dates = sorted({match.group(0)[:8] for match in _DATE_IN_NAME.finditer(path.name)})
+        if parts[3] == "GUNW" and len(dates) == 2:
+            products["gunw"].append({"path": path, "orbit": orbit, "dates": tuple(dates)})
+        elif parts[3] == "GCOV" and len(dates) == 1:
+            products["gcov"].append({"path": path, "orbit": orbit, "date": dates[0]})
+    return products
+
+
+def _fire_pair(products: dict[str, list[dict]]) -> tuple[dict, dict] | None:
+    """The two GCOV products that bracket the fire, named by burn.FIRE_LAYER."""
+    parts = burn.FIRE_LAYER.split("_")  # coh_D52_20260629_20260711
+    if len(parts) != 4:
+        return None
+    orbit, before_date, after_date = parts[1], parts[2], parts[3]
+    by_key = {(product["orbit"], product["date"]): product for product in products["gcov"]}
+    before = by_key.get((orbit, before_date))
+    after = by_key.get((orbit, after_date))
+    return (before, after) if before and after else None
+
+
+def _run_gunw(product: dict, out_dir: Path) -> int:
+    before, after = product["dates"]
+    return gunw.main(
+        [
+            str(product["path"]),
+            "--orbit",
+            product["orbit"],
+            "--dates",
+            _iso(before),
+            _iso(after),
+            "--out",
+            str(out_dir),
+        ]
+    )
+
+
+def _run_gcov(product: dict, out_dir: Path) -> int:
+    return gcov.main(
+        [
+            str(product["path"]),
+            "--orbit",
+            product["orbit"],
+            "--date",
+            _iso(product["date"]),
+            "--out",
+            str(out_dir),
+        ]
+    )
+
+
+def _run_change(before: dict, after: dict, out_dir: Path) -> int:
+    return gcov.main(
+        [
+            str(after["path"]),
+            "--orbit",
+            after["orbit"],
+            "--date",
+            _iso(after["date"]),
+            "--difference",
+            str(before["path"]),
+            "--before-date",
+            _iso(before["date"]),
+            "--rgb",
+            "--out",
+            str(out_dir),
+        ]
+    )
+
+
+def real_steps(
+    products: dict[str, list[dict]], out_dir: Path, data_dir: Path, with_s2: bool
+) -> list[tuple[str, Callable[[], int | None]]]:
+    """The real pipeline as (label, callable) pairs, in contract order."""
+    steps: list[tuple[str, Callable[[], int | None]]] = []
+    for product in products["gunw"]:
+        before, after = product["dates"]
+        label = f"coherence {product['orbit']} {_iso(before)} → {_iso(after)}"
+        steps.append((label, partial(_run_gunw, product, out_dir)))
+    for product in products["gcov"]:
+        label = f"backscatter {product['orbit']} {_iso(product['date'])}"
+        steps.append((label, partial(_run_gcov, product, out_dir)))
+    pair = _fire_pair(products)
+    if pair:
+        before, after = pair
+        label = f"change {after['orbit']} {_iso(before['date'])} → {_iso(after['date'])}"
+        steps.append((label, partial(_run_change, before, after, out_dir)))
+    if with_s2:
+        steps.append(("optical (Sentinel-2, network)", lambda: s2.main(["--out", str(out_dir)])))
+    steps.append(
+        (
+            "perimeter (coherence difference)",
+            partial(
+                burn.main,
+                ["--out", str(out_dir), "--official", str(out_dir / "burn_official.geojson")],
+            ),
+        )
+    )
+    steps.append(
+        ("progression (during the fire)", partial(progress.main, ["--layers", str(out_dir)]))
+    )
+    steps.append(
+        (
+            "act-4 numbers",
+            partial(gcov.main, ["--act4", "--out", str(out_dir), "--data", str(data_dir)]),
+        )
+    )
+    return steps
+
+
+def run_real(args: argparse.Namespace) -> int:
+    """Print the plan (--plan) or run every step (--real)."""
+    products = read_products(args.data)
+    if not products["gunw"] and not products["gcov"]:
+        raise SystemExit(f"no NISAR products in {args.data} — download some first (caramulo.fetch)")
+    steps = real_steps(products, args.out, args.data, args.s2)
+    print(
+        f"{len(products['gunw'])} GUNW + {len(products['gcov'])} GCOV in {args.data}"
+        f" → {len(steps)} steps into {args.out}"
+    )
+    for index, (label, _) in enumerate(steps, start=1):
+        print(f"  {index}. {label}")
+    if args.plan:
+        print("--plan: nothing was written.")
+        return 0
+    for index, (label, run) in enumerate(steps, start=1):
+        print(f"[{index}/{len(steps)}] {label}")
+        code = run()
+        if code not in (None, 0):
+            raise SystemExit(f"step {index} ({label}) failed with {code}")
+    print(f"Done: {args.out}")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
+    if args.real or args.plan:
+        return run_real(args)
     if not args.mock:
         raise SystemExit(
-            "Nothing to do: only --mock is implemented so far (task T2b). Real steps "
-            "arrive with A2 (gunw.py), B2 (gcov.py) and B3 (s2.py); see docs/PLAN.md."
+            "Nothing to do: pick --real (from data/raw), --plan (what --real would do) "
+            "or --mock (synthetic layers, task T2b)."
         )
     manifest_path = args.out / "manifest.json"
     real = _real_layer_count(manifest_path)
