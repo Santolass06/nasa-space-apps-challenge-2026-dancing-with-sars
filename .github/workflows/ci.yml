@@ -37,6 +37,9 @@ jobs:
       - name: Export self-check
         run: python -m caramulo.export
 
+      - name: Caveats self-check
+        run: python -m caramulo.caveats
+
   web:
     name: Web (type-check + build)
     runs-on: ubuntu-latest

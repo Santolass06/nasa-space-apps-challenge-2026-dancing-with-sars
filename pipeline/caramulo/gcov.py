@@ -43,6 +43,12 @@ _Y_PATH = f"{_GCOV_GROUP}/yCoordinates"
 _RANGES = {"hh": (-15.0, -2.0), "hv": (-20.0, -8.0)}
 _COLORMAPS = {"hh": "viridis", "hv": "magma"}
 
+# B4: the change between the two dates is small (p2 -2.7 dB, p98 +2.3 dB), so
+# the diverging map is symmetric and tight around zero.
+_DIFF_RANGE = (-2.5, 2.5)
+# B4: HH/HV ratio (dB) sits around +5 dB on forest; 2-10 dB shows the contrast.
+_RATIO_RANGE = (2.0, 10.0)
+
 _MONTHS = (
     "Jan", "Feb", "Mar", "Apr", "May", "Jun",
     "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
@@ -52,6 +58,17 @@ _CAVEAT = (
     "Speckle is present. The scar darkens only slightly in backscatter; the "
     "standing-trunk explanation in docs/DOSSIER.md is a hypothesis, not a "
     "measurement. Coherence is the fire signal."
+)
+
+_DIFF_CAVEAT = (
+    "After minus before, in dB: negative means a weaker return after the fire. "
+    "Over most of the scene the change is a few tenths of a dB, and speckle "
+    "dominates at pixel scale, so read the pattern, not single pixels."
+)
+
+_RGB_CAVEAT = (
+    "R = HH, G = HV, B = HH/HV, all in dB with fixed ranges: a colour image "
+    "made from radar, not a photograph."
 )
 
 
@@ -121,10 +138,10 @@ def backscatter_db(power: np.ndarray) -> np.ndarray:
 def backscatter_layer(h5_path: Path, pol: str, orbit: str, date: str, out_dir: Path) -> dict:
     """Write one backscatter PNG and return its manifest entry."""
     layer_id = f"{pol}_{orbit}_{date.replace('-', '')}"
-    db = backscatter_db(power_on_grid(h5_path, pol))
+    db = export.downsample2(backscatter_db(power_on_grid(h5_path, pol)))
     vmin, vmax = _RANGES[pol]
-    rgba = export.scalar_rgba(db, _COLORMAPS[pol], vmin, vmax)
-    export.write_png(out_dir / f"{layer_id}.png", rgba)
+    index = export.scalar_index(db, _COLORMAPS[pol], vmin, vmax)
+    export.write_palette_png(out_dir / f"{layer_id}.png", index, _COLORMAPS[pol])
     return export.layer_entry(
         layer_id=layer_id,
         kind=pol,
@@ -137,6 +154,71 @@ def backscatter_layer(h5_path: Path, pol: str, orbit: str, date: str, out_dir: P
         colormap=_COLORMAPS[pol],
         source=h5_path.name,
         caveat=_CAVEAT,
+    )
+
+
+def difference_layer(
+    before: Path, after: Path, pol: str, orbit: str, dates: list[str], out_dir: Path
+) -> dict:
+    """Write one dB-change PNG (after minus before) and return its manifest entry."""
+    d1, d2 = dates
+    layer_id = f"d{pol}_{orbit}_{d1.replace('-', '')}_{d2.replace('-', '')}"
+    change = backscatter_db(power_on_grid(after, pol)) - backscatter_db(power_on_grid(before, pol))
+    change = export.downsample2(change)
+    vmin, vmax = _DIFF_RANGE
+    index = export.scalar_index(change, "rdbu", vmin, vmax)
+    export.write_palette_png(out_dir / f"{layer_id}.png", index, "rdbu")
+    return export.layer_entry(
+        layer_id=layer_id,
+        kind=f"d{pol}",
+        file=f"{layer_id}.png",
+        orbit=orbit,
+        dates=[d1, d2],
+        title=f"Backscatter change {pol.upper()}, {_pretty(d1)} to {_pretty(d2)}",
+        units="dB",
+        value_range=[vmin, vmax],
+        colormap="rdbu",
+        source=f"{before.name} / {after.name}",
+        caveat=_DIFF_CAVEAT,
+    )
+
+
+def rgb_layer(h5_path: Path, orbit: str, date: str, out_dir: Path) -> dict:
+    """Write the HH/HV/HH-HV colour composite of one date and return its manifest entry."""
+    layer_id = f"rgb_{orbit}_{date.replace('-', '')}"
+    hh = export.downsample2(backscatter_db(power_on_grid(h5_path, "hh")))
+    hv = export.downsample2(backscatter_db(power_on_grid(h5_path, "hv")))
+    ratio = hh - hv
+
+    def stretch(data: np.ndarray, limits: tuple[float, float]) -> np.ndarray:
+        low, high = limits
+        return np.clip((data - low) / (high - low), 0.0, 1.0)
+
+    rgb = np.stack(
+        [
+            stretch(hh, _RANGES["hh"]),
+            stretch(hv, _RANGES["hv"]),
+            stretch(ratio, _RATIO_RANGE),
+        ],
+        axis=-1,
+    )
+    valid = np.isfinite(hh) & np.isfinite(hv)
+    rgb = np.round(np.nan_to_num(rgb * 255.0, nan=0.0)).astype(np.uint8)
+    index, palette = export.rgb_index(rgb)
+    index[~valid] = 255  # the four nodata pixels at the swath edge stay transparent
+    export.write_palette_png(out_dir / f"{layer_id}.png", index, palette)
+    return export.layer_entry(
+        layer_id=layer_id,
+        kind="rgb",
+        file=f"{layer_id}.png",
+        orbit=orbit,
+        dates=[date],
+        title=f"Colour composite (HH, HV, HH/HV), {_pretty(date)}",
+        units="RGB",
+        value_range=[0.0, 255.0],
+        colormap="rgb",
+        source=h5_path.name,
+        caveat=_RGB_CAVEAT,
     )
 
 
@@ -153,13 +235,49 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         default=Path("../web/public/layers"),
         help="output directory (default: ../web/public/layers)",
     )
+    parser.add_argument(
+        "--difference",
+        type=Path,
+        default=None,
+        help="also write dhh/dhv against this earlier GCOV (the change, in dB)",
+    )
+    parser.add_argument(
+        "--before-date",
+        default=None,
+        help="acquisition date of --difference (YYYY-MM-DD)",
+    )
+    parser.add_argument(
+        "--rgb",
+        action="store_true",
+        help="also write the HH/HV/HH-HV colour composite of this date",
+    )
     return parser.parse_args(argv)
 
 
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
-    for pol in ("hh", "hv"):
-        entry = backscatter_layer(args.h5, pol, args.orbit, args.date, args.out)
+    if args.difference is not None and args.before_date is None:
+        raise SystemExit("--difference needs --before-date")
+    extras = args.difference is not None or args.rgb
+    if not extras:
+        for pol in ("hh", "hv"):
+            entry = backscatter_layer(args.h5, pol, args.orbit, args.date, args.out)
+            manifest = export.upsert_manifest_entry(args.out / "manifest.json", entry)
+            print(f"Wrote {args.out / entry['file']} and updated {manifest}")
+    if args.difference is not None:
+        for pol in ("hh", "hv"):
+            entry = difference_layer(
+                args.difference,
+                args.h5,
+                pol,
+                args.orbit,
+                [args.before_date, args.date],
+                args.out,
+            )
+            manifest = export.upsert_manifest_entry(args.out / "manifest.json", entry)
+            print(f"Wrote {args.out / entry['file']} and updated {manifest}")
+    if args.rgb:
+        entry = rgb_layer(args.h5, args.orbit, args.date, args.out)
         manifest = export.upsert_manifest_entry(args.out / "manifest.json", entry)
         print(f"Wrote {args.out / entry['file']} and updated {manifest}")
     return 0

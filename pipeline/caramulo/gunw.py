@@ -24,6 +24,7 @@ from rasterio.transform import from_bounds, from_origin
 from rasterio.warp import Resampling, reproject
 
 from caramulo import export
+from caramulo.caveats import coherence_caveat
 from caramulo.grid import CRS, EXTENT_3857, HEIGHT, WIDTH
 
 # GUNW layout confirmed on the first real file (task A1, 2026-11-14):
@@ -48,11 +49,6 @@ _MONTHS = (
     "Oct",
     "Nov",
     "Dec",
-)
-
-_CAVEAT = (
-    "Low coherence also occurs over water and dense forest; "
-    "this pair brackets the fire (2-5 Jul 2026)."
 )
 
 
@@ -121,9 +117,10 @@ def coherence_layer(h5_path: Path, orbit: str, dates: list[str], out_dir: Path) 
     """Write the coherence PNG and return its manifest entry."""
     d1, d2 = dates
     layer_id = f"coh_{orbit}_{d1.replace('-', '')}_{d2.replace('-', '')}"
-    coh = coherence_on_grid(h5_path)
-    rgba = export.scalar_rgba(coh, "gray", 0.0, 1.0)
-    export.write_png(out_dir / f"{layer_id}.png", rgba)
+    coh = export.downsample2(coherence_on_grid(h5_path))
+    gray = np.round(np.clip(np.nan_to_num(coh, nan=0.0), 0.0, 1.0) * 255.0).astype(np.uint8)
+    alpha = np.where(np.isfinite(coh), 255, 0).astype(np.uint8)
+    export.write_gray_png(out_dir / f"{layer_id}.png", gray, alpha)
     return export.layer_entry(
         layer_id=layer_id,
         kind="coh",
@@ -135,7 +132,7 @@ def coherence_layer(h5_path: Path, orbit: str, dates: list[str], out_dir: Path) 
         value_range=[0.0, 1.0],
         colormap="gray",
         source=h5_path.name,
-        caveat=_CAVEAT,
+        caveat=coherence_caveat(d1, d2),
     )
 
 
