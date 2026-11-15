@@ -24,6 +24,10 @@ import { hectares, loadStats, type Polarization, type Stats } from "./stats";
  * Portrait phones and tablets: the map is pinned on top and the step's text sits
  * in a sheet at the bottom of the screen (landscape keeps the two columns).
  */
+/** Timings of the map frame growing or shrinking (the 0.7 s transition on .story in styles.css). */
+const MAP_DATA_DELAY_MS = 380;
+const MAP_CAMERA_DELAY_MS = 640;
+
 const STACKED = "(max-width: 900px) and (orientation: portrait)";
 
 function useStacked(): boolean {
@@ -162,6 +166,7 @@ export default function Story() {
 
   const framed = useRef(false);
   const wasWide = useRef(false);
+  const dataTimer = useRef<number | undefined>(undefined);
 
   const applyStep = useCallback((manager: LayerManager, step: Step) => {
     const rasters: string[] = [];
@@ -175,18 +180,29 @@ export default function Story() {
         rasters.push(ref.id);
       }
     }
-    manager.showLayers(rasters);
-    manager.showVector(overlays);
-    manager.showFocus(step.focus ?? null);
+    // The map frame widens or narrows over the CSS transition on .story (0.7 s). While it
+    // does, the data waits until the frame is most of the way there, so it fades in as the
+    // camera starts and not on top of a half-grown frame at the old zoom; the camera then
+    // waits for the frame to be done.
+    const widthChanges = framed.current && wasWide.current !== Boolean(step.focus);
+    const show = () => {
+      manager.showLayers(rasters);
+      manager.showVector(overlays);
+      manager.showFocus(step.focus ?? null);
+    };
+    window.clearTimeout(dataTimer.current);
+    if (widthChanges) {
+      dataTimer.current = window.setTimeout(show, MAP_DATA_DELAY_MS);
+    } else {
+      show();
+    }
     // A focus step frames its zone with room around it; any other step frames its view.
     const target = step.focus?.view ?? step.focus?.bounds ?? step.mapView?.bounds;
     if (target) {
-      // When the map is about to widen or narrow, let that finish before the camera moves.
-      const widthChanges = wasWide.current !== Boolean(step.focus);
       manager.flyTo(target, {
         instant: !framed.current,
         padding: step.focus ? 90 : 24,
-        delay: widthChanges ? 750 : undefined,
+        delay: widthChanges ? MAP_CAMERA_DELAY_MS : undefined,
       });
       framed.current = true;
       wasWide.current = Boolean(step.focus);
