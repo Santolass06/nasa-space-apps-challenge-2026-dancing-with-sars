@@ -159,8 +159,8 @@ O sinal do incêndio existe nos dados NISAR reais e vê-se melhor pela coerênci
 
 **Medição nos dados completos (14 nov, tarefas A1/A2/A4, números atualizados com C7/B4/B5):** com os GUNW reais na grelha comum, o diferencial de coerência entre o par do fogo (29 jun → 11 jul) e o par de controlo (11 → 23 jul), suavizado a 1 km, mostra:
 
-- a maior região ligada abaixo de −0,25 tem **13.517,9 ha** em lon −8,40..−8,13, lat 40,56..40,68 (centroide −8,27, 40,62; 2.564 vértices); a um limiar mais exigente (−0,30) fica com 12.063 ha. É o número que a app mostra (`stats.json` e `burn_nisar.geojson`);
-- o perímetro oficial do ICNF, calculado a partir do GeoJSON que o E1 publicou, mede **12.819,8 ha**; o próprio documento REE_2026_004 (p. 6) reporta **12.828,9 ha** — os 9 ha de diferença são o método de área, não um erro de dados. Sobreposição: **12.127,8 ha, 94,6% do perímetro oficial** (89,7% do nosso);
+- a maior região ligada abaixo de −0,25 tem **13.501,0 ha** em lon −8,40..−8,13, lat 40,56..40,68 (centroide −8,27, 40,62; 2.564 vértices); a um limiar mais exigente (−0,30) fica com 12.165,0 ha. É o número que a app mostra (`stats.json` e `burn_nisar.geojson`);
+- o perímetro oficial do ICNF, calculado a partir do GeoJSON que o E1 publicou, mede **12.819,8 ha**; o próprio documento REE_2026_004 (p. 6) reporta **12.828,9 ha** — os 9 ha de diferença são o método de área, não um erro de dados. Sobreposição: **12.153,4 ha, 94,8% do perímetro oficial** (90,0% do nosso);
 - dentro da cicatriz, a coerência do par do fogo é **0,28** contra **0,70** no par de controlo; fora da cicatriz são 0,53 e 0,63 — a queda é dentro, não é sazonalidade;
 - os pares das duas geometrias de observação — A15 e A116 (ascendente) e D52 e D124 (descendente) — mostram todos a mesma queda de coerência dentro da cicatriz (**−0,21 a −0,25**), e o par pré-fogo (17 → 29 jun) não mostra queda (**+0,02**): o sinal não depende da geometria de observação nem da sazonalidade;
 - a mancha é maior do que a elipse das pré-visualizações (caixa de ~22 × 13 km) e está mais a **oeste**: a vertente NW da serra, de Tourelhe (ignição, perto de Cambra) na direção de Águeda. As notícias registam que o fogo atingiu o concelho de Águeda (lon ≈ −8,45), o que é consistente com o que os dados mostram.
@@ -252,7 +252,7 @@ Nomeamos cada órbita pela direção + número do track: **D52** = descendente, 
 
 Estas questões não estão confirmadas. Quem as esclarecer atualiza esta lista.
 
-- **A mancha coincide com o perímetro oficial?** Sim, em grande parte: o nosso polígono tem 13.517,9 ha, o do ICNF 12.819,8 ha (área calculada do GeoJSON do E1; o próprio REE reporta 12.828,9 ha) e a sobreposição é de 12.127,8 ha — **94,6% do oficial** e 89,7% do nosso. Os hectares são medidos em UTM 29N (o CRS da grelha); numa projeção de área igual dão +0,07%, que é menos do que a incerteza da digitalização do perímetro.
+- **A mancha coincide com o perímetro oficial?** Sim, em grande parte: o nosso polígono tem 13.501,0 ha, o do ICNF 12.819,8 ha (área calculada do GeoJSON do E1; o próprio REE reporta 12.828,9 ha) e a sobreposição é de 12.153,4 ha — **94,8% do oficial** e 90,0% do nosso. Os hectares são medidos em UTM 29N (o CRS da grelha); numa projeção de área igual dão +0,07%, que é menos do que a incerteza da digitalização do perímetro.
 - **O fumo tapou mesmo os satélites óticos entre 2 e 5 de julho?** Faz sentido, mas ainda não verificámos as imagens Sentinel-2 desses dias. Em Leiria, durante a Kristin, confirmámos que o ótico ficou \~3 semanas sem imagens limpas.
 - **Quanto cai a coerência fora da área ardida no verão?** Vegetação seca também muda; o par de controlo (11 → 23 jul) ajuda a separar.
 - **O brilho HV mostra algo ao longo de julho–outubro?** Hipótese: sim, à medida que as árvores queimadas caem ou são cortadas. Por testar.

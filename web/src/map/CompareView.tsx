@@ -18,6 +18,8 @@ type Props = {
   /** Called once, when both maps have drawn their first frame. */
   onReady?: () => void;
   className?: string;
+  /** Passed to both maps (#82): see MapView. */
+  cooperativeGestures?: boolean;
 };
 
 /**
@@ -38,6 +40,7 @@ export default function CompareView({
   bounds,
   onReady,
   className,
+  cooperativeGestures,
 }: Props) {
   const [maps, setMaps] = useState<[MapLibreMap | null, MapLibreMap | null]>([null, null]);
   const managers = useRef<[LayerManager | null, LayerManager | null]>([null, null]);
@@ -144,9 +147,9 @@ export default function CompareView({
 
   return (
     <div ref={container} className={`compare ${className ?? ""}`}>
-      <MapView className="compare__map" onReady={makeReady(0)} />
+      <MapView className="compare__map" onReady={makeReady(0)} cooperativeGestures={cooperativeGestures} />
       <div className="compare__top" style={{ clipPath: `inset(0 0 0 ${split}%)` }}>
-        <MapView className="compare__map" onReady={makeReady(1)} />
+        <MapView className="compare__map" onReady={makeReady(1)} cooperativeGestures={cooperativeGestures} />
       </div>
       <div
         className="compare__handle"
