@@ -308,6 +308,14 @@ h1 {
   opacity: 1;
 }
 
+/* The step crossing the middle of the screen is the active one, so the last step
+ * has to be tall enough to still cover the middle when the page ends. Without
+ * this, on a tall screen the page stops while the last step is below the middle:
+ * it never activates and its layer picker never appears. */
+.story__act:last-of-type .story__step:last-of-type {
+  min-height: 60vh;
+}
+
 .story__step-text {
   margin: 0 0 0.75rem;
   font-size: 1.02rem;
