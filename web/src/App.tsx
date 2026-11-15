@@ -1,12 +1,4 @@
-// Placeholder shell. The real app is built by fronts C (map) and D (story): see docs/PLAN.md.
-const acts = [
-  "Before",
-  "The fire",
-  "The scar",
-  "Why radar sees it",
-  "Afterwards",
-  "What next",
-];
+import Story from "./story/Story";
 
 export default function App() {
   return (
@@ -29,22 +21,7 @@ export default function App() {
       </header>
 
       <main>
-        <section className="steps" aria-label="Story acts">
-          {acts.map((title, index) => (
-            <article className="card" key={title}>
-              <span className="step-number">{String(index + 1).padStart(2, "0")}</span>
-              <h2>{title}</h2>
-            </article>
-          ))}
-        </section>
-
-        <section className="placeholder" aria-label="Work in progress">
-          <h2>Map and story coming next</h2>
-          <p>
-            Layers are read from <code>public/layers/manifest.json</code>; see{" "}
-            <code>docs/CONTRACT.md</code>.
-          </p>
-        </section>
+        <Story />
       </main>
 
       <footer className="footer">
