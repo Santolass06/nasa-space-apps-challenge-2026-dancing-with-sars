@@ -1,6 +1,7 @@
 import { Marker, type Map as MapLibreMap } from "maplibre-gl";
 
 import { layerUrl, layersBase, type Bounds, type Layer, type Manifest } from "./manifest";
+import { recolourCoherence } from "./style";
 
 const OPACITY = 0.85;
 
@@ -28,6 +29,7 @@ export class LayerManager {
   private readonly manifest: Manifest;
   private readonly byId: Map<string, Layer>;
   private readonly added = new Set<string>();
+  private wanted = new Set<string>();
   private readonly markers: Marker[] = [];
 
   constructor(map: MapLibreMap, manifest: Manifest) {
@@ -52,6 +54,7 @@ export class LayerManager {
   /** Show exactly these raster layers; every other manifest layer is hidden. */
   showLayers(ids: string[]): void {
     const wanted = new Set(ids);
+    this.wanted = wanted;
     for (const layer of this.manifest.layers) {
       if (!wanted.has(layer.id)) {
         this.hide(layer.id);
@@ -64,7 +67,9 @@ export class LayerManager {
         continue;
       }
       this.ensureRaster(layer);
-      this.map.setLayoutProperty(layer.id, "visibility", "visible");
+      if (this.map.getLayer(layer.id)) {
+        this.map.setLayoutProperty(layer.id, "visibility", "visible");
+      }
     }
   }
 
@@ -125,24 +130,42 @@ export class LayerManager {
     if (this.added.has(layer.id)) {
       return;
     }
-    const [west, south, east, north] = this.manifest.bounds;
-    this.map.addSource(layer.id, {
-      type: "image",
-      url: layerUrl(layer),
-      coordinates: [
-        [west, north],
-        [east, north],
-        [east, south],
-        [west, south],
-      ],
-    });
-    this.map.addLayer({
-      id: layer.id,
-      type: "raster",
-      source: layer.id,
-      paint: { "raster-opacity": OPACITY, "raster-fade-duration": 0 },
-    });
     this.added.add(layer.id);
+    // Coherence is recoloured in the browser (transparent where it is high); the other layers load as they are.
+    const url = layer.kind === "coh" ? recolourCoherence(layerUrl(layer)) : Promise.resolve(layerUrl(layer));
+    url
+      .then((source) => {
+        const [west, south, east, north] = this.manifest.bounds;
+        this.map.addSource(layer.id, {
+          type: "image",
+          url: source,
+          coordinates: [
+            [west, north],
+            [east, north],
+            [east, south],
+            [west, south],
+          ],
+        });
+        // Under the basemap's labels, so place names stay readable over the data.
+        const labels = this.map.getStyle().layers.find((l) => l.type === "symbol")?.id;
+        this.map.addLayer(
+          {
+            id: layer.id,
+            type: "raster",
+            source: layer.id,
+            layout: { visibility: this.wanted.has(layer.id) ? "visible" : "none" },
+            paint: {
+              "raster-opacity": layer.kind === "coh" ? 1 : OPACITY,
+              "raster-fade-duration": 0,
+            },
+          },
+          labels,
+        );
+      })
+      .catch((error: unknown) => {
+        this.added.delete(layer.id);
+        console.error(`layer ${layer.id}`, error);
+      });
   }
 
   private ensureVector(id: VectorId): void {
