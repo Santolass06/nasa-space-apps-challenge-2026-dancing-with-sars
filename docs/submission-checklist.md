@@ -17,10 +17,10 @@ depends on the team and is still open.
       **Sunday 15 November 2026, 23:59 local time**. Team target: submitted by **20:00**.
 - [ ] Team registered, 1–6 members, all in the same Local Event or the Universal Event, and
       **visible on the team page before the deadline**.
-- [x] The solution addresses **one** official challenge — *Dancing with the SARs*.
+- [x] The solution addresses **one** official challenge - *Dancing with the SARs*.
 - [x] Work was **created during the event** (14–15 Nov). The commit history is the check:
       no pre-built project code.
-- [x] **Open-source license** — OSI-approved. This repo uses Apache-2.0 (NASA's default when
+- [x] **Open-source license** - OSI-approved. This repo uses Apache-2.0 (NASA's default when
       no license is given). Keep `LICENSE`, `NOTICE` and `docs/data-sources.md` up to date.
 - [x] External resources (code, images, text) identified as such.
 - [x] **Code in a public repository** linked from the project page (this repo is public).
