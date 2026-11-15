@@ -335,7 +335,7 @@ h1 {
   grid-template-columns: minmax(0, 0.6fr) minmax(0, 1.9fr);
 }
 
-.story.is-wide .story__map {
+.story.is-wide .story__map-column {
   --map-height: min(80vh, 780px);
 }
 
@@ -469,9 +469,9 @@ h1 {
 }
 
 .story__map {
-  --map-height: min(72vh, 680px);
-  position: sticky;
-  top: calc((100vh - var(--map-height)) / 2);
+  position: relative;
+  flex: 0 1 var(--map-height);
+  min-height: 200px;
   height: var(--map-height);
   transition:
     height 0.7s cubic-bezier(0.22, 1, 0.36, 1),
@@ -711,21 +711,8 @@ h1 {
   pointer-events: none;
 }
 
-.explorer__hud .picker,
-.explorer__legend .legend {
-  pointer-events: auto;
-}
-
-/* The legend sits at the bottom left, above the attribution, so the controls at the top
-   and the legend do not stack over the middle of the map. */
-.explorer__legend {
-  position: absolute;
-  left: 0.75rem;
-  bottom: 2.75rem;
-  pointer-events: none;
-}
-
 .explorer__hud .picker {
+  pointer-events: auto;
   max-width: 30rem;
 }
 
@@ -1020,11 +1007,13 @@ h1 {
 }
 
 /* Almost full screen: the map frame leaves the page and covers most of the window. */
-.story__map.story__map--full {
+.story__map-column.story__map-column--full {
   position: fixed;
   inset: 1rem;
   z-index: 100;
-  height: auto;
+  height: calc(100vh - 2rem);
+  max-height: none;
+  background: var(--bg);
   box-shadow: 0 0 0 100vmax rgba(3, 5, 12, 0.82);
   transition: none;
 }
@@ -1250,6 +1239,47 @@ h1 {
   display: none;
 }
 
+/* The sticky column owns both the image and its legends, including Expand. */
+.story__map-column {
+  --map-height: min(72vh, 680px);
+  position: sticky;
+  top: 1rem;
+  align-self: start;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  max-height: calc(100vh - 2rem);
+}
+
+.story__map-column--full .story__map {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.story__legend-strip {
+  flex: 0 1 auto;
+  min-height: 0;
+  max-height: 35vh;
+  overflow-y: auto;
+}
+
+.story__legend-strip:not(:empty) {
+  padding-top: 0.5rem;
+}
+
+.story__legend-strip .legend-stack {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+  align-items: start;
+  gap: 0.5rem;
+}
+
+.story__legend-strip .legend {
+  width: auto;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
 /* --- Portrait phones and tablets: map on top, the step's text in a sheet below --- */
 @media (max-width: 900px) and (orientation: portrait) {
   .story,
@@ -1259,12 +1289,17 @@ h1 {
     margin-top: 1rem;
   }
 
-  .story__map {
-    position: sticky;
+  .story__map-column {
     top: 0;
     z-index: 3;
     order: -1;
     height: 56vh;
+    max-height: none;
+  }
+
+  .story__map-column .story__map {
+    flex: 1 1 auto;
+    min-height: 0;
     border-radius: 0 0 18px 18px;
   }
 
@@ -1338,8 +1373,8 @@ h1 {
     margin-top: 1rem;
   }
 
-  .story__map,
-  .story.is-wide .story__map {
+  .story__map-column,
+  .story.is-wide .story__map-column {
     --map-height: calc(100vh - 1.5rem);
   }
 
@@ -1379,24 +1414,10 @@ h1 {
     max-width: none;
   }
 
-  /* One slim legend: title, ramp and the two ends. The caveat opens on demand. */
+  /* Compact legend spacing; every visible layer keeps its own legend. */
   .legend {
     width: auto;
     padding: 0.4rem 0.55rem;
-  }
-
-  .legend-stack .legend + .legend {
-    display: none;
-  }
-
-  .legend__caveat:not(.is-open),
-  .legend__note {
-    display: none;
-  }
-
-  .legend__caveat.is-open {
-    display: block;
-    -webkit-line-clamp: unset;
   }
 
   /* Layer types: one scrolling row in the picker; hidden in the split views, where

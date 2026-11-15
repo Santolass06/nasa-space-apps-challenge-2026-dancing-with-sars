@@ -150,6 +150,7 @@ export default function Story() {
   const [compareReady, setCompareReady] = useState(false);
   const [exploreMode, setExploreMode] = useState<ExploreMode>(1);
   const [exploreFull, setExploreFull] = useState(false);
+  const [legendTarget, setLegendTarget] = useState<HTMLDivElement | null>(null);
   const stacked = useStacked();
   const [mainIdle, setMainIdle] = useState(false);
   const activeRef = useRef(0);
@@ -278,21 +279,18 @@ export default function Story() {
   const shownComparison = lastComparison.current?.step.comparisons?.[0];
   const shownBounds = lastComparison.current?.step.mapView?.bounds;
 
-  // C3: one legend per raster layer the step shows (at most two), or the one
-  // the reader picked in the final step.
-  const pickedLayer = picked ? manifest?.layers.find((layer) => layer.id === picked) : undefined;
-  const legendLayers: Layer[] = pickedLayer
-    ? [pickedLayer]
-    : current
-      ? current.step.layers
-          .map((ref) => manifest?.layers.find((layer) => layer.id === ref.id))
-          .filter((layer): layer is Layer => Boolean(layer))
-          .slice(0, 2)
-      : [];
-
+  // Comparisons keep the left/right order; single maps use the current raster ids.
+  const legendIds = comparison
+    ? [comparison.leftLayerId, comparison.rightLayerId]
+    : exploring && picked
+      ? [picked]
+      : current.step.layers.map((ref) => ref.id);
+  const legendLayers = current.step.figure ? [] : legendIds
+    .map((id) => manifest?.layers.find((layer) => layer.id === id))
+    .filter((layer): layer is Layer => Boolean(layer));
   const legend = legendLayers.length > 0 && (
     <div className="legend-stack">
-      {legendLayers.map((layer) => <Legend key={layer.id} layer={layer} />)}
+      {legendLayers.map((layer, index) => <Legend key={`${index}-${layer.id}`} layer={layer} />)}
     </div>
   );
 
@@ -396,72 +394,75 @@ export default function Story() {
         ))}
       </div>
 
-      <div className={`story__map${exploreFull ? " story__map--full" : ""}`}>
-        <MapView className="story__map-view" onReady={onMapReady} cooperativeGestures={!exploreFull} />
-        {exploring && manifest && (
-          <Explorer
-            manifest={manifest}
-            mode={exploreMode}
-            onModeChange={setExploreMode}
-            full={exploreFull}
-            onFullChange={setExploreFull}
-            picker={
-              <LayerPicker
-                manifest={manifest}
-                onPick={(id) => {
-                  managerRef.current?.showLayers([id]);
-                  setPicked(id);
-                }}
-              />
-            }
-            legend={legend}
-          />
-        )}
-        {!exploring && legendLayers.length > 0 && (
-          <div className="map-hud">{legend}</div>
-        )}
-        {steps.map(
-          ({ index, step }) =>
-            step.figure && (
-              <figure
-                key={step.id}
-                className={`story__figure${index === applied ? " is-open" : ""}`}
-                aria-hidden={index !== applied}
-              >
-                <img
-                  src={`${import.meta.env.BASE_URL}${step.figure.src}`}
-                  alt={step.figure.alt}
-                  decoding="async"
+      <div className={`story__map-column${exploreFull ? " story__map-column--full" : ""}`}>
+        <div className="story__map">
+          <MapView className="story__map-view" onReady={onMapReady} cooperativeGestures={!exploreFull} />
+          {exploring && manifest && (
+            <Explorer
+              manifest={manifest}
+              mode={exploreMode}
+              onModeChange={setExploreMode}
+              full={exploreFull}
+              onFullChange={setExploreFull}
+              picker={
+                <LayerPicker
+                  manifest={manifest}
+                  onPick={(id) => {
+                    managerRef.current?.showLayers([id]);
+                    setPicked(id);
+                  }}
                 />
-                <figcaption>
-                  <p>{step.figure.caption}</p>
-                  <p className="story__credit">
-                    {step.figure.credit} ·{" "}
-                    <a href={step.figure.licenceUrl} target="_blank" rel="noreferrer">
-                      {step.figure.licence}
-                    </a>{" "}
-                    ·{" "}
-                    <a href={step.figure.sourceUrl} target="_blank" rel="noreferrer">
-                      source
-                    </a>
-                    . Resized.
-                  </p>
-                </figcaption>
-              </figure>
-            ),
-        )}
-        {shownComparison && (mainIdle || comparison) && (
-          <div className={`story__overlay${comparison && compareReady ? " is-open" : ""}`}>
-            <CompareView
-              before={shownComparison.leftLayerId}
-              after={shownComparison.rightLayerId}
-              beforeLabel={layerTitle(manifest, shownComparison.leftLayerId)}
-              afterLabel={layerTitle(manifest, shownComparison.rightLayerId)}
-              bounds={shownBounds}
-              onReady={() => setCompareReady(true)}
+              }
+              legend={legend}
+              legendTarget={legendTarget}
             />
-          </div>
-        )}
+          )}
+          {steps.map(
+            ({ index, step }) =>
+              step.figure && (
+                <figure
+                  key={step.id}
+                  className={`story__figure${index === applied ? " is-open" : ""}`}
+                  aria-hidden={index !== applied}
+                >
+                  <img
+                    src={`${import.meta.env.BASE_URL}${step.figure.src}`}
+                    alt={step.figure.alt}
+                    decoding="async"
+                  />
+                  <figcaption>
+                    <p>{step.figure.caption}</p>
+                    <p className="story__credit">
+                      {step.figure.credit} ·{" "}
+                      <a href={step.figure.licenceUrl} target="_blank" rel="noreferrer">
+                        {step.figure.licence}
+                      </a>{" "}
+                      ·{" "}
+                      <a href={step.figure.sourceUrl} target="_blank" rel="noreferrer">
+                        source
+                      </a>
+                      . Resized.
+                    </p>
+                  </figcaption>
+                </figure>
+              ),
+          )}
+          {shownComparison && (mainIdle || comparison) && (
+            <div className={`story__overlay${comparison && compareReady ? " is-open" : ""}`}>
+              <CompareView
+                before={shownComparison.leftLayerId}
+                after={shownComparison.rightLayerId}
+                beforeLabel={layerTitle(manifest, shownComparison.leftLayerId)}
+                afterLabel={layerTitle(manifest, shownComparison.rightLayerId)}
+                bounds={shownBounds}
+                onReady={() => setCompareReady(true)}
+              />
+            </div>
+          )}
+        </div>
+        <div className="story__legend-strip" ref={setLegendTarget} role="region" aria-label="Visible layer legends">
+          {!exploring && legend}
+        </div>
       </div>
 
       {stacked && (
