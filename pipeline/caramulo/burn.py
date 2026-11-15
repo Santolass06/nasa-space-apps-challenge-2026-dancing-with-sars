@@ -1,7 +1,9 @@
 """Burn mask, polygon and burned area.
 
-In:  the fire-pair and control-pair coherence layers (PNG, common grid) and,
-     when available, the official perimeter (burn_official.geojson).
+In:  the fire-pair and control-pair coherence layers (PNG, full common grid, the
+     "@2x" files: the half-grid layers the map loads first are for display, and
+     tracing on them moves the areas by ~3%) and, when available, the official
+     perimeter (burn_official.geojson).
 Out: burn_nisar.geojson (our polygon, WGS84) and stats.json (our area, the
      official area and the overlap when the official perimeter exists).
 Reads: the coherence layers produced by caramulo.gunw.
@@ -17,8 +19,8 @@ not re-tuned.
 Run inside pipeline/:
 
     uv run python -m caramulo.burn
-    uv run python -m caramulo.burn --fire ../web/public/layers/coh_D52_20260629_20260711.png \
-        --control ../web/public/layers/coh_D52_20260711_20260723.png
+    uv run python -m caramulo.burn --fire ../web/public/layers/coh_D52_20260629_20260711@2x.png \
+        --control ../web/public/layers/coh_D52_20260711_20260723@2x.png
 """
 
 from __future__ import annotations
@@ -49,6 +51,14 @@ WGS84 = "EPSG:4326"
 FIRE_LAYER = "coh_D52_20260629_20260711"
 CONTROL_LAYER = "coh_D52_20260711_20260723"
 LAYERS_DIR = Path("../web/public/layers")
+# The full-grid files (C7): areas are traced here, the half grid is only for display.
+FIRE_FILE = export.lod_files(FIRE_LAYER)[1]
+CONTROL_FILE = export.lod_files(CONTROL_LAYER)[1]
+
+
+def _layer_id(path: Path) -> str:
+    """The layer's id, without the "@2x" of its full-grid file."""
+    return path.stem.removesuffix("@2x")
 
 
 def _coherence(path: Path) -> tuple[np.ndarray, np.ndarray]:
@@ -73,7 +83,7 @@ def burn_mask(
     diff = np.where(valid, fire - control, 0.0)
 
     # Web Mercator pixels are larger than the ground: convert to ground metres.
-    # The layer may be downscaled (C7), so the pixel comes from the array, not the grid.
+    # The pixel comes from the array, not the grid, so any layer size gives the right area.
     lat_mid = (BBOX[1] + BBOX[3]) / 2.0
     merc_m_per_px = (EXTENT_3857[2] - EXTENT_3857[0]) / fire.shape[1]
     ground_m_per_px = merc_m_per_px * math.cos(math.radians(lat_mid))
@@ -118,13 +128,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
     )
-    parser.add_argument(
-        "--fire", type=Path, default=LAYERS_DIR / f"{FIRE_LAYER}.png", help="fire-pair layer"
-    )
+    parser.add_argument("--fire", type=Path, default=LAYERS_DIR / FIRE_FILE, help="fire-pair layer")
     parser.add_argument(
         "--control",
         type=Path,
-        default=LAYERS_DIR / f"{CONTROL_LAYER}.png",
+        default=LAYERS_DIR / CONTROL_FILE,
         help="control-pair layer",
     )
     parser.add_argument("--threshold", type=float, default=THRESHOLD)
@@ -153,8 +161,8 @@ def main(argv: list[str] | None = None) -> int:
             "components": info["components"],
             "dropped_ha": info["dropped_ha"],
         },
-        "fire_layer": args.fire.stem,
-        "control_layer": args.control.stem,
+        "fire_layer": _layer_id(args.fire),
+        "control_layer": _layer_id(args.control),
         "our_area_ha": round(area_ha, 1),
         "official_area_ha": None,
         "overlap_ha": None,
@@ -184,7 +192,7 @@ def main(argv: list[str] | None = None) -> int:
                     "area_ha": round(area_ha, 1),
                     "threshold": args.threshold,
                     "method": "coherence difference (fire pair minus control pair)",
-                    "source": f"{args.fire.stem} minus {args.control.stem}",
+                    "source": f"{_layer_id(args.fire)} minus {_layer_id(args.control)}",
                 },
             )
         ],

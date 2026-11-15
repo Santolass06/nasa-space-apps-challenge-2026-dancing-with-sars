@@ -42,5 +42,5 @@ export function loadStats(): Promise<Stats> {
   return cached;
 }
 
-/** 13517.9 → "13,517.9" (the UI is English). */
+/** 13501 → "13,501" (the UI is English). */
 export const hectares = (value: number) => value.toLocaleString("en-GB", { maximumFractionDigits: 1 });
