@@ -1369,19 +1369,9 @@ h1 {
   }
 }
 
-/* --- Compact controls on phones, in either orientation --- */
-@media (max-width: 640px), (orientation: landscape) and (max-height: 520px) {
-  .explorer__bar {
-    gap: 0.3rem;
-  }
-
-  .explorer__recipes {
-    flex: 1;
-    min-width: 0;
-    max-width: none;
-  }
-
-  /* One slim legend: title, ramp and the two ends. The caveat opens on demand. */
+/* --- One slim legend on small screens: title, ramp and the two ends. The caveat opens on
+   demand. Portrait tablets get it too: their open legend covered a fifth of the map. --- */
+@media (max-width: 900px) and (orientation: portrait), (max-width: 640px), (orientation: landscape) and (max-height: 520px) {
   .legend {
     width: auto;
     padding: 0.4rem 0.55rem;
@@ -1399,6 +1389,27 @@ h1 {
   .legend__caveat.is-open {
     display: block;
     -webkit-line-clamp: unset;
+  }
+}
+
+/* Fingers: the zoom buttons are 29 px by default, under the usual 44 px target. */
+@media (pointer: coarse) {
+  .maplibregl-ctrl-group button {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+/* --- Compact controls on phones, in either orientation --- */
+@media (max-width: 640px), (orientation: landscape) and (max-height: 520px) {
+  .explorer__bar {
+    gap: 0.3rem;
+  }
+
+  .explorer__recipes {
+    flex: 1;
+    min-width: 0;
+    max-width: none;
   }
 
   /* Layer types: one scrolling row in the picker; hidden in the split views, where

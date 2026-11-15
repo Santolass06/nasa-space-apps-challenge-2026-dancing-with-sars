@@ -79,6 +79,16 @@ export default function MapView({ onReady, className, cooperativeGestures = true
     });
     map.addControl(new NavigationControl({ showCompass: false }), "bottom-right");
     map.addControl(new AttributionControl({ compact: true }), "bottom-left");
+    // MapLibre opens a compact attribution and only folds it on the first map move. On a
+    // phone the page scrolls past the map (cooperative gestures), so it would sit open over
+    // a quarter of the picture. A narrow map starts with it folded; the "i" button opens it.
+    map.once("load", () => {
+      if (map.getContainer().clientWidth < 640) {
+        const attrib = map.getContainer().querySelector<HTMLDetailsElement>(".maplibregl-ctrl-attrib");
+        attrib?.removeAttribute("open");
+        attrib?.classList.remove("maplibregl-compact-show");
+      }
+    });
     // "style.load" fires when the style is parsed — before the first tiles are
     // drawn — which is when our own layers can be added.
     map.once("style.load", () => readyRef.current?.(map));
