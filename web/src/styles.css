@@ -528,8 +528,9 @@ h1 {
 }
 
 .picker {
-  display: flex;
-  gap: 0.5rem;
+  position: relative;
+  z-index: 5; /* its tooltips open over the legends below it */
+  max-width: 24rem;
   padding: 0.5rem;
   background: rgba(11, 16, 32, 0.88);
   border: 1px solid var(--border);
@@ -537,17 +538,95 @@ h1 {
   backdrop-filter: blur(6px);
 }
 
-.picker__field {
+.chooser {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.chooser__kinds {
   display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-  font-size: 0.68rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.chooser__chip-wrap {
+  position: relative;
+}
+
+.chooser__chip {
+  padding: 0.25rem 0.6rem;
+  font: inherit;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.chooser__chip:hover,
+.chooser__chip:focus-visible {
+  border-color: var(--accent);
+}
+
+.chooser__chip.is-selected {
+  color: #0b1020;
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+/* What this kind of layer usually reveals: shown on hover and on keyboard focus. */
+.chooser__tip {
+  position: absolute;
+  top: calc(100% + 0.4rem);
+  left: 0;
+  z-index: 20;
+  display: grid;
+  gap: 0.3rem;
+  width: 17rem;
+  padding: 0.6rem 0.7rem;
+  font-size: 0.74rem;
+  line-height: 1.4;
+  color: var(--text);
+  background: rgba(11, 16, 32, 0.97);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-4px);
+  pointer-events: none;
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease,
+    visibility 0s linear 0.2s;
+}
+
+.chooser__tip--above {
+  top: auto;
+  bottom: calc(100% + 0.4rem);
+  transform: translateY(4px);
+}
+
+.chooser__tip em {
+  font-style: normal;
   color: var(--muted);
 }
 
-.picker__field select {
+.chooser__chip-wrap:hover .chooser__tip,
+.chooser__chip-wrap:focus-within .chooser__tip {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition-delay: 0.12s, 0.12s, 0s;
+}
+
+.chooser select {
+  width: 100%;
   min-width: 9rem;
   padding: 0.3rem 0.4rem;
   font-size: 0.8rem;
@@ -555,6 +634,163 @@ h1 {
   background: var(--bg-soft);
   border: 1px solid var(--border);
   border-radius: 8px;
+}
+
+/* --- Explorer: one, two or four maps ---------------------------------- */
+
+.explorer {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.explorer__stage {
+  position: absolute;
+  inset: 0;
+  background: var(--bg-soft);
+  pointer-events: auto;
+}
+
+.explorer__stage .compare {
+  height: 100%;
+}
+
+.explorer__bar {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  z-index: 6;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.4rem;
+  max-width: calc(100% - 1.5rem);
+  pointer-events: auto;
+}
+
+.explorer__modes {
+  display: flex;
+  padding: 0.2rem;
+  background: rgba(11, 16, 32, 0.88);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  backdrop-filter: blur(6px);
+}
+
+.explorer__mode,
+.explorer__full {
+  padding: 0.25rem 0.7rem;
+  font: inherit;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--text);
+  background: transparent;
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.explorer__mode.is-selected {
+  color: #0b1020;
+  background: var(--accent);
+}
+
+.explorer__full {
+  background: rgba(11, 16, 32, 0.88);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(6px);
+}
+
+.explorer__recipes {
+  max-width: 14rem;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.74rem;
+  color: var(--text);
+  background: rgba(11, 16, 32, 0.88);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+}
+
+/* Two and four maps: the bar gets its own strip above them. */
+.explorer--multi .explorer__stage {
+  top: 2.9rem;
+}
+
+.explorer--multi .explorer__bar {
+  top: 0;
+  right: 0;
+  left: 0;
+  max-width: none;
+  padding: 0.45rem 0.75rem;
+  background: var(--bg-soft);
+  border-bottom: 1px solid var(--border);
+  border-radius: 20px 20px 0 0;
+}
+
+.grid4__chooser .chooser__chip {
+  padding: 0.12rem 0.45rem;
+  font-size: 0.64rem;
+}
+
+.grid4__chooser .chooser {
+  gap: 0.25rem;
+}
+
+.grid4__chooser .chooser select {
+  padding: 0.15rem 0.3rem;
+  font-size: 0.72rem;
+}
+
+.compare__label.is-interactive {
+  bottom: 2.6rem;
+  max-width: 46%;
+  padding: 0;
+  background: none;
+  pointer-events: auto;
+}
+
+.grid4 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 2px;
+  height: 100%;
+  background: var(--border);
+}
+
+.grid4__panel {
+  position: relative;
+  min-height: 0;
+  background: var(--bg-soft);
+}
+
+.grid4__map {
+  width: 100%;
+  height: 100%;
+}
+
+.grid4__chooser {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 5;
+  max-width: calc(100% - 1rem);
+  padding: 0.4rem;
+  background: rgba(11, 16, 32, 0.88);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  backdrop-filter: blur(6px);
+}
+
+/* Almost full screen: the map frame leaves the page and covers most of the window. */
+.story__map.story__map--full {
+  position: fixed;
+  inset: 1rem;
+  z-index: 100;
+  height: auto;
+  box-shadow: 0 0 0 100vmax rgba(3, 5, 12, 0.82);
+  transition: none;
 }
 
 .legend-stack {
@@ -741,19 +977,6 @@ h1 {
     max-width: none;
   }
 
-  .picker {
-    flex-wrap: wrap;
-  }
-
-  .picker__field {
-    flex: 1;
-    min-width: 8rem;
-  }
-
-  .picker__field select {
-    min-width: 0;
-    width: 100%;
-  }
 
   .legend {
     width: auto;

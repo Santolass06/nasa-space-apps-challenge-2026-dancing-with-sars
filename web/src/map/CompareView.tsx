@@ -1,5 +1,5 @@
 import type { Map as MapLibreMap } from "maplibre-gl";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 
 import MapView from "./MapView";
 import { LayerManager } from "./layers";
@@ -9,8 +9,10 @@ type Props = {
   /** Manifest layer ids to compare: left side and right side. */
   before: string;
   after: string;
-  beforeLabel: string;
-  afterLabel: string;
+  beforeLabel: ReactNode;
+  afterLabel: ReactNode;
+  /** The labels hold controls (a layer chooser), so they must take clicks. */
+  interactiveLabels?: boolean;
   /** Where to frame both maps; changing it eases the camera there. */
   bounds?: Bounds;
   /** Called once, when both maps have drawn their first frame. */
@@ -32,6 +34,7 @@ export default function CompareView({
   after,
   beforeLabel,
   afterLabel,
+  interactiveLabels,
   bounds,
   onReady,
   className,
@@ -185,8 +188,16 @@ export default function CompareView({
           }
         }}
       />
-      <span className="compare__label compare__label--left">{beforeLabel}</span>
-      <span className="compare__label compare__label--right">{afterLabel}</span>
+      <div
+        className={`compare__label compare__label--left${interactiveLabels ? " is-interactive" : ""}`}
+      >
+        {beforeLabel}
+      </div>
+      <div
+        className={`compare__label compare__label--right${interactiveLabels ? " is-interactive" : ""}`}
+      >
+        {afterLabel}
+      </div>
     </div>
   );
 }

@@ -2,6 +2,7 @@ import type { Map as MapLibreMap } from "maplibre-gl";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import CompareView from "../map/CompareView";
+import Explorer, { type ExploreMode } from "../map/Explorer";
 import LayerPicker from "../map/LayerPicker";
 import Legend from "../map/Legend";
 import MapView from "../map/MapView";
@@ -125,6 +126,8 @@ export default function Story() {
   const [stats, setStats] = useState<Stats | null>(null);
   const managerRef = useRef<LayerManager | null>(null);
   const [compareReady, setCompareReady] = useState(false);
+  const [exploreMode, setExploreMode] = useState<ExploreMode>(1);
+  const [exploreFull, setExploreFull] = useState(false);
   const [mainIdle, setMainIdle] = useState(false);
   const activeRef = useRef(0);
   const stepRefs = useRef<Array<HTMLElement | null>>([]);
@@ -227,6 +230,7 @@ export default function Story() {
 
   const current = steps[applied] ?? steps[0];
   const comparison = current?.step.comparisons?.[0];
+  const exploring = current?.step.id === "explore-the-map";
   // The comparison maps are built once and kept: the overlay fades in and out,
   // and switching pairs is a cross-fade inside it. Until the reader reaches the
   // first comparison they are built in the background from the first one.
@@ -248,6 +252,19 @@ export default function Story() {
           .filter((layer): layer is Layer => Boolean(layer))
           .slice(0, 2)
       : [];
+
+  // Leaving the explore step closes the expanded view; while it is open the page behind stays put.
+  useEffect(() => {
+    if (!exploring) {
+      setExploreFull(false);
+    }
+  }, [exploring]);
+  useEffect(() => {
+    document.body.style.overflow = exploreFull ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [exploreFull]);
 
   // Drive the single map. Comparison steps draw their own pair instead.
   useEffect(() => {
@@ -315,11 +332,21 @@ export default function Story() {
         ))}
       </div>
 
-      <div className="story__map">
+      <div className={`story__map${exploreFull ? " story__map--full" : ""}`}>
         <MapView className="story__map-view" onReady={onMapReady} />
-        {(legendLayers.length > 0 || (current?.step.id === "explore-the-map" && manifest)) && (
+        {exploring && manifest && (
+          <Explorer
+            manifest={manifest}
+            mode={exploreMode}
+            onModeChange={setExploreMode}
+            full={exploreFull}
+            onFullChange={setExploreFull}
+          />
+        )}
+        {(!exploring || exploreMode === 1) &&
+          (legendLayers.length > 0 || (exploring && manifest)) && (
           <div className="map-hud">
-            {current?.step.id === "explore-the-map" && manifest && (
+            {exploring && manifest && (
               <LayerPicker
                 manifest={manifest}
                 onPick={(id) => {
