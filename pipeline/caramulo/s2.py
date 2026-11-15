@@ -17,7 +17,14 @@ from rasterio.enums import ColorInterp, Resampling
 from rasterio.transform import from_bounds
 from rasterio.vrt import WarpedVRT
 
-from caramulo.export import layer_entry, rgb_rgba, write_manifest, write_png
+from caramulo.export import (
+    downsample_rgba,
+    layer_entry,
+    rgb_index,
+    rgb_rgba,
+    write_manifest,
+    write_palette_png,
+)
 from caramulo.grid import BBOX, CRS, EXTENT_3857, HEIGHT, WIDTH
 
 CATALOG_URL = "https://earth-search.aws.element84.com/v1"
@@ -99,12 +106,14 @@ def main() -> None:
         layers = manifest["layers"]
 
     catalog = Client.open(CATALOG_URL)
-    images = {day: render_scene(catalog, day) for day in SCENES}
+    images = {day: downsample_rgba(render_scene(catalog, day)) for day in SCENES}
 
     for day, rgba in images.items():
         layer_id = f"s2_{day:%Y%m%d}"
         filename = f"{layer_id}.png"
-        write_png(args.out / filename, rgba)
+        index, palette = rgb_index(rgba[..., :3])
+        index[rgba[..., 3] < 128] = 255
+        write_palette_png(args.out / filename, index, palette)
         entry = layer_entry(
             layer_id=layer_id,
             kind="s2",

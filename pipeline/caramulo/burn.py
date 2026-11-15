@@ -39,7 +39,7 @@ from shapely.geometry import MultiPolygon, Polygon, shape
 from shapely.ops import unary_union
 
 from caramulo import export
-from caramulo.grid import BBOX, CRS, EXTENT_3857, HEIGHT, WIDTH
+from caramulo.grid import BBOX, CRS, EXTENT_3857
 
 THRESHOLD = -0.25  # coherence drop vs the control pair; calibrated against the official areas
 SMOOTHING_M = 1000.0  # box smoothing on the ground before thresholding
@@ -73,8 +73,9 @@ def burn_mask(
     diff = np.where(valid, fire - control, 0.0)
 
     # Web Mercator pixels are larger than the ground: convert to ground metres.
+    # The layer may be downscaled (C7), so the pixel comes from the array, not the grid.
     lat_mid = (BBOX[1] + BBOX[3]) / 2.0
-    merc_m_per_px = (EXTENT_3857[2] - EXTENT_3857[0]) / WIDTH
+    merc_m_per_px = (EXTENT_3857[2] - EXTENT_3857[0]) / fire.shape[1]
     ground_m_per_px = merc_m_per_px * math.cos(math.radians(lat_mid))
 
     box = max(1, round(SMOOTHING_M / ground_m_per_px))
@@ -98,7 +99,7 @@ def burn_mask(
 
 def mask_to_polygon(mask: np.ndarray) -> Polygon | MultiPolygon:
     """Vectorise the mask (Web Mercator) and merge the pieces."""
-    transform = from_bounds(*EXTENT_3857, WIDTH, HEIGHT)
+    transform = from_bounds(*EXTENT_3857, mask.shape[1], mask.shape[0])
     geoms = [
         shape(geom) for geom, _value in shapes(mask.astype("uint8"), mask=mask, transform=transform)
     ]
