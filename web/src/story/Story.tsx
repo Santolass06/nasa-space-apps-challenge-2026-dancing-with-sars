@@ -202,34 +202,36 @@ export default function Story() {
                   }}
                   className={`story__step${item.index === active ? " is-active" : ""}`}
                 >
-                  <p className="story__step-text">{item.step.text}</p>
-                  <ul className="story__captions">
-                    {item.step.layers.map((ref) => (
-                      <li key={ref.id}>
-                        <span className="story__layer-name">{layerTitle(manifest, ref.id)}</span>{" "}
-                        {ref.caption}
-                      </li>
-                    ))}
-                  </ul>
-                  {item.step.sources && item.step.sources.length > 0 && (
-                    <p className="story__sources">
-                      Sources:{" "}
-                      {item.step.sources.map((url, position) => (
-                        <span key={url}>
-                          <a href={url} target="_blank" rel="noreferrer">
-                            {new URL(url).hostname}
-                          </a>
-                          {position < item.step.sources!.length - 1 ? ", " : ""}
-                        </span>
+                  <div className="story__step-body">
+                    <p className="story__step-text">{item.step.text}</p>
+                    <ul className="story__captions">
+                      {item.step.layers.map((ref) => (
+                        <li key={ref.id}>
+                          <span className="story__layer-name">{layerTitle(manifest, ref.id)}</span>{" "}
+                          {ref.caption}
+                        </li>
                       ))}
-                    </p>
-                  )}
-                  {item.index === active && act.id === "scar" && stats && (
-                    <StatsPanel stats={stats} />
-                  )}
-                  {item.index === active && act.id === "radar" && stats?.act4 && (
-                    <Act4Panel act4={stats.act4} />
-                  )}
+                    </ul>
+                    {item.step.sources && item.step.sources.length > 0 && (
+                      <p className="story__sources">
+                        Sources:{" "}
+                        {item.step.sources.map((url, position) => (
+                          <span key={url}>
+                            <a href={url} target="_blank" rel="noreferrer">
+                              {new URL(url).hostname}
+                            </a>
+                            {position < item.step.sources!.length - 1 ? ", " : ""}
+                          </span>
+                        ))}
+                      </p>
+                    )}
+                    {item.index === active && act.id === "scar" && stats && (
+                      <StatsPanel stats={stats} />
+                    )}
+                    {item.index === active && act.id === "radar" && stats?.act4 && (
+                      <Act4Panel act4={stats.act4} />
+                    )}
+                  </div>
                 </article>
               ))}
           </section>

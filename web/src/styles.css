@@ -310,16 +310,18 @@ h1 {
 }
 
 .story__step {
-  /* Each step owns most of a screen of scroll, so its map state holds
-     before the next one takes over. */
+  /* The step is a scroll runway: its text stays pinned (see the body) while
+     the map state holds, then the next step takes over. */
   min-height: 80vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 1.25rem 0 1.5rem;
   border-top: 1px solid var(--border);
   opacity: 0.5;
   transition: opacity 0.25s ease;
+}
+
+.story__step-body {
+  position: sticky;
+  top: 34vh;
+  padding: 1.25rem 0 1.5rem;
 }
 
 .story__step.is-active {
@@ -355,9 +357,10 @@ h1 {
 }
 
 .story__map {
+  --map-height: min(72vh, 680px);
   position: sticky;
-  top: 1.5rem;
-  height: min(72vh, 680px);
+  top: calc((100vh - var(--map-height)) / 2);
+  height: var(--map-height);
   border: 1px solid var(--border);
   border-radius: 20px;
   overflow: hidden;
@@ -552,6 +555,10 @@ h1 {
 
   .story__step {
     min-height: 55vh;
+  }
+
+  .story__step-body {
+    top: calc(45vh + 1rem);
   }
 }
 
