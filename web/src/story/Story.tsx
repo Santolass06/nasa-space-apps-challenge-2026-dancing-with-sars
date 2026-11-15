@@ -19,6 +19,23 @@ import {
 } from "./story";
 import { hectares, loadStats, type Polarization, type Stats } from "./stats";
 
+/**
+ * Portrait phones and tablets: the map is pinned on top and the step's text sits
+ * in a sheet at the bottom of the screen (landscape keeps the two columns).
+ */
+const STACKED = "(max-width: 900px) and (orientation: portrait)";
+
+function useStacked(): boolean {
+  const [stacked, setStacked] = useState(() => window.matchMedia(STACKED).matches);
+  useEffect(() => {
+    const query = window.matchMedia(STACKED);
+    const onChange = () => setStacked(query.matches);
+    query.addEventListener("change", onChange);
+    return () => query.removeEventListener("change", onChange);
+  }, []);
+  return stacked;
+}
+
 /** How long scrolling must rest on a step before the map follows it. */
 const APPLY_DELAY_MS = 260;
 /** Steps applied closer together than this count as fast scrolling. */
@@ -128,6 +145,7 @@ export default function Story() {
   const [compareReady, setCompareReady] = useState(false);
   const [exploreMode, setExploreMode] = useState<ExploreMode>(1);
   const [exploreFull, setExploreFull] = useState(false);
+  const stacked = useStacked();
   const [mainIdle, setMainIdle] = useState(false);
   const activeRef = useRef(0);
   const stepRefs = useRef<Array<HTMLElement | null>>([]);
@@ -282,6 +300,40 @@ export default function Story() {
     setPicked(null);
   }, [applied, comparison, applyStep, current]);
 
+  /** The text of a step: its sentence, one caption per layer, sources, and the numbers panels. */
+  const stepContent = (item: FlatStep) => (
+    <>
+          <p className="story__step-text">{item.step.text}</p>
+          <ul className="story__captions">
+            {item.step.layers.map((ref) => (
+              <li key={ref.id}>
+                <span className="story__layer-name">{layerTitle(manifest, ref.id)}</span>{" "}
+                {ref.caption}
+              </li>
+            ))}
+          </ul>
+          {item.step.sources && item.step.sources.length > 0 && (
+            <p className="story__sources">
+              Sources:{" "}
+              {item.step.sources.map((url, position) => (
+                <span key={url}>
+                  <a href={url} target="_blank" rel="noreferrer">
+                    {new URL(url).hostname}
+                  </a>
+                  {position < item.step.sources!.length - 1 ? ", " : ""}
+                </span>
+              ))}
+            </p>
+          )}
+          {item.index === active && item.act.id === "scar" && !item.step.focus && stats && (
+            <StatsPanel stats={stats} />
+          )}
+          {item.index === active && item.act.id === "radar" && !item.step.focus && stats?.act4 && (
+            <Act4Panel act4={stats.act4} />
+          )}
+    </>
+  );
+
   return (
     <div className={`story${current?.step.focus ? " is-wide" : ""}`}>
       <div className="story__text">
@@ -300,34 +352,7 @@ export default function Story() {
                   className={`story__step${item.index === active ? " is-active" : ""}`}
                 >
                   <div className="story__step-body">
-                    <p className="story__step-text">{item.step.text}</p>
-                    <ul className="story__captions">
-                      {item.step.layers.map((ref) => (
-                        <li key={ref.id}>
-                          <span className="story__layer-name">{layerTitle(manifest, ref.id)}</span>{" "}
-                          {ref.caption}
-                        </li>
-                      ))}
-                    </ul>
-                    {item.step.sources && item.step.sources.length > 0 && (
-                      <p className="story__sources">
-                        Sources:{" "}
-                        {item.step.sources.map((url, position) => (
-                          <span key={url}>
-                            <a href={url} target="_blank" rel="noreferrer">
-                              {new URL(url).hostname}
-                            </a>
-                            {position < item.step.sources!.length - 1 ? ", " : ""}
-                          </span>
-                        ))}
-                      </p>
-                    )}
-                    {item.index === active && act.id === "scar" && !item.step.focus && stats && (
-                      <StatsPanel stats={stats} />
-                    )}
-                    {item.index === active && act.id === "radar" && !item.step.focus && stats?.act4 && (
-                      <Act4Panel act4={stats.act4} />
-                    )}
+                    {!stacked && stepContent(item)}
                   </div>
                 </article>
               ))}
@@ -348,7 +373,7 @@ export default function Story() {
         )}
         {(!exploring || exploreMode === 1) &&
           (legendLayers.length > 0 || (exploring && manifest)) && (
-          <div className="map-hud">
+          <div className={`map-hud${exploring ? " map-hud--explore" : ""}`}>
             {exploring && manifest && (
               <LayerPicker
                 manifest={manifest}
@@ -410,6 +435,15 @@ export default function Story() {
           </div>
         )}
       </div>
+
+      {stacked && (
+        <div className="story__sheet" role="region" aria-live="polite" aria-label="About this view">
+          <p className="story__sheet-act">{steps[active].act.title}</p>
+          <div className="story__sheet-body" key={steps[active].step.id}>
+            {stepContent(steps[active])}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

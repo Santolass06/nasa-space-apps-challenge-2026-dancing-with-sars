@@ -1108,27 +1108,210 @@ h1 {
   color: var(--muted);
 }
 
-@media (max-width: 900px) {
+/* The sheet only exists on portrait phones and tablets. */
+.story__sheet {
+  display: none;
+}
+
+/* --- Portrait phones and tablets: map on top, the step's text in a sheet below --- */
+@media (max-width: 900px) and (orientation: portrait) {
   .story,
   .story.is-wide {
     grid-template-columns: 1fr;
+    gap: 0;
+    margin-top: 1rem;
   }
 
-  /* The map stays pinned while the steps scroll under it. */
   .story__map {
     position: sticky;
     top: 0;
     z-index: 3;
     order: -1;
-    height: 45vh;
+    height: 56vh;
+    border-radius: 0 0 18px 18px;
+  }
+
+  /* The steps are only room to scroll through; their text lives in the sheet. */
+  .story__act-title,
+  .story__step-body {
+    display: none;
   }
 
   .story__step {
-    min-height: 55vh;
+    min-height: 62vh;
+    border-top: 0;
+    opacity: 1;
+  }
+
+  .story__sheet {
+    position: sticky;
+    bottom: 0;
+    z-index: 4;
+    display: block;
+    max-height: 42vh;
+    margin: 0 -1.25rem;
+    padding: 0.9rem 1.25rem calc(1rem + env(safe-area-inset-bottom, 0px));
+    overflow-y: auto;
+    background: var(--bg-soft);
+    border-top: 1px solid var(--border);
+    border-radius: 18px 18px 0 0;
+    box-shadow: 0 -12px 30px rgba(0, 0, 0, 0.45);
+  }
+
+  .story__sheet-act {
+    margin: 0 0 0.35rem;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .story__sheet-body {
+    animation: settle 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .story__sheet .story__step-text {
+    margin-bottom: 0.5rem;
+    font-size: 0.98rem;
+    line-height: 1.5;
+  }
+
+  .story__sheet .story__captions {
+    font-size: 0.78rem;
+  }
+
+  .story__sheet .story__sources {
+    font-size: 0.68rem;
+  }
+
+  /* In the explore step the layout bar runs along the top; the picker goes below it. */
+  .map-hud--explore {
+    top: 3rem;
+  }
+}
+
+/* --- Landscape phones: the two columns stay, tightened to a short screen --- */
+@media (orientation: landscape) and (max-height: 520px) {
+  .page {
+    padding-top: 1.5rem;
+  }
+
+  .hero {
+    padding-bottom: 1.5rem;
+  }
+
+  .story {
+    gap: 1.25rem;
+    margin-top: 1rem;
+  }
+
+  .story__map,
+  .story.is-wide .story__map {
+    --map-height: calc(100vh - 1.5rem);
+  }
+
+  .story__step {
+    min-height: 90vh;
   }
 
   .story__step-body {
-    top: calc(45vh + 1rem);
+    top: 8vh;
+    padding: 0.5rem 0 0.75rem;
+  }
+
+  .story__step-text {
+    font-size: 0.9rem;
+    line-height: 1.45;
+  }
+
+  .story__captions,
+  .story__sources {
+    font-size: 0.72rem;
+  }
+
+  .story__act-title {
+    padding: 0.4rem 0;
+  }
+}
+
+/* --- Compact controls on phones, in either orientation --- */
+@media (max-width: 640px), (orientation: landscape) and (max-height: 520px) {
+  .explorer__bar {
+    gap: 0.3rem;
+  }
+
+  .explorer__recipes {
+    flex: 1;
+    min-width: 0;
+    max-width: none;
+  }
+
+  /* One slim legend: title, ramp and the two ends. The caveat opens on demand. */
+  .legend {
+    width: auto;
+    padding: 0.4rem 0.55rem;
+  }
+
+  .legend-stack .legend + .legend {
+    display: none;
+  }
+
+  .legend__caveat:not(.is-open),
+  .legend__note {
+    display: none;
+  }
+
+  .legend__caveat.is-open {
+    display: block;
+    -webkit-line-clamp: unset;
+  }
+
+  /* Layer types: one scrolling row in the picker; hidden in the split views, where
+     the date menu is enough (a phone has no hover to open their tips). */
+  .picker {
+    max-width: none;
+  }
+
+  .picker .chooser__kinds {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .picker .chooser__chip-wrap {
+    flex: none;
+  }
+
+  .picker .chooser__tip {
+    display: none;
+  }
+
+  .compare__label.is-interactive .chooser__kinds,
+  .quad__chooser .chooser__kinds {
+    display: none !important;
+  }
+
+  /* At the top of the picture: the bottom edge belongs to the attribution and zoom buttons. */
+  .compare__label.is-interactive {
+    top: 0.5rem;
+    bottom: auto;
+    max-width: 47%;
+  }
+
+  .compare__label.is-interactive .chooser select {
+    min-width: 0;
+    font-size: 0.7rem;
+  }
+
+  .story__figure {
+    padding: 0.6rem;
+    gap: 0.5rem;
+  }
+
+  /* The layer names above the attribution and the zoom buttons, not under them. */
+  .compare__label:not(.is-interactive) {
+    bottom: 2.7rem;
   }
 }
 
@@ -1140,17 +1323,13 @@ h1 {
     max-width: none;
   }
 
-
-  .legend {
-    width: auto;
+  .map-hud.map-hud--explore {
+    top: 3rem;
   }
 
-  .legend__caveat {
-    -webkit-line-clamp: 2;
-  }
-
-  .legend__caveat.is-open {
-    -webkit-line-clamp: unset;
+  /* The bar wraps to two lines on a phone. */
+  .explorer--multi .explorer__stage {
+    top: 5.6rem;
   }
 }
 

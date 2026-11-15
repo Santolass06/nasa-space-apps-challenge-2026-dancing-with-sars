@@ -54,6 +54,20 @@ const MODES: Array<{ mode: ExploreMode; label: string; hint: string }> = [
   { mode: 4, label: "4 layers", hint: "Four layers split by a point you can drag anywhere" },
 ];
 
+/** Four layers need room (and four WebGL contexts): phones, in either orientation, get one and two. */
+const NARROW = "(max-width: 640px), (orientation: landscape) and (max-height: 520px)";
+
+function useNarrow(): boolean {
+  const [narrow, setNarrow] = useState(() => window.matchMedia(NARROW).matches);
+  useEffect(() => {
+    const query = window.matchMedia(NARROW);
+    const onChange = () => setNarrow(query.matches);
+    query.addEventListener("change", onChange);
+    return () => query.removeEventListener("change", onChange);
+  }, []);
+  return narrow;
+}
+
 /**
  * The last step: explore the layers on one map, as a before/after pair split by
  * a slider, or as four layers split by a point you drag freely, optionally
@@ -61,7 +75,9 @@ const MODES: Array<{ mode: ExploreMode; label: string; hint: string }> = [
  * The one-map mode is the story's own map; this draws the controls for all
  * three and the two- and four-map views over it.
  */
-export default function Explorer({ manifest, mode, onModeChange, full, onFullChange }: Props) {
+export default function Explorer({ manifest, mode: wanted, onModeChange, full, onFullChange }: Props) {
+  const narrow = useNarrow();
+  const mode: ExploreMode = narrow && wanted === 4 ? 2 : wanted;
   const [fourStyle, setFourStyle] = useState<FourStyle>("point");
   const [ids, setIds] = useState<string[]>(() => {
     const four = recipesFor(manifest, 4)[0]?.ids;
@@ -126,7 +142,7 @@ export default function Explorer({ manifest, mode, onModeChange, full, onFullCha
 
       <div className="explorer__bar" role="toolbar" aria-label="Map layout">
         <div className="explorer__modes">
-          {MODES.map((item) => (
+          {MODES.filter((item) => !(narrow && item.mode === 4)).map((item) => (
             <button
               key={item.mode}
               type="button"
