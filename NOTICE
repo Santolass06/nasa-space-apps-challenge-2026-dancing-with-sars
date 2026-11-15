@@ -38,18 +38,32 @@ verified with `pip-licenses` / `npm ls` before the final submission):
   scrollama, Observable Plot         MIT / ISC
   Tailwind CSS                       MIT
 
-Additional data and basemap attribution (fill in when used):
+Additional data and basemap attribution:
 
   Copernicus Sentinel-2 L2A (true-colour imagery)
-  Contains modified Copernicus Sentinel data 2026.
+  License: Copernicus open access policy (European Commission Delegated
+  Regulation (EU) No 1159/2013).
   Accessed via Earth Search (Element 84).
+  Required attribution notice:
+  "Contains modified Copernicus Sentinel data 2026."
+
   Official burned-area perimeter — Tourelhe wildfire (July 2026)
-  Attribution: Instituto da Conservação da Natureza e das Florestas, I.P. (ICNF).
   Source: https://www.icnf.pt/api/file/doc/7205ba3d11e327a9
   Reference: ICNF post-fire emergency stabilisation report REE_2026_004, p. 6.
   Processing: Converted from Shapefile (EPSG:3763) to WGS84 GeoJSON.
-  License: Dataset-specific reuse terms have not been confirmed.
-  Basemap: OpenFreeMap / OpenStreetMap contributors       [attribution text to add]
+  License: *verify* — Dataset-specific reuse terms were not found in the ZIP
+  or report. Under ICNF portal general terms (Avisos Legais), information is
+  free for personal, educational or scientific non-profit use, with mandatory
+  source attribution: "ICNF, [camada], [URL], [data]".
+  Attribution: Instituto da Conservação da Natureza e das Florestas, I.P. (ICNF),
+  Incêndio Rural de Tourelhe (REE_2026_004), 2026.
+
+  Basemap (OpenFreeMap / OpenStreetMap)
+  Styles & tile hosting: OpenFreeMap (MIT License, https://openfreemap.org).
+  Map data: OpenStreetMap contributors (Open Data Commons Open Database License /
+  ODbL 1.0, https://www.openstreetmap.org/copyright) and OpenMapTiles (CC-BY 4.0).
+  Required attribution notice:
+  "OpenFreeMap © OpenMapTiles Data from OpenStreetMap"
 
 Cite every source in the Space Apps project form.
 
