@@ -1679,11 +1679,12 @@ h1 {
   font-weight: 600;
 }
 
-/* While the story map's frame grows, the canvas is redrawn a little after the frame has moved.
-   Anchored to the right and top edges, which do not move, the old picture stays put in between
-   instead of travelling with the left edge; the strip it has not yet filled is the frame's own
-   dark background. */
-.story__map-view .maplibregl-canvas {
+/* While the story map's frame grows, the canvas is redrawn a little after the frame has
+   moved. Anchored to the right and top edges, which do not move, the old picture stays put
+   in between instead of travelling with the left edge; the strip it has not yet filled is
+   the frame's own dark background. The comparison pair draws inside the same frame and
+   follows the same rule. */
+.story__map .maplibregl-canvas {
   right: 0;
   left: auto;
 }

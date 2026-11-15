@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState, type ReactNode } from "react"
 import MapView from "./MapView";
 import { LayerManager } from "./layers";
 import { loadManifest, type Bounds } from "./manifest";
+import { useSyncedMaps } from "./useSyncedMaps";
 
 type Props = {
   /** Manifest layer ids to compare: left side and right side. */
@@ -102,39 +103,11 @@ export default function CompareView({
     right.once("idle", done);
   }, [maps]);
 
-  // Keep the two cameras identical. The comparison is what stops the loop:
-  // jumpTo() re-fires "move" on the other map, and the second pass is a no-op.
-  useEffect(() => {
-    const [left, right] = maps;
-    if (!left || !right) {
-      return;
-    }
-    const follow = (from: MapLibreMap, to: MapLibreMap) => () => {
-      const a = from.getCenter();
-      const b = to.getCenter();
-      const same =
-        Math.abs(a.lng - b.lng) < 1e-9 &&
-        Math.abs(a.lat - b.lat) < 1e-9 &&
-        Math.abs(from.getZoom() - to.getZoom()) < 1e-9;
-      if (same) {
-        return;
-      }
-      to.jumpTo({
-        center: from.getCenter(),
-        zoom: from.getZoom(),
-        bearing: from.getBearing(),
-        pitch: from.getPitch(),
-      });
-    };
-    const leftFollows = follow(left, right);
-    const rightFollows = follow(right, left);
-    left.on("move", leftFollows);
-    right.on("move", rightFollows);
-    return () => {
-      left.off("move", leftFollows);
-      right.off("move", rightFollows);
-    };
-  }, [maps]);
+  // Keep the two cameras identical (the helper the four quarters use too). The comparison
+  // is what stops the loop: jumpTo() re-fires "move" on the other map, and the second pass
+  // is a no-op. A frame that changes width reaches both maps on its own, so neither copy
+  // can undo the other's correction.
+  useSyncedMaps(maps);
 
   const moveTo = (clientX: number) => {
     const box = container.current?.getBoundingClientRect();
