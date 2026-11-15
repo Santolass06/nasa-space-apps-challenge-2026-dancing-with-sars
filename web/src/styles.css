@@ -83,11 +83,32 @@ h1 {
   letter-spacing: -0.03em;
 }
 
+/* "em chamas": flame colours, with a slow ember glow behind the letters. */
 .accent {
-  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  background: linear-gradient(100deg, #ffd166 0%, #ff9f43 32%, #ff5a2a 68%, #e0301e 100%);
+  background-size: 140% 100%;
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+  filter: drop-shadow(0 0 0.35em rgba(255, 90, 40, 0.32));
+  animation: ember 7s ease-in-out infinite alternate;
+}
+
+@keyframes ember {
+  from {
+    background-position: 0% 50%;
+    filter: drop-shadow(0 0 0.25em rgba(255, 90, 40, 0.22));
+  }
+  to {
+    background-position: 100% 50%;
+    filter: drop-shadow(0 0 0.5em rgba(255, 110, 40, 0.5));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .accent {
+    animation: none;
+  }
 }
 
 .lede {
