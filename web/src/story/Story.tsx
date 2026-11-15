@@ -129,6 +129,7 @@ export default function Story() {
   }, []);
 
   const framed = useRef(false);
+  const wasWide = useRef(false);
 
   const applyStep = useCallback((manager: LayerManager, step: Step) => {
     const rasters: string[] = [];
@@ -146,9 +147,19 @@ export default function Story() {
     manager.showLayers(rasters);
     manager.showVector(vectors);
     manager.showPlaces(places);
-    if (step.mapView?.bounds) {
-      manager.flyTo(step.mapView.bounds, { instant: !framed.current });
+    manager.showFocus(step.focus ?? null);
+    // A focus step frames its zone with room around it; any other step frames its view.
+    const target = step.focus?.view ?? step.focus?.bounds ?? step.mapView?.bounds;
+    if (target) {
+      // When the map is about to widen or narrow, let that finish before the camera moves.
+      const widthChanges = wasWide.current !== Boolean(step.focus);
+      manager.flyTo(target, {
+        instant: !framed.current,
+        padding: step.focus ? 90 : 24,
+        delay: widthChanges ? 750 : undefined,
+      });
       framed.current = true;
+      wasWide.current = Boolean(step.focus);
     }
   }, []);
 
@@ -231,7 +242,7 @@ export default function Story() {
   }, [active, comparison, applyStep, current]);
 
   return (
-    <div className="story">
+    <div className={`story${current?.step.focus ? " is-wide" : ""}`}>
       <div className="story__text">
         {story.acts.map((act) => (
           <section className="story__act" key={act.id} id={`act-${act.id}`}>
@@ -270,10 +281,10 @@ export default function Story() {
                         ))}
                       </p>
                     )}
-                    {item.index === active && act.id === "scar" && stats && (
+                    {item.index === active && act.id === "scar" && !item.step.focus && stats && (
                       <StatsPanel stats={stats} />
                     )}
-                    {item.index === active && act.id === "radar" && stats?.act4 && (
+                    {item.index === active && act.id === "radar" && !item.step.focus && stats?.act4 && (
                       <Act4Panel act4={stats.act4} />
                     )}
                   </div>

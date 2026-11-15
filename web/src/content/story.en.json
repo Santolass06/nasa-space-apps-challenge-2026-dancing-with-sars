@@ -225,6 +225,40 @@
       "title": "The fire scar",
       "steps": [
         {
+          "id": "inside-the-scar",
+          "text": "Compare the dashed area, inside the burned zone, with the ground around it. Coherence tells how much the radar signal changed between two passes of the satellite: low coherence means it changed a lot. Between 29 June and 11 July, the passes before and after the fire, the signal inside the dashed box stopped matching, so the colour is strongest there and fainter outside.",
+          "layers": [
+            {
+              "id": "coh_D52_20260629_20260711",
+              "caption": "Orange marks low coherence: the signal over the ground changed between the two passes."
+            }
+          ],
+          "mapView": {
+            "bounds": [
+              -8.5,
+              40.45,
+              -7.95,
+              40.85
+            ]
+          },
+          "focus": {
+            "bounds": [
+              -8.282,
+              40.627,
+              -8.248,
+              40.645
+            ],
+            "label": "Inside the burned area",
+            "view": [
+              -8.34,
+              40.595,
+              -8.19,
+              40.68
+            ]
+          },
+          "comparisons": []
+        },
+        {
           "id": "compare-fire-and-control",
           "text": "Compare the radar measurements across the fire with those from the following 12 days.",
           "layers": [
@@ -281,6 +315,37 @@
       "id": "radar",
       "title": "How radar sees change",
       "steps": [
+        {
+          "id": "read-brightness",
+          "text": "Radar brightness depends on the surface. Calm water acts like a mirror: it sends the radar beam away from the satellite, so a reservoir sends back almost nothing and shows as the darkest area. The Ribeiradio reservoir, on the Vouga river, sits at the dark end of the scale.",
+          "layers": [
+            {
+              "id": "hh_D52_20260711",
+              "caption": "Dark means a weak echo, as over this water. Bright means a strong echo, as over rough ground."
+            }
+          ],
+          "mapView": {
+            "bounds": [
+              -8.5,
+              40.45,
+              -7.95,
+              40.85
+            ]
+          },
+          "focus": {
+            "bounds": [
+              -8.322,
+              40.738,
+              -8.178,
+              40.79
+            ],
+            "label": "Ribeiradio reservoir"
+          },
+          "comparisons": [],
+          "sources": [
+            "https://www.openstreetmap.org/relation/4873363"
+          ]
+        },
         {
           "id": "compare-hh-and-hv",
           "text": "Compare two radar channels from the same overpass and look for areas that appear bright in one channel and dark in the other.",

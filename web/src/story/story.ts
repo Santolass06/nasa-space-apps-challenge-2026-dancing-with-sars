@@ -18,6 +18,17 @@ export type Figure = {
   sourceUrl: string;
 };
 
+/**
+ * A zone to look at closely: the map widens, zooms to `bounds` and outlines it
+ * with `label`. The text of the step explains what the reader is looking at.
+ */
+export type Focus = {
+  bounds: Bounds;
+  label: string;
+  /** What the camera frames, when the reader needs more of the surroundings than the zone itself. */
+  view?: Bounds;
+};
+
 export type Step = {
   id: string;
   text: string;
@@ -25,6 +36,7 @@ export type Step = {
   mapView?: { bounds: Bounds };
   comparisons?: Comparison[];
   figure?: Figure;
+  focus?: Focus;
   sources?: string[];
 };
 

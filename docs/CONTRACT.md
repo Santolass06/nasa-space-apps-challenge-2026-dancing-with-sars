@@ -97,6 +97,10 @@ A app não conhece nomes de ficheiros: lê `web/public/layers/manifest.json` e d
 
 Um passo de `story.en.json` pode ter `figure`: uma imagem que ocupa o mapa nesse passo (por exemplo, uma imagem de satélite com o fumo). Campos: `src` (caminho em `web/public/`), `alt`, `caption`, `credit`, `licence`, `licenceUrl` e `sourceUrl`. A app mostra sempre o crédito, a licença e a ligação à fonte por baixo da imagem, e só entram figuras com licença aberta que o permita (a licença é verificada e registada em `NOTICE` e `docs/data-sources.md`). Um passo com figura pode ter `layers: []`.
 
+## Passos da história com zona em foco
+
+Um passo pode ter `focus` (`bounds` = `[oeste, sul, este, norte]`, `label` e, opcionalmente, `view` com o enquadramento da câmara quando o leitor precisa de ver mais à volta): o mapa alarga, a câmara aproxima-se da zona e a zona fica contornada e com nome, para o texto do passo explicar um exemplo concreto. A zona escolhe-se com os dados à frente (por exemplo, a albufeira é o maior bloco escuro do HH; a caixa dentro da cicatriz tem mais de 98% da área dentro do perímetro oficial) e o texto não leva números escritos à mão: os números ficam em `stats.json` e nas legendas.
+
 ## Dentro dos HDF5
 
 Caminhos do GUNW confirmados no primeiro ficheiro real (tarefa A1, 14 nov 2026) e do GCOV no primeiro GCOV (tarefa B1, 14 nov 2026).

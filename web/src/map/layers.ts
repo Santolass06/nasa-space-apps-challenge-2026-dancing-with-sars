@@ -1,7 +1,9 @@
-import { Marker, type Map as MapLibreMap } from "maplibre-gl";
+import { Marker, type GeoJSONSource, type Map as MapLibreMap } from "maplibre-gl";
 
 import { layerImage } from "./images";
 import { layersBase, type Bounds, type Layer, type Manifest } from "./manifest";
+
+export type FocusZone = { bounds: Bounds; label: string };
 
 const OPACITY = 0.85;
 
@@ -11,6 +13,9 @@ const FADE_MS = 650;
 const FADE_OUT_DELAY_MS = 120;
 const CAMERA_MS = 1400;
 const CAMERA_DEBOUNCE_MS = 150;
+// The layers are 46 m per pixel; past this zoom they are magnified more than
+// about 2x and look smeared, so the story's close-ups stop here.
+const MAX_ZOOM = 12.4;
 
 const reducedMotion = (): boolean =>
   typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -51,7 +56,11 @@ export class LayerManager {
   private placesLoading: Promise<void> | undefined;
   private placesVisible = false;
   private lastFit = "";
+  private lastView: { bounds: Bounds; padding: number } | undefined;
   private cameraTimer: number | undefined;
+  private refitTimer: number | undefined;
+  private focusLabel: HTMLElement | undefined;
+  private focusMarker: Marker | undefined;
 
   constructor(map: MapLibreMap, manifest: Manifest) {
     this.map = map;
@@ -62,6 +71,26 @@ export class LayerManager {
       if ((event as { originalEvent?: unknown }).originalEvent) {
         this.lastFit = "";
       }
+    });
+    // When the story widens the map, its left edge moves and its right edge stays.
+    // MapLibre keeps the centre of the canvas fixed, which would slide the whole
+    // picture sideways while it grows; shift it back so the ground stays still
+    // and the new width just reveals more of it.
+    const container = map.getContainer();
+    let lastWidth = container.clientWidth;
+    let lastRight = container.getBoundingClientRect().right;
+    map.on("resize", () => {
+      const width = container.clientWidth;
+      const right = container.getBoundingClientRect().right;
+      const grew = width - lastWidth;
+      if (grew !== 0 && Math.abs(right - lastRight) < 1.5 && !map.isMoving()) {
+        map.panBy([-grew / 2, 0], { duration: 0 });
+      }
+      lastWidth = width;
+      lastRight = right;
+      // A window resize re-frames the same box once it has settled.
+      window.clearTimeout(this.refitTimer);
+      this.refitTimer = window.setTimeout(() => this.refit(), 250);
     });
   }
 
@@ -139,24 +168,124 @@ export class LayerManager {
    * move. Repeated calls for the same box are ignored, and quick scrolling
    * through several steps only moves the camera for the last one.
    */
-  flyTo(bounds: Bounds = this.manifest.bounds, options: { instant?: boolean } = {}): void {
-    const key = bounds.join(",");
+  flyTo(
+    bounds: Bounds = this.manifest.bounds,
+    options: { instant?: boolean; padding?: number; delay?: number } = {},
+  ): void {
+    const padding = options.padding ?? 24;
+    const key = `${bounds.join(",")}|${padding}`;
     if (key === this.lastFit) {
       return;
     }
     this.lastFit = key;
+    this.lastView = { bounds, padding };
     window.clearTimeout(this.cameraTimer);
-    const go = () =>
-      this.map.fitBounds(bounds, {
-        padding: 24,
-        duration: options.instant || reducedMotion() ? 0 : CAMERA_MS,
-        easing: easeInOutCubic,
-      });
+    const go = () => this.fit(bounds, padding, options.instant || reducedMotion() ? 0 : CAMERA_MS);
     if (options.instant) {
       go();
     } else {
-      this.cameraTimer = window.setTimeout(go, CAMERA_DEBOUNCE_MS);
+      this.cameraTimer = window.setTimeout(go, options.delay ?? CAMERA_DEBOUNCE_MS);
     }
+  }
+
+  private fit(bounds: Bounds, padding: number, duration: number): void {
+    this.map.fitBounds(bounds, { padding, duration, easing: easeInOutCubic, maxZoom: MAX_ZOOM });
+  }
+
+  private refit(): void {
+    if (this.lastView && this.lastFit !== "" && !this.map.isMoving()) {
+      this.fit(this.lastView.bounds, this.lastView.padding, reducedMotion() ? 0 : 450);
+    }
+  }
+
+  /**
+   * Outline a zone and name it (or fade the outline out when `zone` is null).
+   * The outline and its label cross-fade like every other overlay.
+   */
+  showFocus(zone: FocusZone | null): void {
+    if (!zone) {
+      this.setFocusVisible(false);
+      return;
+    }
+    this.ensureFocus();
+    const [west, south, east, north] = zone.bounds;
+    const source = this.map.getSource("focus") as GeoJSONSource | undefined;
+    void source?.setData({
+      type: "Feature",
+      properties: {},
+      geometry: {
+        type: "Polygon",
+        coordinates: [
+          [
+            [west, south],
+            [east, south],
+            [east, north],
+            [west, north],
+            [west, south],
+          ],
+        ],
+      },
+    });
+    if (this.focusLabel && this.focusMarker) {
+      this.focusLabel.textContent = zone.label;
+      this.focusMarker.setLngLat([(west + east) / 2, north]);
+    }
+    this.setFocusVisible(true);
+  }
+
+  private ensureFocus(): void {
+    if (this.added.has("focus")) {
+      return;
+    }
+    const fade = { duration: fadeMs(), delay: 0 };
+    this.map.addSource("focus", {
+      type: "geojson",
+      data: { type: "FeatureCollection", features: [] },
+    });
+    this.map.addLayer({
+      id: "focus-fill",
+      type: "fill",
+      source: "focus",
+      paint: { "fill-color": "#ffffff", "fill-opacity": 0, "fill-opacity-transition": fade },
+    });
+    this.map.addLayer({
+      id: "focus-line",
+      type: "line",
+      source: "focus",
+      paint: {
+        "line-color": "#ffffff",
+        "line-width": 2.5,
+        "line-dasharray": [2, 1.5],
+        "line-opacity": 0,
+        "line-opacity-transition": fade,
+      },
+    });
+    const element = document.createElement("div");
+    const label = document.createElement("span");
+    label.className = "focus-label is-hidden";
+    element.append(label);
+    this.focusLabel = label;
+    this.focusMarker = new Marker({ element, anchor: "bottom", offset: [0, -6] })
+      .setLngLat([0, 0])
+      .addTo(this.map);
+    this.added.add("focus");
+  }
+
+  private setFocusVisible(visible: boolean): void {
+    if (!this.added.has("focus") || visible === this.shown.has("focus")) {
+      return;
+    }
+    if (visible) {
+      this.shown.add("focus");
+    } else {
+      this.shown.delete("focus");
+    }
+    const transition = { duration: fadeMs(), delay: visible ? 0 : FADE_OUT_DELAY_MS };
+    this.map.setPaintProperty("focus-fill", "fill-opacity-transition", transition);
+    this.map.setPaintProperty("focus-fill", "fill-opacity", visible ? 0.07 : 0);
+    this.map.setPaintProperty("focus-line", "line-opacity-transition", transition);
+    this.map.setPaintProperty("focus-line", "line-opacity", visible ? 1 : 0);
+    this.focusLabel?.classList.toggle("is-hidden", !visible);
   }
 
   private loadPlaces(): Promise<void> {

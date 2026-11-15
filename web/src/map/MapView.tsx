@@ -36,6 +36,9 @@ export default function MapView({ onReady, className }: Props) {
       center: VOUZELA,
       zoom: 10.5,
       attributionControl: false,
+      // Render at least at 2x and let the browser scale down: labels and edges
+      // come out smoother on ordinary (1x) screens.
+      pixelRatio: Math.max(window.devicePixelRatio || 1, 2),
     });
     map.addControl(new NavigationControl({ showCompass: false }), "bottom-right");
     map.addControl(new AttributionControl({ compact: true }), "bottom-left");

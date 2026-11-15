@@ -298,6 +298,37 @@ h1 {
   margin-top: 2.5rem;
 }
 
+/* A focus step widens the map: the text column narrows, the map grows. */
+.story {
+  transition: grid-template-columns 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.story.is-wide {
+  grid-template-columns: minmax(0, 0.6fr) minmax(0, 1.9fr);
+}
+
+.story.is-wide .story__map {
+  --map-height: min(80vh, 780px);
+}
+
+.focus-label {
+  display: inline-block;
+  padding: 0.15rem 0.55rem;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #0b1020;
+  background: #fff;
+  border-radius: 999px;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
+  white-space: nowrap;
+  transition: opacity 0.5s ease;
+}
+
+.focus-label.is-hidden {
+  opacity: 0;
+}
+
 .story__act {
   margin-bottom: 2rem;
 }
@@ -356,6 +387,9 @@ h1 {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .story,
+  .story__map,
+  .focus-label,
   .story__step,
   .story__step-body,
   .story__overlay,
@@ -407,6 +441,9 @@ h1 {
   position: sticky;
   top: calc((100vh - var(--map-height)) / 2);
   height: var(--map-height);
+  transition:
+    height 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    top 0.7s cubic-bezier(0.22, 1, 0.36, 1);
   border: 1px solid var(--border);
   border-radius: 20px;
   overflow: hidden;
@@ -673,7 +710,8 @@ h1 {
 }
 
 @media (max-width: 900px) {
-  .story {
+  .story,
+  .story.is-wide {
     grid-template-columns: 1fr;
   }
 
