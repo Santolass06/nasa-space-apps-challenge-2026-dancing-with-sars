@@ -156,6 +156,27 @@ h1 {
   background: rgba(255, 255, 255, 0.02);
 }
 
+.map-section {
+  margin-top: 2.5rem;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  overflow: hidden;
+  background: var(--bg-soft);
+}
+
+.map {
+  width: 100%;
+  height: min(70vh, 640px);
+}
+
+.map .maplibregl-ctrl-group {
+  background: rgba(11, 16, 32, 0.85);
+}
+
+.map .maplibregl-ctrl button span {
+  filter: invert(1);
+}
+
 .placeholder h2 {
   margin: 0 0 0.5rem;
   font-size: 1.3rem;
