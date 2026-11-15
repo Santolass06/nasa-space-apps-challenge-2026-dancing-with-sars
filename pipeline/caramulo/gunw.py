@@ -24,6 +24,7 @@ from rasterio.transform import from_bounds, from_origin
 from rasterio.warp import Resampling, reproject
 
 from caramulo import export
+from caramulo.caveats import coherence_caveat
 from caramulo.grid import CRS, EXTENT_3857, HEIGHT, WIDTH
 
 # GUNW layout confirmed on the first real file (task A1, 2026-11-14):
@@ -48,11 +49,6 @@ _MONTHS = (
     "Oct",
     "Nov",
     "Dec",
-)
-
-_CAVEAT = (
-    "Low coherence also occurs over water and dense forest; "
-    "this pair brackets the fire (2-5 Jul 2026)."
 )
 
 
@@ -136,7 +132,7 @@ def coherence_layer(h5_path: Path, orbit: str, dates: list[str], out_dir: Path) 
         value_range=[0.0, 1.0],
         colormap="gray",
         source=h5_path.name,
-        caveat=_CAVEAT,
+        caveat=coherence_caveat(d1, d2),
     )
 
 
