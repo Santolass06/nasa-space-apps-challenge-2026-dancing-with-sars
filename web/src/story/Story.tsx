@@ -149,6 +149,7 @@ export default function Story() {
   const [mainIdle, setMainIdle] = useState(false);
   const activeRef = useRef(0);
   const stepRefs = useRef<Array<HTMLElement | null>>([]);
+  const [indexOpen, setIndexOpen] = useState(false);
 
   useEffect(() => {
     loadManifest()
@@ -267,9 +268,9 @@ export default function Story() {
     ? [pickedLayer]
     : current
       ? current.step.layers
-          .map((ref) => manifest?.layers.find((layer) => layer.id === ref.id))
-          .filter((layer): layer is Layer => Boolean(layer))
-          .slice(0, 2)
+        .map((ref) => manifest?.layers.find((layer) => layer.id === ref.id))
+        .filter((layer): layer is Layer => Boolean(layer))
+        .slice(0, 2)
       : [];
 
   const legend = legendLayers.length > 0 && (
@@ -307,39 +308,69 @@ export default function Story() {
   /** The text of a step: its sentence, one caption per layer, sources, and the numbers panels. */
   const stepContent = (item: FlatStep) => (
     <>
-          <p className="story__step-text">{item.step.text}</p>
-          <ul className="story__captions">
-            {item.step.layers.map((ref) => (
-              <li key={ref.id}>
-                <span className="story__layer-name">{layerTitle(manifest, ref.id)}</span>{" "}
-                {ref.caption}
-              </li>
-            ))}
-          </ul>
-          {item.step.sources && item.step.sources.length > 0 && (
-            <p className="story__sources">
-              Sources:{" "}
-              {item.step.sources.map((url, position) => (
-                <span key={url}>
-                  <a href={url} target="_blank" rel="noreferrer">
-                    {new URL(url).hostname}
-                  </a>
-                  {position < item.step.sources!.length - 1 ? ", " : ""}
-                </span>
-              ))}
-            </p>
-          )}
-          {item.index === active && item.act.id === "scar" && !item.step.focus && stats && (
-            <StatsPanel stats={stats} />
-          )}
-          {item.index === active && item.act.id === "radar" && !item.step.focus && stats?.act4 && (
-            <Act4Panel act4={stats.act4} />
-          )}
+      <p className="story__step-text">{item.step.text}</p>
+      <ul className="story__captions">
+        {item.step.layers.map((ref) => (
+          <li key={ref.id}>
+            <span className="story__layer-name">{layerTitle(manifest, ref.id)}</span>{" "}
+            {ref.caption}
+          </li>
+        ))}
+      </ul>
+      {item.step.sources && item.step.sources.length > 0 && (
+        <p className="story__sources">
+          Sources:{" "}
+          {item.step.sources.map((url, position) => (
+            <span key={url}>
+              <a href={url} target="_blank" rel="noreferrer">
+                {new URL(url).hostname}
+              </a>
+              {position < item.step.sources!.length - 1 ? ", " : ""}
+            </span>
+          ))}
+        </p>
+      )}
+      {item.index === active && item.act.id === "scar" && !item.step.focus && stats && (
+        <StatsPanel stats={stats} />
+      )}
+      {item.index === active && item.act.id === "radar" && !item.step.focus && stats?.act4 && (
+        <Act4Panel act4={stats.act4} />
+      )}
     </>
   );
 
   return (
     <div className={`story${current?.step.focus ? " is-wide" : ""}`}>
+
+
+      <div className="story__index">
+        <button
+          type="button"
+          className="story__index-toggle"
+          aria-label="Story index"
+          aria-expanded={indexOpen}
+          aria-controls="story-index"
+          onClick={() => setIndexOpen((open) => !open)}
+        >
+          <span aria-hidden="true">☰</span>
+        </button>
+
+        <nav id="story-index" aria-label="Story index" hidden={!indexOpen}>
+          {story.acts.map((act) => (
+            <a
+              key={act.id}
+              href={`#act-${act.id}`}
+              onClick={() => setIndexOpen(false)}
+            >
+              {act.title}
+            </a>
+          ))}
+          <a href="#step-explore-the-map" onClick={() => setIndexOpen(false)}>
+            Explore the map
+          </a>
+        </nav>
+      </div>
+
       <div className="story__text">
         {story.acts.map((act) => (
           <section className="story__act" key={act.id} id={`act-${act.id}`}>
@@ -349,6 +380,7 @@ export default function Story() {
               .map((item) => (
                 <article
                   key={item.step.id}
+                  id={`step-${item.step.id}`}
                   data-step={item.index}
                   ref={(element) => {
                     stepRefs.current[item.index] = element;

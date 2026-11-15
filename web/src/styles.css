@@ -1371,3 +1371,50 @@ h1 {
 .story-loading {
   min-height: 70vh;
 }
+
+.story__index {
+  position: fixed;
+  top: 3rem;
+  right: 3rem;
+  z-index: 20;
+}
+
+.story__index-toggle,
+.story__index nav {
+  color: var(--text);
+  background: var(--bg-soft, #0b1020);
+  border: 1px solid var(--border);
+  border-radius: 0.6rem;
+}
+
+.story__index-toggle {
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  margin-inline-start: auto;
+  place-items: center;
+  cursor: pointer;
+}
+
+.story__index nav {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  width: min(16rem, calc(100vw - 2rem));
+  padding: 0.5rem;
+}
+
+.story__index nav[hidden] {
+  display: none;
+}
+
+.story__index nav a {
+  display: block;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.35rem;
+}
+
+.story__index nav a:hover,
+.story__index nav a:focus-visible {
+  background: rgba(255, 255, 255, 0.08);
+}
