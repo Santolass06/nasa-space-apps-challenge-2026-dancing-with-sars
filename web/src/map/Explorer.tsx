@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 
 import CompareView from "./CompareView";
 import GridView from "./GridView";
@@ -46,6 +46,8 @@ type Props = {
   onModeChange: (mode: ExploreMode) => void;
   full: boolean;
   onFullChange: (full: boolean) => void;
+  picker?: ReactNode;
+  legend?: ReactNode;
 };
 
 const MODES: Array<{ mode: ExploreMode; label: string; hint: string }> = [
@@ -75,7 +77,7 @@ function useNarrow(): boolean {
  * The one-map mode is the story's own map; this draws the controls for all
  * three and the two- and four-map views over it.
  */
-export default function Explorer({ manifest, mode: wanted, onModeChange, full, onFullChange }: Props) {
+export default function Explorer({ manifest, mode: wanted, onModeChange, full, onFullChange, picker, legend }: Props) {
   const narrow = useNarrow();
   const mode: ExploreMode = narrow && wanted === 4 ? 2 : wanted;
   const [fourStyle, setFourStyle] = useState<FourStyle>("point");
@@ -140,67 +142,73 @@ export default function Explorer({ manifest, mode: wanted, onModeChange, full, o
         </div>
       )}
 
-      <div className="explorer__bar" role="toolbar" aria-label="Map layout">
-        <div className="explorer__modes">
-          {MODES.filter((item) => !(narrow && item.mode === 4)).map((item) => (
+      <div className={mode === 1 ? "explorer__hud" : undefined}>
+        <div className={mode === 1 ? "explorer__controls" : undefined}>
+          {mode === 1 && picker}
+          <div className="explorer__bar" role="toolbar" aria-label="Map layout">
+            <div className="explorer__modes">
+              {MODES.filter((item) => !(narrow && item.mode === 4)).map((item) => (
+                <button
+                  key={item.mode}
+                  type="button"
+                  title={item.hint}
+                  className={`explorer__mode${item.mode === mode ? " is-selected" : ""}`}
+                  aria-pressed={item.mode === mode}
+                  onClick={() => onModeChange(item.mode)}
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
+            {recipes.length > 0 && (
+              <select
+                className="explorer__recipes"
+                aria-label="Ready-made comparison"
+                value=""
+                onChange={(event) => {
+                  const recipe = recipes.find((r) => r.name === event.target.value);
+                  if (recipe) {
+                    setIds((current) => [...recipe.ids, ...current.slice(recipe.ids.length)]);
+                  }
+                }}
+              >
+                <option value="">Ready-made comparisons…</option>
+                {recipes.map((recipe) => (
+                  <option key={recipe.name} value={recipe.name} title={recipe.why}>
+                    {recipe.name}
+                  </option>
+                ))}
+              </select>
+            )}
+            {mode === 4 && full && (
+              <button
+                type="button"
+                className="explorer__style"
+                title={
+                  fourStyle === "point"
+                    ? "Show four separate maps side by side"
+                    : "Show one map split by a point"
+                }
+                aria-label={
+                  fourStyle === "point" ? "Four separate maps" : "One map split by a point"
+                }
+                onClick={() => setFourStyle(fourStyle === "point" ? "grid" : "point")}
+              >
+                {fourStyle === "point" ? GRID_ICON : POINT_ICON}
+              </button>
+            )}
             <button
-              key={item.mode}
               type="button"
-              title={item.hint}
-              className={`explorer__mode${item.mode === mode ? " is-selected" : ""}`}
-              aria-pressed={item.mode === mode}
-              onClick={() => onModeChange(item.mode)}
+              className="explorer__full"
+              aria-pressed={full}
+              title={full ? "Back to the page (Esc)" : "Almost full screen"}
+              onClick={() => onFullChange(!full)}
             >
-              {item.label}
+              {full ? "Close" : "Expand"}
             </button>
-          ))}
+          </div>
         </div>
-        {recipes.length > 0 && (
-          <select
-            className="explorer__recipes"
-            aria-label="Ready-made comparison"
-            value=""
-            onChange={(event) => {
-              const recipe = recipes.find((r) => r.name === event.target.value);
-              if (recipe) {
-                setIds((current) => [...recipe.ids, ...current.slice(recipe.ids.length)]);
-              }
-            }}
-          >
-            <option value="">Ready-made comparisons…</option>
-            {recipes.map((recipe) => (
-              <option key={recipe.name} value={recipe.name} title={recipe.why}>
-                {recipe.name}
-              </option>
-            ))}
-          </select>
-        )}
-        {mode === 4 && full && (
-          <button
-            type="button"
-            className="explorer__style"
-            title={
-              fourStyle === "point"
-                ? "Show four separate maps side by side"
-                : "Show one map split by a point"
-            }
-            aria-label={
-              fourStyle === "point" ? "Four separate maps" : "One map split by a point"
-            }
-            onClick={() => setFourStyle(fourStyle === "point" ? "grid" : "point")}
-          >
-            {fourStyle === "point" ? GRID_ICON : POINT_ICON}
-          </button>
-        )}
-        <button
-          type="button"
-          className="explorer__full"
-          aria-pressed={full}
-          title={full ? "Back to the page (Esc)" : "Almost full screen"}
-          onClick={() => onFullChange(!full)}
-        >
-          {full ? "Close" : "Expand"}
-        </button>
+        {mode === 1 && legend}
       </div>
     </div>
   );
