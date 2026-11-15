@@ -85,7 +85,7 @@ the manifest in the same order. The HDF5 paths each step uses are in
 | [`docs/PRODUCTS.md`](docs/PRODUCTS.md) | NISAR products that exist and the ones used |
 | [`docs/DECISIONS.md`](docs/DECISIONS.md) | Decisions taken during the weekend |
 | [`docs/AI_USE.md`](docs/AI_USE.md) | Where and how AI was used |
-| [`docs/STORY-VALIDATION.md`](docs/STORY-VALIDATION.md) | Each claim in acts 1, 3 and 4 checked against the data |
+| [`docs/STORY-VALIDATION.md`](docs/STORY-VALIDATION.md) | Each claim in the story checked against the data |
 | [`docs/DEMO-SCRIPT.md`](docs/DEMO-SCRIPT.md) | The 30-second demo video, shot by shot |
 | [`docs/challenge.md`](docs/challenge.md) | Official challenge statement (offline snapshot) |
 | [`docs/data-sources.md`](docs/data-sources.md) | Data sources, licenses, citations |
