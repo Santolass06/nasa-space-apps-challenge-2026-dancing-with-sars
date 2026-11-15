@@ -59,6 +59,22 @@ cd pipeline
 uv run python -m caramulo.fetch --start 2026-06-17 --end 2026-07-25 --dry-run
 ```
 
+Download them and rebuild every layer from the raw products:
+
+```bash
+cd pipeline
+uv run python -m caramulo.fetch --start 2026-06-17 --end 2026-10-16   # ~25 GB into data/raw
+uv run python run.py --plan   # the steps a full run would take, and with which products
+uv run python run.py --real   # coherence, backscatter, change, perimeter, progression, numbers
+uv run python run.py --real --s2   # also the Sentinel-2 optical layers (needs the network)
+```
+
+`run.py --real` reads the orbit and the dates from the NISAR file names, so it needs no
+product table; each step prints what it reads and writes, and re-running one step leaves
+the manifest in the same order. The HDF5 paths each step uses are in
+[`docs/CONTRACT.md`](docs/CONTRACT.md), the products in
+[`docs/PRODUCTS.md`](docs/PRODUCTS.md).
+
 ## Documentation
 
 | Document | Contents |

@@ -417,13 +417,24 @@ def write_manifest(path: Path | str, layers: list[dict]) -> Path:
 
 
 def upsert_manifest_entry(path: Path | str, entry: dict) -> Path:
-    """Insert or replace one layer entry in manifest.json, keeping the other layers."""
+    """Insert or replace one layer entry in manifest.json, keeping the other layers.
+
+    A replaced entry keeps its original position, so re-running one step does not
+    reshuffle the manifest and every diff stays about the data, not the order.
+    """
     path = Path(path)
     layers: list[dict] = []
+    replaced = False
     if path.exists():
         existing = json.loads(path.read_text())
-        layers = [layer for layer in existing.get("layers", []) if layer.get("id") != entry["id"]]
-    layers.append(entry)
+        for layer in existing.get("layers", []):
+            if layer.get("id") == entry["id"]:
+                layers.append(entry)
+                replaced = True
+            else:
+                layers.append(layer)
+    if not replaced:
+        layers.append(entry)
     return write_manifest(path, layers)
 
 
