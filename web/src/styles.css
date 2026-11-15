@@ -46,7 +46,9 @@ code {
 }
 
 .page {
-  width: min(1080px, 100% - 2.5rem);
+  /* Wide screens use their width: the text starts nearer the left edge and the map gets room.
+     On a phone the margin stays 2.5 rem. */
+  width: min(1440px, 100% - clamp(2.5rem, 6vw, 5rem));
   margin: 0 auto;
   padding: 4rem 0 2rem;
 }
@@ -336,7 +338,7 @@ h1 {
 }
 
 .story.is-wide .story__map {
-  --map-height: min(80vh, 780px);
+  --map-height: min(82vh, 840px);
 }
 
 .focus-label {
@@ -442,14 +444,14 @@ h1 {
 
 .story__step-text {
   margin: 0 0 0.75rem;
-  font-size: 1.02rem;
+  font-size: 1.12rem;
   line-height: 1.55;
 }
 
 .story__captions {
   margin: 0;
   padding-left: 1rem;
-  font-size: 0.85rem;
+  font-size: 0.92rem;
   color: var(--muted);
 }
 
@@ -464,12 +466,12 @@ h1 {
 
 .story__sources {
   margin: 0.6rem 0 0;
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   color: var(--muted);
 }
 
 .story__map {
-  --map-height: min(72vh, 680px);
+  --map-height: min(74vh, 760px);
   position: sticky;
   top: calc((100vh - var(--map-height)) / 2);
   height: var(--map-height);
@@ -1367,19 +1369,9 @@ h1 {
   }
 }
 
-/* --- Compact controls on phones, in either orientation --- */
-@media (max-width: 640px), (orientation: landscape) and (max-height: 520px) {
-  .explorer__bar {
-    gap: 0.3rem;
-  }
-
-  .explorer__recipes {
-    flex: 1;
-    min-width: 0;
-    max-width: none;
-  }
-
-  /* One slim legend: title, ramp and the two ends. The caveat opens on demand. */
+/* --- One slim legend on small screens: title, ramp and the two ends. The caveat opens on
+   demand. Portrait tablets get it too: their open legend covered a fifth of the map. --- */
+@media (max-width: 900px) and (orientation: portrait), (max-width: 640px), (orientation: landscape) and (max-height: 520px) {
   .legend {
     width: auto;
     padding: 0.4rem 0.55rem;
@@ -1397,6 +1389,27 @@ h1 {
   .legend__caveat.is-open {
     display: block;
     -webkit-line-clamp: unset;
+  }
+}
+
+/* Fingers: the zoom buttons are 29 px by default, under the usual 44 px target. */
+@media (pointer: coarse) {
+  .maplibregl-ctrl-group button {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+/* --- Compact controls on phones, in either orientation --- */
+@media (max-width: 640px), (orientation: landscape) and (max-height: 520px) {
+  .explorer__bar {
+    gap: 0.3rem;
+  }
+
+  .explorer__recipes {
+    flex: 1;
+    min-width: 0;
+    max-width: none;
   }
 
   /* Layer types: one scrolling row in the picker; hidden in the split views, where
