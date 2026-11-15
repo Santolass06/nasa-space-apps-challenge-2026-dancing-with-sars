@@ -53,6 +53,8 @@ Two halves that only touch through files, so nothing can fail during the demo:
 
 The data contract between them is in [`docs/CONTRACT.md`](docs/CONTRACT.md).
 
+**Which area is which.** 12,829 ha is the ICNF report's figure (12,828.9 ha) rounded; the ICNF perimeter file measures 12,819.8 ha; the area of the radar scar is a separate measurement. The areas the app shows (scar, official perimeter, overlap) are read from `web/public/layers/stats.json`, not typed into the text.
+
 ## Repository layout
 
 ```
