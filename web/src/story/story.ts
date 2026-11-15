@@ -34,7 +34,7 @@ export function flatten(): FlatStep[] {
   return flat;
 }
 
-const VECTOR_IDS = ["burn_nisar", "burn_official"] as const;
+const VECTOR_IDS = ["burn_nisar", "burn_official", "progress"] as const;
 
 export type VectorRef = (typeof VECTOR_IDS)[number];
 

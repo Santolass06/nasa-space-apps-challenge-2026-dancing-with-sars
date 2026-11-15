@@ -5,7 +5,7 @@ import CompareView from "../map/CompareView";
 import LayerPicker from "../map/LayerPicker";
 import Legend from "../map/Legend";
 import MapView from "../map/MapView";
-import { LayerManager } from "../map/layers";
+import { LayerManager, type OverlayId } from "../map/layers";
 import { loadManifest, type Layer, type Manifest } from "../map/manifest";
 import { flatten, isVector, PLACES_ID, story, type Step } from "./story";
 import { hectares, loadStats, type Polarization, type Stats } from "./stats";
@@ -102,20 +102,18 @@ export default function Story() {
 
   const applyStep = useCallback((manager: LayerManager, step: Step) => {
     const rasters: string[] = [];
-    const vectors: Array<"burn_nisar" | "burn_official"> = [];
-    let places = false;
+    const overlays: OverlayId[] = [];
     for (const ref of step.layers) {
       if (ref.id === PLACES_ID) {
-        places = true;
+        overlays.push("places");
       } else if (isVector(ref.id)) {
-        vectors.push(ref.id);
+        overlays.push(ref.id);
       } else {
         rasters.push(ref.id);
       }
     }
     manager.showLayers(rasters);
-    manager.showVector(vectors);
-    manager.showPlaces(places);
+    manager.showVector(overlays);
     if (step.mapView?.bounds) {
       manager.flyTo(step.mapView.bounds);
     }
