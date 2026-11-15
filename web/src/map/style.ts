@@ -11,7 +11,7 @@ export const COHERENCE_CLEAR = 0.5;
 export const COHERENCE_FULL = 0.2;
 const MAX_ALPHA = 0.95;
 /** Half-width of the box smoothing applied for display only (2 = 5 x 5 pixels, ~230 m): it tames the pixel speckle. */
-const SMOOTH_RADIUS = 2;
+export const SMOOTH_RADIUS = 2;
 
 type Rgba = [number, number, number, number];
 
@@ -69,7 +69,7 @@ function boxMean(values: Float32Array, weights: Uint8Array, width: number, heigh
 const cache = new Map<string, Promise<string>>();
 
 /** Fetch a coherence PNG and return a blob URL of its recoloured version (one per url). */
-export function recolourCoherence(url: string): Promise<string> {
+export function recolourCoherence(url: string, radius = SMOOTH_RADIUS): Promise<string> {
   let result = cache.get(url);
   if (!result) {
     result = (async () => {
@@ -96,7 +96,7 @@ export function recolourCoherence(url: string): Promise<string> {
         grey[p] = pixels[p * 4];
         valid[p] = pixels[p * 4 + 3] >= 128 ? 1 : 0;
       }
-      const smooth = boxMean(grey, valid, canvas.width, canvas.height, SMOOTH_RADIUS);
+      const smooth = boxMean(grey, valid, canvas.width, canvas.height, radius);
       for (let p = 0; p < count; p++) {
         const i = p * 4;
         if (!valid[p]) {

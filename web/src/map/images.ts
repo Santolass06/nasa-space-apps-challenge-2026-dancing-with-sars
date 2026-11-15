@@ -1,5 +1,5 @@
-import { layerUrl, type Layer } from "./manifest";
-import { recolourCoherence } from "./style";
+import { layerHiresUrl, layerUrl, type Layer } from "./manifest";
+import { SMOOTH_RADIUS, recolourCoherence } from "./style";
 
 const cache = new Map<string, Promise<string>>();
 
@@ -23,15 +23,18 @@ function whenIdle<T>(work: () => Promise<T>): Promise<T> {
  * time. Coherence goes through the display recolour first (style.ts): at idle
  * when it is only being preloaded, straight away when the story needs it now.
  */
-export function layerImage(layer: Layer, urgent = false): Promise<string> {
-  let result = cache.get(layer.id);
+export function layerImage(layer: Layer, urgent = false, hires = false): Promise<string> {
+  const key = hires ? `${layer.id}@2x` : layer.id;
+  let result = cache.get(key);
   if (!result) {
-    const url = layerUrl(layer);
+    const url = (hires ? layerHiresUrl(layer) : undefined) ?? layerUrl(layer);
+    // The full-grid image has twice the pixels, so the display smoothing covers twice the radius.
+    const radius = hires ? SMOOTH_RADIUS * 2 : SMOOTH_RADIUS;
     result =
       layer.kind === "coh"
         ? urgent
-          ? recolourCoherence(url)
-          : whenIdle(() => recolourCoherence(url))
+          ? recolourCoherence(url, radius)
+          : whenIdle(() => recolourCoherence(url, radius))
         : fetch(url)
             .then((response) => {
               if (!response.ok) {
@@ -40,9 +43,9 @@ export function layerImage(layer: Layer, urgent = false): Promise<string> {
               return response.blob();
             })
             .then((blob) => URL.createObjectURL(blob));
-    cache.set(layer.id, result);
+    cache.set(key, result);
     // A failed download must be retried the next time someone asks.
-    result.catch(() => cache.delete(layer.id));
+    result.catch(() => cache.delete(key));
   }
   return result;
 }

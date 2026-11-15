@@ -1,4 +1,4 @@
-import { Marker, type GeoJSONSource, type Map as MapLibreMap } from "maplibre-gl";
+import { Marker, type GeoJSONSource, type ImageSource, type Map as MapLibreMap } from "maplibre-gl";
 
 import { layerImage } from "./images";
 import { layersBase, type Bounds, type Layer, type Manifest } from "./manifest";
@@ -16,6 +16,9 @@ const CAMERA_DEBOUNCE_MS = 150;
 // The layers are 46 m per pixel; past this zoom they are magnified more than
 // about 2x and look smeared, so the story's close-ups stop here.
 const MAX_ZOOM = 12.4;
+// From this zoom the 46 m layers are magnified past 1:1 on screen, so the
+// full-grid (23 m) version of each visible layer is swapped in.
+const HIRES_ZOOM = 10.8;
 
 const reducedMotion = (): boolean =>
   typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -54,6 +57,7 @@ export class LayerManager {
   private readonly added = new Set<string>();
   private readonly loading = new Map<string, Promise<void>>();
   private readonly shown = new Set<string>();
+  private readonly sharp = new Set<string>();
   private wanted = new Set<string>();
   private readonly markers: Marker[] = [];
   private placesLoading: Promise<void> | undefined;
@@ -76,6 +80,8 @@ export class LayerManager {
         this.lastFit = "";
       }
     });
+    // Zooming in swaps the visible layers for their full-grid versions.
+    map.on("zoomend", () => this.sharpen());
     // When the story widens the map, its left edge moves and its right edge stays.
     // MapLibre keeps the centre of the canvas fixed, which would slide the whole
     // picture sideways while it grows; shift it back so the ground stays still
@@ -142,6 +148,34 @@ export class LayerManager {
       }
       this.fadeRaster(layer.id, true);
       void this.ensureRaster(layer, true);
+    }
+    this.sharpen();
+  }
+
+  /**
+   * Level of detail: once the map is zoomed in far enough, replace each visible
+   * layer's half-grid image with its full-grid one (when the manifest has it).
+   * It never goes back: the sharper image stays for the rest of the session.
+   */
+  private sharpen(): void {
+    if (this.map.getZoom() < HIRES_ZOOM) {
+      return;
+    }
+    for (const id of this.shown) {
+      const layer = this.byId.get(id);
+      if (!layer?.hires || this.sharp.has(id) || !this.map.getSource(id)) {
+        continue;
+      }
+      this.sharp.add(id);
+      layerImage(layer, true, true)
+        .then((url) => {
+          const source = this.map.getSource(id) as ImageSource | undefined;
+          source?.updateImage({ url });
+        })
+        .catch((error: unknown) => {
+          this.sharp.delete(id);
+          console.error(`layer ${id} (full grid)`, error);
+        });
     }
   }
 
