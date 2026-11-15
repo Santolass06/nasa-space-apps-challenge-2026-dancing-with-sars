@@ -72,6 +72,24 @@
         "source": "https://executivedigest.sapo.pt/?p=788227",
         "coordinateSource": "https://www.visitviseudaolafoes.pt/wp-content/uploads/2024/07/Folheto_A4_PR-Cambarinho-VZL-5Jun-1.pdf"
       }
+    },
+    {
+      "type": "Feature",
+      "id": "daires",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -8.254616,
+          40.580389
+        ]
+      },
+      "properties": {
+        "name": "Daires",
+        "kind": "front",
+        "description": "The fire reached this village on 4 July; it was not evacuated.",
+        "source": "https://cnnportugal.iol.pt/incendios/aldeia/frentes-de-incendio-mantem-se-ativas-e-chegam-a-aldeia-do-caramulo-em-tondela/20260704/6a497614d34edcee7c66119c",
+        "coordinateSource": "https://www.openstreetmap.org/node/5347012985"
+      }
     }
   ]
 }

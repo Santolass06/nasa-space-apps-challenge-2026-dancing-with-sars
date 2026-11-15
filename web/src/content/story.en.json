@@ -107,8 +107,30 @@
           ]
         },
         {
+          "id": "speed",
+          "text": "Overnight the fire was spreading at an average of 765 metres an hour, about 600 hectares an hour, according to the head of the national civil protection authority.",
+          "layers": [
+            {
+              "id": "places",
+              "caption": "Tourelhe, where the fire began, is marked on the map."
+            }
+          ],
+          "mapView": {
+            "bounds": [
+              -8.5,
+              40.45,
+              -7.95,
+              40.85
+            ]
+          },
+          "comparisons": [],
+          "sources": [
+            "https://www.sabado.pt/portugal/amp/incendios-fogo-em-vouzela-ja-queimou-13-mil-hectares-e-e-o-mais-preocupante"
+          ]
+        },
+        {
           "id": "evacuations",
-          "text": "During the wildfire, residents were evacuated from Matadegas and Mançores in Tondela.",
+          "text": "On the morning of 3 July the fire was out of control on the slope of the Serra do Caramulo. Matadegas had been evacuated overnight and Mançores was being evacuated; a local fire commander said the resources were few and some villages had none.",
           "layers": [
             {
               "id": "places",
@@ -125,7 +147,30 @@
           },
           "comparisons": [],
           "sources": [
-            "https://www.sabado.pt/portugal/amp/duas-aldeias-evacuadas-em-tondela-por-causa-do-incendio-de-vouzela"
+            "https://www.sabado.pt/portugal/amp/duas-aldeias-evacuadas-em-tondela-por-causa-do-incendio-de-vouzela",
+            "https://www.diarioviseu.pt/2026/07/04/encosta-da-serra-do-caramulo-com-varias-frentes/"
+          ]
+        },
+        {
+          "id": "daires",
+          "text": "On 4 July the flames reached Daires, in the Caramulo area, and kept burning with intensity near several villages. The mayor of Tondela said Daires was not evacuated, and that no injuries or destroyed property had been reported in the municipality.",
+          "layers": [
+            {
+              "id": "places",
+              "caption": "Daires is the village the fire reached on 4 July."
+            }
+          ],
+          "mapView": {
+            "bounds": [
+              -8.5,
+              40.45,
+              -7.95,
+              40.85
+            ]
+          },
+          "comparisons": [],
+          "sources": [
+            "https://cnnportugal.iol.pt/incendios/aldeia/frentes-de-incendio-mantem-se-ativas-e-chegam-a-aldeia-do-caramulo-em-tondela/20260704/6a497614d34edcee7c66119c"
           ]
         },
         {
