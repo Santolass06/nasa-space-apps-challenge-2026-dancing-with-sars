@@ -34,7 +34,7 @@ body {
 }
 
 a {
-  color: var(--accent);
+  color: var(--act-accent);
 }
 
 code {
@@ -171,7 +171,7 @@ h1 {
 .step-number {
   font-family: ui-monospace, monospace;
   font-size: 0.78rem;
-  color: var(--accent);
+  color: var(--act-accent);
   letter-spacing: 0.15em;
 }
 
@@ -371,7 +371,7 @@ h1 {
   font-weight: 700;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--accent);
+  color: var(--act-accent);
   /* The page's own background, so the band is invisible and hides what scrolls under it. */
   background-color: var(--bg);
   background-image: var(--mood-glow);
@@ -1216,7 +1216,7 @@ h1 {
     font-weight: 700;
     letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: var(--accent);
+    color: var(--act-accent);
   }
 
   .story__sheet-body {
