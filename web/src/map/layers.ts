@@ -196,7 +196,7 @@ export class LayerManager {
   }
 
   /**
-   * Keep the labels from sitting on top of each other (Matadegas and Mansores
+   * Keep the labels from sitting on top of each other (Matadegas and Mançores
    * are 15 px apart at the story's zoom): each label takes the first free spot
    * among "on the point", above, below, and to either side, in screen pixels.
    */

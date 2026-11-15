@@ -145,7 +145,7 @@ Foi o maior incêndio de 2026 em Portugal: 12.828,9 hectares (ICNF, REE_2026_004
 | Área ardida | 12.828,9 ha (ICNF, REE_2026_004, p. 6); a imprensa da época falava em 12.804 ha (provisório) e 13–15 mil ha | [ICNF REE_2026_004](https://www.icnf.pt/api/file/doc/d305b338642255f3); [Agroportal / Lusa](https://www.agroportal.pt/?p=1265118) |
 | Concelhos afetados | Vouzela, Oliveira de Frades, Tondela e serra do Caramulo | [Lusa](https://www.agroportal.pt/incendios-sul-da-europa-enfrenta-inicio-precoce-da-epoca-de-fogos-florestais/) |
 | Velocidade | Chegou a cerca de 600 ha por hora | [Sábado](https://www.sabado.pt/portugal/amp/incendios-fogo-em-vouzela-ja-queimou-13-mil-hectares-e-e-o-mais-preocupante) |
-| Impacto humano | Aldeias evacuadas (ex.: Matadagase, Mansores, em Tondela); dezenas de feridos | [Sábado](https://www.sabado.pt/portugal/amp/duas-aldeias-evacuadas-em-tondela-por-causa-do-incendio-de-vouzela) |
+| Impacto humano | Aldeias evacuadas (ex.: Matadegas e Mançores, em Tondela; a imprensa escreve também "Mansores" e "Matadagas"); dezenas de feridos | [Sábado](https://www.sabado.pt/portugal/amp/duas-aldeias-evacuadas-em-tondela-por-causa-do-incendio-de-vouzela) |
 | Património natural | Os 24 ha da Reserva Botânica de Cambarinho destruídos | [Lusa](https://executivedigest.sapo.pt/?p=788227) |
 | Depois | Tondela e a Universidade de Aveiro preparam medidas para mitigar os efeitos do fogo na serra | [Notícias ao Minuto](https://www.noticiasaominuto.com/pais/3029882/tondela-prepara-plano-para-mitigar-efeitos-do-fogo-na-serra-do-caramulo) |
 
