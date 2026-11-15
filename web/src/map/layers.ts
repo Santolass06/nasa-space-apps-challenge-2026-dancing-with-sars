@@ -101,28 +101,35 @@ export class LayerManager {
     });
     // Zooming in swaps the visible layers for their full-grid versions.
     map.on("zoomend", () => this.sharpen());
-    // When the story widens the map, its left edge moves and its right edge stays.
-    // MapLibre keeps the centre of the canvas fixed, which would slide the whole
-    // picture sideways while it grows; shift it back so the ground stays still
-    // and the new width just reveals more of it.
-    const container = map.getContainer();
-    let lastWidth = container.clientWidth;
-    let lastHeight = container.clientHeight;
-    let lastRight = container.getBoundingClientRect().right;
+    // When the story widens or heightens the map frame, its left edge moves (the right edge
+    // stays) and its bottom edge moves (the top stays). MapLibre keeps the centre of the canvas
+    // fixed, which would slide the whole picture while it grows; shift the camera back so the
+    // ground stays still and the new size just reveals more of it. The shift is a jumpTo, not a
+    // panBy: panBy starts a zero-length animation that still counts as "moving" until the next
+    // frame, which made every other frame skip its correction and the picture lurch in steps.
+    // It is skipped while the camera is moving (a jump would cancel a flight); after a jumpTo
+    // the map is not moving, so the next frame is corrected too.
+    const canvas = map.getCanvas();
+    const frame = () => {
+      const box = canvas.getBoundingClientRect();
+      return { w: box.width, h: box.height, right: box.right, top: box.top, x: box.left + box.width / 2, y: box.top + box.height / 2 };
+    };
+    let last = frame();
     map.on("resize", () => {
-      const width = container.clientWidth;
-      const height = container.clientHeight;
-      const right = container.getBoundingClientRect().right;
-      if (width === lastWidth && height === lastHeight) {
+      const now = frame();
+      if (now.w === last.w && now.h === last.h) {
         return; // only the drawing resolution changed, not the frame
       }
-      const grew = width - lastWidth;
-      if (grew !== 0 && Math.abs(right - lastRight) < 1.5 && !map.isMoving()) {
-        map.panBy([-grew / 2, 0], { duration: 0 });
+      // Where the camera's centre point sits on the page moved by (now - last); move the
+      // camera by that much so the ground under it stays where it was. Only along an axis
+      // whose far edge did not move (the right edge, the top), so Expand is left alone.
+      const dx = Math.abs(now.right - last.right) < 1.5 ? now.x - last.x : 0;
+      const dy = Math.abs(now.top - last.top) < 1.5 ? now.y - last.y : 0;
+      if ((dx !== 0 || dy !== 0) && !map.isMoving()) {
+        const centre = map.project(map.getCenter());
+        map.jumpTo({ center: map.unproject([centre.x + dx, centre.y + dy]) });
       }
-      lastWidth = width;
-      lastHeight = height;
-      lastRight = right;
+      last = now;
       // A window resize re-frames the same box once it has settled.
       window.clearTimeout(this.refitTimer);
       this.refitTimer = window.setTimeout(() => this.refit(), 250);
