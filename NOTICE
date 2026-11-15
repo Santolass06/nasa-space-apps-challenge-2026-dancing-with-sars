@@ -26,8 +26,8 @@ its license is recorded in docs/data-sources.md.
 SOFTWARE DEPENDENCIES
 --------------------------------------------------------------------------------
 
-Third-party libraries keep their original licenses. Main dependencies (licenses to be
-verified with `pip-licenses` / `npm ls` before the final submission):
+Third-party libraries keep their original licenses. The ones we ship or call at
+build time (check with `pip-licenses` / `npm ls` before a release):
 
   asf_search, earthaccess            BSD-3-Clause / MIT
   h5py, NumPy, SciPy                 BSD-3-Clause
@@ -35,21 +35,42 @@ verified with `pip-licenses` / `npm ls` before the final submission):
   pystac-client                      Apache-2.0
   React, React DOM, Vite             MIT
   MapLibre GL JS                     BSD-3-Clause
-  scrollama, Observable Plot         MIT / ISC
   Tailwind CSS                       MIT
 
-Additional data and basemap attribution (fill in when used):
+No API keys are needed to build, run or serve this project.
 
-  Copernicus Sentinel-2 L2A (true-colour imagery)
-  Contains modified Copernicus Sentinel data 2026.
-  Accessed via Earth Search (Element 84).
-  Official burned-area perimeter — Tourelhe wildfire (July 2026)
+--------------------------------------------------------------------------------
+DATA ATTRIBUTION (verified 14 Nov 2026)
+--------------------------------------------------------------------------------
+
+Copernicus Sentinel-2 L2A (true-colour imagery)
+  Required notice for adapted data, per the ESA legal notice on the use of
+  Copernicus Sentinel data (Reg. (EU) No 377/2014):
+      "Contains modified Copernicus Sentinel data 2026"
+  Accessed via Earth Search (Element 84, AWS Open Data).
+
+Official burned-area perimeter — Tourelhe wildfire (July 2026)
   Attribution: Instituto da Conservação da Natureza e das Florestas, I.P. (ICNF).
+  Required form, per the ICNF geoCatalogo conditions of use:
+      ICNF, <layer name>, <download URL>, <download date>
   Source: https://www.icnf.pt/api/file/doc/7205ba3d11e327a9
   Reference: ICNF post-fire emergency stabilisation report REE_2026_004, p. 6.
-  Processing: Converted from Shapefile (EPSG:3763) to WGS84 GeoJSON.
-  License: Dataset-specific reuse terms have not been confirmed.
-  Basemap: OpenFreeMap / OpenStreetMap contributors       [attribution text to add]
+  Processing: converted from Shapefile (EPSG:3763) to WGS84 GeoJSON.
+  Licence: open data under the ICNF geoCatalogo conditions of use
+  (https://geocatalogo.icnf.pt/dados/condicoes_utilizacao.pdf) — free reuse,
+  provided the source is specified in the form above.
+
+Basemap — OpenFreeMap (public instance)
+  OpenFreeMap © OpenMapTiles. Data from OpenStreetMap.
+  The project is MIT (https://openfreemap.org/); the public instance needs no
+  API key and has no request limit. The map data is OpenStreetMap, under the
+  Open Database Licence (https://www.openstreetmap.org/copyright), and the tile
+  schema and styles are OpenMapTiles, under CC-BY 4.0.
+  MapLibre shows this attribution automatically in the map's attribution
+  control, and it is never hidden.
+
+  (CARTO basemaps were used while building the app and dropped: their 2026
+  terms require an API key for the free tier, and this project ships no keys.)
 
 Cite every source in the Space Apps project form.
 
