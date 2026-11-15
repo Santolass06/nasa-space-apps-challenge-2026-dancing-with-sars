@@ -43,6 +43,8 @@ pip-wheel-metadata/
 node_modules/
 web/dist/
 web/.vite/
+# copied from node_modules by web/scripts/copy-maplibre-worker.mjs
+web/public/maplibre/
 npm-debug.log*
 yarn-error.log*
 pnpm-debug.log*
