@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  --bg: #05070f;
+  /* --bg (the page's dark base) is set per act in moods.css */
   --bg-soft: #0b1020;
   --card: rgba(255, 255, 255, 0.04);
   --border: rgba(255, 255, 255, 0.1);
@@ -30,10 +30,7 @@ body {
   margin: 0;
   min-height: 100vh;
   color: var(--text);
-  background:
-    radial-gradient(1200px 600px at 15% -10%, rgba(79, 209, 197, 0.16), transparent 60%),
-    radial-gradient(900px 500px at 90% 0%, rgba(124, 156, 255, 0.16), transparent 55%),
-    var(--bg);
+  background: var(--bg);
 }
 
 a {
@@ -63,7 +60,7 @@ code {
   position: absolute;
   inset: -4rem 20% auto;
   height: 12rem;
-  background: radial-gradient(closest-side, rgba(79, 209, 197, 0.25), transparent);
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--mood-a) 25%, transparent), transparent);
   filter: blur(40px);
   pointer-events: none;
 }
@@ -375,7 +372,10 @@ h1 {
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--accent);
-  background: var(--bg);
+  /* The page's own background, so the band is invisible and hides what scrolls under it. */
+  background-color: var(--bg);
+  background-image: var(--mood-glow);
+  background-attachment: fixed;
 }
 
 .story__step {
