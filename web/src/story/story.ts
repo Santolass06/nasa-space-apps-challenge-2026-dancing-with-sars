@@ -44,3 +44,10 @@ export function isVector(id: string): id is VectorRef {
 
 /** "places" is drawn as HTML markers, not as a raster or a perimeter. */
 export const PLACES_ID = "places";
+
+/** What the reader sees for the layers that are not in the manifest. */
+export const OVERLAY_TITLES: Record<string, string> = {
+  [PLACES_ID]: "Places",
+  burn_official: "Official burn perimeter (ICNF)",
+  burn_nisar: "Burn perimeter from NISAR coherence",
+};

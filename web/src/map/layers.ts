@@ -185,12 +185,53 @@ export class LayerManager {
           );
         });
         this.applyPlaces();
+        this.map.on("moveend", () => this.spreadPlaces());
+        this.spreadPlaces();
       })
       .catch((error: unknown) => {
         this.placesLoading = undefined;
         console.error("places", error);
       });
     return this.placesLoading;
+  }
+
+  /**
+   * Keep the labels from sitting on top of each other (Matadegas and Mansores
+   * are 15 px apart at the story's zoom): each label takes the first free spot
+   * among "on the point", above, below, and to either side, in screen pixels.
+   */
+  private spreadPlaces(): void {
+    const taken: Array<[number, number, number, number]> = [];
+    for (const marker of this.markers) {
+      const label = marker.getElement().firstElementChild as HTMLElement | null;
+      if (!label) {
+        continue;
+      }
+      const w = label.offsetWidth;
+      const h = label.offsetHeight;
+      const at = this.map.project(marker.getLngLat());
+      const gap = 4;
+      const spots: Array<[number, number]> = [
+        [0, 0],
+        [0, -(h + gap)],
+        [0, h + gap],
+        [-(w / 2 + gap), 0],
+        [w / 2 + gap, 0],
+        [0, -2 * (h + gap)],
+        [0, 2 * (h + gap)],
+      ];
+      const free = (dx: number, dy: number) =>
+        taken.every(
+          ([x0, y0, x1, y1]) =>
+            at.x + dx + w / 2 <= x0 ||
+            at.x + dx - w / 2 >= x1 ||
+            at.y + dy + h / 2 <= y0 ||
+            at.y + dy - h / 2 >= y1,
+        );
+      const [dx, dy] = spots.find(([x, y]) => free(x, y)) ?? spots[0];
+      marker.setOffset([dx, dy]);
+      taken.push([at.x + dx - w / 2, at.y + dy - h / 2, at.x + dx + w / 2, at.y + dy + h / 2]);
+    }
   }
 
   private applyPlaces(): void {

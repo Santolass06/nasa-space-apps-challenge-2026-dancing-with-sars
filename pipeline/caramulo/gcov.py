@@ -58,7 +58,7 @@ _MONTHS = (
 
 _CAVEAT = (
     "Speckle is present. The scar darkens only slightly in backscatter; the "
-    "standing-trunk explanation in docs/DOSSIER.md is a hypothesis, not a "
+    "standing-trunk explanation is a hypothesis, not a "
     "measurement. Coherence is the fire signal."
 )
 

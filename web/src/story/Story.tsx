@@ -7,11 +7,19 @@ import Legend from "../map/Legend";
 import MapView from "../map/MapView";
 import { LayerManager } from "../map/layers";
 import { loadManifest, type Layer, type Manifest } from "../map/manifest";
-import { flatten, isVector, PLACES_ID, story, type FlatStep, type Step } from "./story";
+import {
+  flatten,
+  isVector,
+  OVERLAY_TITLES,
+  PLACES_ID,
+  story,
+  type FlatStep,
+  type Step,
+} from "./story";
 import { hectares, loadStats, type Polarization, type Stats } from "./stats";
 
 const layerTitle = (manifest: Manifest | null, id: string): string =>
-  manifest?.layers.find((layer: Layer) => layer.id === id)?.title ?? id;
+  manifest?.layers.find((layer: Layer) => layer.id === id)?.title ?? OVERLAY_TITLES[id] ?? id;
 
 /** Raster ids in the order the story will want them, starting after `from`, then the rest. */
 function preloadOrder(steps: FlatStep[], from: number, all: string[]): string[] {

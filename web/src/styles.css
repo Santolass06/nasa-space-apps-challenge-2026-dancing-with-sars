@@ -532,6 +532,31 @@ h1 {
   -webkit-line-clamp: 3;
 }
 
+.legend__caveat.is-open {
+  display: block;
+  -webkit-line-clamp: unset;
+}
+
+.legend__more {
+  margin: 0.2rem 0 0;
+  padding: 0;
+  font: inherit;
+  font-size: 0.62rem;
+  color: var(--accent);
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+.legend__scale {
+  gap: 0.5rem;
+}
+
+.legend__scale em {
+  font-style: normal;
+  opacity: 0.85;
+}
+
 .stats {
   display: grid;
   gap: 0.5rem;
@@ -648,6 +673,10 @@ h1 {
 
   .legend__caveat {
     -webkit-line-clamp: 2;
+  }
+
+  .legend__caveat.is-open {
+    -webkit-line-clamp: unset;
   }
 }
 
