@@ -18,6 +18,7 @@ Uma linha por decisão: data, decisão, quem decidiu.
 | 2026-11-14 | B6: as camadas de agosto (HH/HV) e outubro (coerência) que o `story.en.json` já citava passam a existir — o contrato exige que todos os IDs da história estejam no manifest, e sem elas qualquer PR falhava a auditoria | André (B6) |
 | 2026-11-14 | C7: camadas raster a metade da grelha (1000 px, ~46 m/px) e no formato mais leve — gray+alpha com filtro PNG "Up" para a coerência (731–810 KB), paleta de 255 cores para HH/HV e uma paleta de 216 cores para o ótico (337–382 KB); a compressão sozinha não chegava (RGBA a 1000 px ainda dava 1,07 MB e o ótico 2,5 MB). A área da cicatriz não muda: 13.517,9 ha | André (C7) |
 | 2026-11-14 | B4: diferença em dB (depois − antes) com escala divergente simétrica ±2,5 dB e composição R=HH, G=HV, B=HH/HV (razão em dB, escala 2–10). O HV cai 0,40 dB dentro da cicatriz contra 0,27 fora; o HH só 0,13 contra 0,14 — o HV muda mais do que o dossier supõe, e é isso que o D5 tem de dizer | André (B4) |
+| 2026-11-14 | B5: números do ato 4 calculados nos produtos (não nas PNG) — HH −7,55 → −7,82 dB dentro (−0,27) e −7,70 → −7,84 fora (−0,14); HV −12,45 → −13,12 dentro (−0,67) e −12,96 → −13,23 fora (−0,27); coerência dentro 0,28 (par do fogo) contra 0,70 (controlo), fora 0,53 e 0,63. O HV mexe 2,5× mais que o HH: o D5 tem de dizer isto, não a hipótese dos troncos | André (B5) |
 
 ## Frentes (atualizar sempre que alguém entra ou sai)
 
