@@ -6,7 +6,6 @@ Reads: Sentinel-2 L2A (Copernicus; no login needed).
 """
 
 import argparse
-import json
 from datetime import date
 from pathlib import Path
 
@@ -17,6 +16,7 @@ from rasterio.enums import ColorInterp, Resampling
 from rasterio.transform import from_bounds
 from rasterio.vrt import WarpedVRT
 
+from caramulo import export
 from caramulo.export import (
     downsample_rgba,
     layer_entry,
@@ -100,8 +100,8 @@ def main(argv: list[str] | None = None) -> None:
 
     manifest_path = args.out / "manifest.json"
     layers = []
-    if manifest_path.exists():
-        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    if export.manifest_target(manifest_path).exists():
+        manifest = export.read_manifest(manifest_path)
         if manifest["bounds"] != list(BBOX):
             parser.error("Existing manifest uses a different grid. Regenerate its layers first.")
         layers = manifest["layers"]
