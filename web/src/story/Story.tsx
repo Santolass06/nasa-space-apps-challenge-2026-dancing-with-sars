@@ -272,6 +272,12 @@ export default function Story() {
           .slice(0, 2)
       : [];
 
+  const legend = legendLayers.length > 0 && (
+    <div className="legend-stack">
+      {legendLayers.map((layer) => <Legend key={layer.id} layer={layer} />)}
+    </div>
+  );
+
   // Leaving the explore step closes the expanded view; while it is open the page behind stays put.
   useEffect(() => {
     if (!exploring) {
@@ -367,12 +373,7 @@ export default function Story() {
             onModeChange={setExploreMode}
             full={exploreFull}
             onFullChange={setExploreFull}
-          />
-        )}
-        {(!exploring || exploreMode === 1) &&
-          (legendLayers.length > 0 || (exploring && manifest)) && (
-          <div className={`map-hud${exploring ? " map-hud--explore" : ""}`}>
-            {exploring && manifest && (
+            picker={
               <LayerPicker
                 manifest={manifest}
                 onPick={(id) => {
@@ -380,15 +381,12 @@ export default function Story() {
                   setPicked(id);
                 }}
               />
-            )}
-            {legendLayers.length > 0 && (
-              <div className="legend-stack">
-                {legendLayers.map((layer) => (
-                  <Legend key={layer.id} layer={layer} />
-                ))}
-              </div>
-            )}
-          </div>
+            }
+            legend={legend}
+          />
+        )}
+        {!exploring && legendLayers.length > 0 && (
+          <div className="map-hud">{legend}</div>
         )}
         {steps.map(
           ({ index, step }) =>

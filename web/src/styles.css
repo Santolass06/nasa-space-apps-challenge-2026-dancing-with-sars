@@ -669,6 +669,27 @@ h1 {
   pointer-events: auto;
 }
 
+.explorer__hud {
+  position: absolute;
+  inset: 0.75rem 0.75rem auto;
+  display: grid;
+  gap: 0.4rem;
+  pointer-events: auto;
+}
+
+.explorer__controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 0.4rem;
+}
+
+.explorer--one .explorer__bar {
+  position: static;
+  max-width: 100%;
+  margin-left: auto;
+}
+
 .explorer__modes {
   display: flex;
   padding: 0.2rem;
@@ -1184,11 +1205,6 @@ h1 {
   .story__sheet .story__sources {
     font-size: 0.68rem;
   }
-
-  /* In the explore step the layout bar runs along the top; the picker goes below it. */
-  .map-hud--explore {
-    top: 3rem;
-  }
 }
 
 /* --- Landscape phones: the two columns stay, tightened to a short screen --- */
@@ -1321,10 +1337,6 @@ h1 {
     right: 0.5rem;
     left: 0.5rem;
     max-width: none;
-  }
-
-  .map-hud.map-hud--explore {
-    top: 3rem;
   }
 
   /* The bar wraps to two lines on a phone. */
