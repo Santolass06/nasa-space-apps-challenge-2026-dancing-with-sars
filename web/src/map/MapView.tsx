@@ -69,9 +69,18 @@ export default function MapView({ onReady, className, cooperativeGestures = true
       map.remove();
       mapRef.current = null;
     };
-    // Rebuilt when the gesture mode changes (the expanded explorer). Recreating is
-    // the honest way: MapLibre takes cooperativeGestures at construction only, and
-    // each caller re-adds its layers in onReady.
+  }, []);
+
+  // The mode can change while the map lives (the expanded explorer), so it is switched
+  // on the handler instead of rebuilding the map: a rebuild would reset the camera and
+  // make every caller add its layers again in onReady.
+  useEffect(() => {
+    const handler = mapRef.current?.cooperativeGestures;
+    if (cooperativeGestures) {
+      handler?.enable();
+    } else {
+      handler?.disable();
+    }
   }, [cooperativeGestures]);
 
   return <div ref={container} className={className ?? "map"} />;
