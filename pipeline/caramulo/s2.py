@@ -130,8 +130,13 @@ def main(argv: list[str] | None = None) -> None:
             ),
             caveat=CAVEATS[day],
         )
-        layers = [layer for layer in layers if layer["id"] != layer_id]
-        layers.append(entry)
+        # Replace in place: re-running must not move the entry to the end.
+        for index, layer in enumerate(layers):
+            if layer["id"] == layer_id:
+                layers[index] = entry
+                break
+        else:
+            layers.append(entry)
 
     write_manifest(manifest_path, layers)
 

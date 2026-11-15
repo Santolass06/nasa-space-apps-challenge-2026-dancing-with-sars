@@ -21,7 +21,7 @@ Revisão dos atos 1, 3 e 4 de `web/src/content/story.en.json`.
 
 ## Sobreposição com o perímetro oficial
 
-**Confirmada.** A mancha detetada pelo radar coincide em grande parte com o perímetro oficial do ICNF. Segundo os resultados da A4, a interseção cobre **94,8% da área oficial** e **90,0% da área detetada pelo radar**. As duas percentagens medem a mesma interseção, usando áreas de referência diferentes.
+**Confirmada.** A mancha detetada pelo radar coincide em grande parte com o perímetro oficial do ICNF. Segundo o `stats.json` (a fonte dos números que a app mostra), a interseção cobre **94,6% da área oficial** e **89,7% da área detetada pelo radar** (12.127,8 ha de 12.819,8 ha e de 13.517,9 ha). As duas percentagens medem a mesma interseção, usando áreas de referência diferentes.
 
 O limiar de deteção foi calibrado com os totais de área oficiais. Por isso, a semelhança entre os totais em hectares é um resultado da calibração. A sobreposição acrescenta evidência de que as duas geometrias cobrem, em grande parte, o mesmo terreno.
 

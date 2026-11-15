@@ -25,6 +25,7 @@ Uma linha por decisão: data, decisão, quem decidiu.
 | 2026-11-14 | D1: a história é comandada pelo `story.en.json` com um IntersectionObserver (sem `scrollama`); os números do ato 3 e a tabela do ato 4 vêm do `stats.json`, nunca escritos à mão | André (D1) |
 | 2026-11-14 | A7: `run.py --real` orquestra os passos pela ordem do contrato, lendo órbita e datas do nome dos produtos NISAR (nenhuma tabela de produtos à mão) e com um `--plan` que não escreve nada; o `upsert_manifest_entry` passou a substituir a entrada no lugar, para re-correr um passo não baralhar o manifest | André (A7) |
 | 2026-11-14 | L1: mapa de base trocado de CARTO para OpenFreeMap — os termos da CARTO (2026) exigem chave de API até no nível gratuito e este projeto não transporta chaves; o OpenFreeMap é grátis, sem chave e sem limite, e o MapLibre mostra a atribuição sozinho. As três linhas *verify* das fontes ficaram verificadas nas páginas oficiais (ESA, ICNF geoCatalogo, OpenFreeMap) | André (L1) |
+| 2026-11-15 | A série temporal (`series.json`, B6/D7) foi cortada: as camadas por data (hh/hv de junho a outubro, coerência de outubro) contam a história do ato 5 e o gráfico não chegou a existir. O `series.py` fica como stub e o CONTRACT deixa de a prometer | André (auditoria) |
 
 ## Frentes (atualizar sempre que alguém entra ou sai)
 
