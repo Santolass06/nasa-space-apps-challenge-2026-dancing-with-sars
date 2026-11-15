@@ -1,5 +1,8 @@
 import { type ReactNode, useEffect, useState } from "react";
 
+import { createPortal } from "react-dom";
+
+import Legend from "./Legend";
 import CompareView from "./CompareView";
 import GridView from "./GridView";
 import LayerChooser from "./LayerChooser";
@@ -48,6 +51,7 @@ type Props = {
   onFullChange: (full: boolean) => void;
   picker?: ReactNode;
   legend?: ReactNode;
+  legendTarget: HTMLElement | null;
 };
 
 const MODES: Array<{ mode: ExploreMode; label: string; hint: string }> = [
@@ -77,7 +81,7 @@ function useNarrow(): boolean {
  * The one-map mode is the story's own map; this draws the controls for all
  * three and the two- and four-map views over it.
  */
-export default function Explorer({ manifest, mode: wanted, onModeChange, full, onFullChange, picker, legend }: Props) {
+export default function Explorer({ manifest, mode: wanted, onModeChange, full, onFullChange, picker, legend, legendTarget }: Props) {
   const narrow = useNarrow();
   const mode: ExploreMode = narrow && wanted === 4 ? 2 : wanted;
   const [fourStyle, setFourStyle] = useState<FourStyle>("point");
@@ -210,7 +214,14 @@ export default function Explorer({ manifest, mode: wanted, onModeChange, full, o
           </div>
         </div>
       </div>
-      {mode === 1 && legend && <div className="explorer__legend">{legend}</div>}
+      {legendTarget && createPortal(mode === 1 ? legend : (
+        <div className="legend-stack">
+          {ids.slice(0, mode).map((id, index) => {
+            const layer = manifest.layers.find((item) => item.id === id);
+            return layer ? <Legend key={`${index}-${id}`} layer={layer} /> : null;
+          })}
+        </div>
+      ), legendTarget)}
     </div>
   );
 }
