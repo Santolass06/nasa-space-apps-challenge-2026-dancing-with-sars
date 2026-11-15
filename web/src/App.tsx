@@ -1,4 +1,7 @@
-import Story from "./story/Story";
+import { lazy, Suspense } from "react";
+
+// The story (and with it the map library) loads after the page has painted.
+const Story = lazy(() => import("./story/Story"));
 
 export default function App() {
   return (
@@ -10,9 +13,9 @@ export default function App() {
           Caramulo <span className="accent">em chamas</span>
         </h1>
         <p className="lede">
-          The largest wildfire of Portugal&apos;s 2026 season (Vouzela, 2–5 July, 12,804 ha),
-          told with NISAR L-band radar alone: what happened, how the radar saw it through the
-          smoke, and what came after.
+          The largest wildfire of Portugal&apos;s 2026 season (Vouzela, 2–5 July), told with
+          NISAR L-band radar alone: what happened, how the radar saw it through the smoke,
+          and what came after.
         </p>
         <div className="badges">
           <span className="badge">NISAR · L-band SAR</span>
@@ -21,7 +24,9 @@ export default function App() {
       </header>
 
       <main>
-        <Story />
+        <Suspense fallback={<div className="story-loading" aria-busy="true" />}>
+          <Story />
+        </Suspense>
       </main>
 
       <footer className="footer">

@@ -1,4 +1,6 @@
-import type { Layer } from "./manifest";
+import { useState } from "react";
+
+import type { Layer, LayerKind } from "./manifest";
 import { coherenceRampCss } from "./style";
 
 // The same anchors as pipeline/caramulo/export.py (`_COLORMAP_ANCHORS`): the
@@ -32,6 +34,17 @@ const RAMP: Record<string, string[]> = {
   rdbu: ["#2166ac", "#67a9cf", "#d1e5f0", "#f7f7f7", "#fddbc7", "#ef8a62", "#b2182b"],
 };
 
+/** What the two ends of the scale mean, in words (the numbers alone say nothing to most readers). */
+const ENDS: Partial<Record<LayerKind, [string, string]>> = {
+  hh: ["weaker echo", "stronger echo"],
+  hv: ["weaker echo", "stronger echo"],
+  dhh: ["dimmer", "brighter"],
+  dhv: ["dimmer", "brighter"],
+};
+
+/** Caveats longer than this fold behind "More". */
+const CAVEAT_SHORT = 110;
+
 type Props = { layer: Layer };
 
 /**
@@ -44,6 +57,9 @@ export default function Legend({ layer }: Props) {
   const ramp = isCoherence ? undefined : RAMP[layer.colormap];
   const [low, high] = layer.range;
   const suffix = layer.units === "coherence" ? "" : ` ${layer.units}`;
+  const ends = ENDS[layer.kind];
+  const [open, setOpen] = useState(false);
+  const long = layer.caveat.length > CAVEAT_SHORT;
 
   return (
     <figure className="legend">
@@ -72,17 +88,24 @@ export default function Legend({ layer }: Props) {
             <span>
               {low}
               {suffix}
+              {ends && <em> · {ends[0]}</em>}
             </span>
             <span>
               {high}
               {suffix}
+              {ends && <em> · {ends[1]}</em>}
             </span>
           </div>
         </>
       ) : (
         <p className="legend__note">Natural colour (RGB) — not a scale.</p>
       )}
-      <p className="legend__caveat">{layer.caveat}</p>
+      <p className={`legend__caveat${open ? " is-open" : ""}`}>{layer.caveat}</p>
+      {long && (
+        <button type="button" className="legend__more" onClick={() => setOpen(!open)}>
+          {open ? "Less" : "More"}
+        </button>
+      )}
     </figure>
   );
 }
