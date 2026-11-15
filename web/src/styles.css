@@ -83,30 +83,40 @@ h1 {
   letter-spacing: -0.03em;
 }
 
-/* "em chamas": flame colours, with a slow ember glow behind the letters. */
+/* "em chamas": flame colours, with an ember glow behind the letters (only its opacity moves). */
+.flame {
+  position: relative;
+  isolation: isolate;
+}
+
 .accent {
-  background: linear-gradient(100deg, #ffd166 0%, #ff9f43 32%, #ff5a2a 68%, #e0301e 100%);
-  background-size: 140% 100%;
+  background: linear-gradient(100deg, #ffd166 0%, #ff9f43 34%, #ff5a2a 70%, #e0301e 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  filter: drop-shadow(0 0 0.35em rgba(255, 90, 40, 0.32));
-  animation: ember 7s ease-in-out infinite alternate;
+}
+
+.flame::before {
+  content: "";
+  position: absolute;
+  inset: -0.1em -0.15em;
+  z-index: -1;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(255, 96, 40, 0.55), transparent);
+  filter: blur(0.3em);
+  opacity: 0.35;
+  animation: ember 6s ease-in-out infinite alternate;
+  pointer-events: none;
 }
 
 @keyframes ember {
-  from {
-    background-position: 0% 50%;
-    filter: drop-shadow(0 0 0.25em rgba(255, 90, 40, 0.22));
-  }
   to {
-    background-position: 100% 50%;
-    filter: drop-shadow(0 0 0.5em rgba(255, 110, 40, 0.5));
+    opacity: 0.7;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .accent {
+  .flame::before {
     animation: none;
   }
 }
