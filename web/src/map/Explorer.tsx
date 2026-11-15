@@ -127,15 +127,16 @@ export default function Explorer({ manifest, mode: wanted, onModeChange, full, o
                 tipsAbove
               />
             }
+            cooperativeGestures={!full}
           />
         </div>
       )}
       {mode === 4 && (
         <div className="explorer__stage">
           {full && fourStyle === "grid" ? (
-            <GridView manifest={manifest} ids={ids} onChange={setOne} />
+            <GridView manifest={manifest} ids={ids} onChange={setOne} cooperativeGestures={!full} />
           ) : (
-            <QuadView manifest={manifest} ids={ids} onChange={setOne} />
+            <QuadView manifest={manifest} ids={ids} onChange={setOne} cooperativeGestures={!full} />
           )}
         </div>
       )}

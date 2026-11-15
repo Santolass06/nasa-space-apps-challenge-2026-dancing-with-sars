@@ -12,13 +12,15 @@ type Props = {
   /** One layer id per panel (four). */
   ids: string[];
   onChange: (panel: number, id: string) => void;
+  /** Passed to every map (#82): see MapView. */
+  cooperativeGestures?: boolean;
 };
 
 /**
  * Four maps in a 2×2 grid (the expanded view's alternative to the split point), each with its own layer, all sharing one camera:
  * pan or zoom any of them and the others follow.
  */
-export default function GridView({ manifest, ids, onChange }: Props) {
+export default function GridView({ manifest, ids, onChange, cooperativeGestures }: Props) {
   const [maps, setMaps] = useState<Array<MapLibreMap | null>>([null, null, null, null]);
   const managers = useRef<Array<LayerManager | null>>([null, null, null, null]);
   const idsRef = useRef(ids);
@@ -49,7 +51,7 @@ export default function GridView({ manifest, ids, onChange }: Props) {
     <div className="grid4">
       {[0, 1, 2, 3].map((panel) => (
         <div className="grid4__panel" key={panel}>
-          <MapView className="grid4__map" onReady={makeReady(panel)} />
+          <MapView className="grid4__map" onReady={makeReady(panel)} cooperativeGestures={cooperativeGestures} />
           <div className="grid4__chooser">
             <LayerChooser
               manifest={manifest}

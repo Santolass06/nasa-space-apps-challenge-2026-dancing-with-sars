@@ -25,10 +25,17 @@ type Props = {
   /** Called once the map has loaded, so the caller can add layers (C1). */
   onReady?: (map: Map) => void;
   className?: string;
+  /**
+   * Cooperative gestures (#82): the wheel scrolls the page and Ctrl/⌘ + wheel
+   * zooms; on touch, one finger scrolls the page and two fingers move the map.
+   * Off only for the expanded explorer, where the map owns the viewport and a
+   * plain wheel is expected to zoom.
+   */
+  cooperativeGestures?: boolean;
 };
 
 /** The MapLibre map, centred on Vouzela. Layers are added by the caller (C1). */
-export default function MapView({ onReady, className }: Props) {
+export default function MapView({ onReady, className, cooperativeGestures = true }: Props) {
   const container = useRef<HTMLDivElement>(null);
   const mapRef = useRef<Map | null>(null);
   const readyRef = useRef(onReady);
@@ -47,6 +54,7 @@ export default function MapView({ onReady, className }: Props) {
       // Render at least at 2x and let the browser scale down: labels and edges
       // come out smoother on ordinary (1x) screens.
       pixelRatio: Math.max(window.devicePixelRatio || 1, 2),
+      cooperativeGestures,
     });
     map.addControl(new NavigationControl({ showCompass: false }), "bottom-right");
     map.addControl(new AttributionControl({ compact: true }), "bottom-left");
@@ -61,7 +69,10 @@ export default function MapView({ onReady, className }: Props) {
       map.remove();
       mapRef.current = null;
     };
-  }, []);
+    // Rebuilt when the gesture mode changes (the expanded explorer). Recreating is
+    // the honest way: MapLibre takes cooperativeGestures at construction only, and
+    // each caller re-adds its layers in onReady.
+  }, [cooperativeGestures]);
 
   return <div ref={container} className={className ?? "map"} />;
 }
