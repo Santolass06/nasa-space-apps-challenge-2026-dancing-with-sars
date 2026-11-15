@@ -84,6 +84,7 @@ function Act4Panel({ act4 }: { act4: Stats["act4"] }) {
 export default function Story() {
   const steps = useMemo(flatten, []);
   const [active, setActive] = useState(0);
+  const [picked, setPicked] = useState<string | null>(null);
   const [manifest, setManifest] = useState<Manifest | null>(null);
   const [stats, setStats] = useState<Stats | null>(null);
   const managerRef = useRef<LayerManager | null>(null);
@@ -160,13 +161,17 @@ export default function Story() {
   const current = steps[active] ?? steps[0];
   const comparison = current?.step.comparisons?.[0];
 
-  // C3: one legend per raster layer the step shows (at most two).
-  const legendLayers: Layer[] = current
-    ? current.step.layers
-        .map((ref) => manifest?.layers.find((layer) => layer.id === ref.id))
-        .filter((layer): layer is Layer => Boolean(layer))
-        .slice(0, 2)
-    : [];
+  // C3: one legend per raster layer the step shows (at most two), or the one
+  // the reader picked in the final step.
+  const pickedLayer = picked ? manifest?.layers.find((layer) => layer.id === picked) : undefined;
+  const legendLayers: Layer[] = pickedLayer
+    ? [pickedLayer]
+    : current
+      ? current.step.layers
+          .map((ref) => manifest?.layers.find((layer) => layer.id === ref.id))
+          .filter((layer): layer is Layer => Boolean(layer))
+          .slice(0, 2)
+      : [];
 
   // Drive the single map. Comparison steps draw their own pair instead.
   useEffect(() => {
@@ -175,6 +180,7 @@ export default function Story() {
       return;
     }
     applyStep(manager, current.step);
+    setPicked(null);
   }, [active, comparison, applyStep, current]);
 
   return (
@@ -230,20 +236,25 @@ export default function Story() {
 
       <div className="story__map">
         <MapView className="story__map-view" onReady={onMapReady} />
-        {legendLayers.length > 0 && (
-          <div className="legend-stack">
-            {legendLayers.map((layer) => (
-              <Legend key={layer.id} layer={layer} />
-            ))}
+        {(legendLayers.length > 0 || (current?.step.id === "explore-the-map" && manifest)) && (
+          <div className="map-hud">
+            {current?.step.id === "explore-the-map" && manifest && (
+              <LayerPicker
+                manifest={manifest}
+                onPick={(id) => {
+                  managerRef.current?.showLayers([id]);
+                  setPicked(id);
+                }}
+              />
+            )}
+            {legendLayers.length > 0 && (
+              <div className="legend-stack">
+                {legendLayers.map((layer) => (
+                  <Legend key={layer.id} layer={layer} />
+                ))}
+              </div>
+            )}
           </div>
-        )}
-        {current?.step.id === "explore-the-map" && manifest && (
-          <LayerPicker
-            manifest={manifest}
-            onPick={(id) => {
-              managerRef.current?.showLayers([id]);
-            }}
-          />
         )}
         {comparison && (
           <div className="story__overlay">
