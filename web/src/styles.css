@@ -1460,7 +1460,9 @@ h1 {
 }
 
 .footer {
-  margin-top: 3.5rem;
+  /* The map is sticky inside the story: it stays put until the footer comes up, then the
+     footer pushes it, never over it. This margin is the space left between the two. */
+  margin-top: 2.5rem;
   padding-top: 1.5rem;
   border-top: 1px solid var(--border);
   font-size: 0.8rem;
