@@ -107,15 +107,21 @@ export class LayerManager {
     // and the new width just reveals more of it.
     const container = map.getContainer();
     let lastWidth = container.clientWidth;
+    let lastHeight = container.clientHeight;
     let lastRight = container.getBoundingClientRect().right;
     map.on("resize", () => {
       const width = container.clientWidth;
+      const height = container.clientHeight;
       const right = container.getBoundingClientRect().right;
+      if (width === lastWidth && height === lastHeight) {
+        return; // only the drawing resolution changed, not the frame
+      }
       const grew = width - lastWidth;
       if (grew !== 0 && Math.abs(right - lastRight) < 1.5 && !map.isMoving()) {
         map.panBy([-grew / 2, 0], { duration: 0 });
       }
       lastWidth = width;
+      lastHeight = height;
       lastRight = right;
       // A window resize re-frames the same box once it has settled.
       window.clearTimeout(this.refitTimer);
