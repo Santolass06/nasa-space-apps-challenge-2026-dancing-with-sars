@@ -64,7 +64,8 @@ Basemap — OpenFreeMap (public instance)
   OpenFreeMap © OpenMapTiles. Data from OpenStreetMap.
   The project is MIT (https://openfreemap.org/); the public instance needs no
   API key and has no request limit. The map data is OpenStreetMap, under the
-  Open Database Licence (https://www.openstreetmap.org/copyright).
+  Open Database Licence (https://www.openstreetmap.org/copyright), and the tile
+  schema and styles are OpenMapTiles, under CC-BY 4.0.
   MapLibre shows this attribution automatically in the map's attribution
   control, and it is never hidden.
 
