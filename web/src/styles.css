@@ -46,7 +46,9 @@ code {
 }
 
 .page {
-  width: min(1080px, 100% - 2.5rem);
+  /* Wide screens use their width: the text starts nearer the left edge and the map gets room.
+     On a phone the margin stays 2.5 rem. */
+  width: min(1440px, 100% - clamp(2.5rem, 6vw, 5rem));
   margin: 0 auto;
   padding: 4rem 0 2rem;
 }
@@ -336,7 +338,7 @@ h1 {
 }
 
 .story.is-wide .story__map-column {
-  --map-height: min(80vh, 780px);
+  --map-height: min(82vh, 840px);
 }
 
 .focus-label {
@@ -442,14 +444,14 @@ h1 {
 
 .story__step-text {
   margin: 0 0 0.75rem;
-  font-size: 1.02rem;
+  font-size: 1.12rem;
   line-height: 1.55;
 }
 
 .story__captions {
   margin: 0;
   padding-left: 1rem;
-  font-size: 0.85rem;
+  font-size: 0.92rem;
   color: var(--muted);
 }
 
@@ -464,7 +466,7 @@ h1 {
 
 .story__sources {
   margin: 0.6rem 0 0;
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   color: var(--muted);
 }
 
@@ -473,9 +475,10 @@ h1 {
   flex: 0 1 var(--map-height);
   min-height: 200px;
   height: var(--map-height);
+  /* In a column the flex basis, not the height, sets the size: it is what has to animate. */
   transition:
-    height 0.7s cubic-bezier(0.22, 1, 0.36, 1),
-    top 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    flex-basis 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    height 0.7s cubic-bezier(0.22, 1, 0.36, 1);
   border: 1px solid var(--border);
   border-radius: 20px;
   overflow: hidden;
@@ -691,19 +694,20 @@ h1 {
 .explorer__bar {
   position: absolute;
   top: 0.75rem;
-  right: 0.75rem;
+  /* The top right of the window is the story index button's: the controls stop short of it. */
+  right: 3.75rem;
   z-index: 6;
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-end;
   gap: 0.4rem;
-  max-width: calc(100% - 1.5rem);
+  max-width: calc(100% - 4.5rem);
   pointer-events: auto;
 }
 
 .explorer__hud {
   position: absolute;
-  inset: 0.75rem 0.75rem auto;
+  inset: 0.75rem 3.75rem auto 0.75rem;
   display: grid;
   gap: 0.4rem;
   /* The strip spans the map: only the panels inside it take the pointer, so the
@@ -1023,16 +1027,6 @@ h1 {
   gap: 0.4rem;
 }
 
-.map-hud {
-  position: absolute;
-  top: 0.75rem;
-  left: 0.75rem;
-  z-index: 3;
-  display: grid;
-  gap: 0.4rem;
-  max-width: calc(100% - 1.5rem);
-}
-
 .legend {
   width: 13rem;
   margin: 0;
@@ -1241,7 +1235,7 @@ h1 {
 
 /* The sticky column owns both the image and its legends, including Expand. */
 .story__map-column {
-  --map-height: min(72vh, 680px);
+  --map-height: min(74vh, 760px);
   position: sticky;
   top: 1rem;
   align-self: start;
@@ -1257,8 +1251,8 @@ h1 {
 }
 
 .story__legend-strip {
-  flex: 0 1 auto;
-  min-height: 0;
+  /* The legends keep their height; it is the map that gives way on a short window. */
+  flex: 0 0 auto;
   max-height: 35vh;
   overflow-y: auto;
 }
@@ -1295,6 +1289,10 @@ h1 {
     order: -1;
     height: 56vh;
     max-height: none;
+  }
+
+  .story__legend-strip {
+    max-height: 24vh;
   }
 
   .story__map-column .story__map {
@@ -1402,6 +1400,37 @@ h1 {
   }
 }
 
+/* --- One slim legend on small screens: title, ramp and the two ends. The caveat opens on
+   demand. Portrait tablets get it too: their open legend covered a fifth of the map. --- */
+@media (max-width: 900px) and (orientation: portrait), (max-width: 640px), (orientation: landscape) and (max-height: 520px) {
+  .legend {
+    width: auto;
+    padding: 0.4rem 0.55rem;
+  }
+
+  .legend-stack .legend + .legend {
+    display: none;
+  }
+
+  .legend__caveat:not(.is-open),
+  .legend__note {
+    display: none;
+  }
+
+  .legend__caveat.is-open {
+    display: block;
+    -webkit-line-clamp: unset;
+  }
+}
+
+/* Fingers: the zoom buttons are 29 px by default, under the usual 44 px target. */
+@media (pointer: coarse) {
+  .maplibregl-ctrl-group button {
+    width: 40px;
+    height: 40px;
+  }
+}
+
 /* --- Compact controls on phones, in either orientation --- */
 @media (max-width: 640px), (orientation: landscape) and (max-height: 520px) {
   .explorer__bar {
@@ -1412,12 +1441,6 @@ h1 {
     flex: 1;
     min-width: 0;
     max-width: none;
-  }
-
-  /* Compact legend spacing; every visible layer keeps its own legend. */
-  .legend {
-    width: auto;
-    padding: 0.4rem 0.55rem;
   }
 
   /* Layer types: one scrolling row in the picker; hidden in the split views, where
@@ -1469,12 +1492,6 @@ h1 {
 }
 
 @media (max-width: 640px) {
-  .map-hud {
-    top: 0.5rem;
-    right: 0.5rem;
-    left: 0.5rem;
-    max-width: none;
-  }
 
   /* The bar wraps to two lines on a phone. */
   .explorer--multi .explorer__stage {
@@ -1519,4 +1536,58 @@ h1 {
   width: 100%;
   height: 100%;
   pointer-events: none;
+}
+
+/* --- Story index: a fixed button at the top right that lists the acts --- */
+.story__index {
+  position: fixed;
+  top: 0.75rem;
+  right: 0.75rem;
+  z-index: 20;
+}
+
+.story__index-toggle,
+.story__index nav {
+  color: var(--text);
+  background: var(--bg-soft, #0b1020);
+  border: 1px solid var(--border);
+  border-radius: 0.6rem;
+}
+
+.story__index-toggle {
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  margin-inline-start: auto;
+  place-items: center;
+  cursor: pointer;
+}
+
+.story__index nav {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  width: min(16rem, calc(100vw - 2rem));
+  padding: 0.5rem;
+}
+
+.story__index nav[hidden] {
+  display: none;
+}
+
+.story__index nav a {
+  display: block;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.35rem;
+}
+
+.story__index nav a:hover,
+.story__index nav a:focus-visible {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* The act the reader is in. */
+.story__index nav a[aria-current="location"] {
+  color: var(--act-accent);
+  font-weight: 600;
 }

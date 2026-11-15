@@ -17,7 +17,9 @@ import {
   type FlatStep,
   type Step,
 } from "./storyTypes";
+import { startMoodDrift } from "../moodDrift";
 import Embers from "./Embers";
+import StoryIndex from "./StoryIndex";
 import { hectares, loadStats, type Polarization, type Stats } from "./stats";
 
 /**
@@ -307,6 +309,9 @@ export default function Story() {
     };
   }, [activeAct]);
 
+  // The glow behind the page drifts while the reader rests (the act labels exist by now).
+  useEffect(() => startMoodDrift(), []);
+
   // Leaving the explore step closes the expanded view; while it is open the page behind stays put.
   useEffect(() => {
     if (!exploring) {
@@ -370,6 +375,7 @@ export default function Story() {
   return (
     <div className={`story${current?.step.focus || current?.step.wide ? " is-wide" : ""}`}>
       <Embers active={activeAct === "fire"} />
+      <StoryIndex acts={story.acts} activeAct={activeAct} />
       <div className="story__text">
         {story.acts.map((act) => (
           <section className="story__act" key={act.id} id={`act-${act.id}`}>
@@ -379,6 +385,7 @@ export default function Story() {
               .map((item) => (
                 <article
                   key={item.step.id}
+                  id={`step-${item.step.id}`}
                   data-step={item.index}
                   ref={(element) => {
                     stepRefs.current[item.index] = element;
@@ -460,7 +467,13 @@ export default function Story() {
             </div>
           )}
         </div>
-        <div className="story__legend-strip" ref={setLegendTarget} role="region" aria-label="Visible layer legends">
+        <div
+          className="story__legend-strip"
+          ref={setLegendTarget}
+          {...(exploring || legendLayers.length > 0
+            ? { role: "region", "aria-label": "Visible layer legends" }
+            : {})}
+        >
           {!exploring && legend}
         </div>
       </div>
