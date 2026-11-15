@@ -1,4 +1,5 @@
 import type { Layer } from "./manifest";
+import { coherenceRampCss } from "./style";
 
 // The same anchors as pipeline/caramulo/export.py (`_COLORMAP_ANCHORS`): the
 // pipeline interpolates evenly between them, so a CSS gradient with the same
@@ -39,14 +40,28 @@ type Props = { layer: Layer };
  * known colormap, it gets a legend for free.
  */
 export default function Legend({ layer }: Props) {
-  const ramp = RAMP[layer.colormap];
+  const isCoherence = layer.kind === "coh";
+  const ramp = isCoherence ? undefined : RAMP[layer.colormap];
   const [low, high] = layer.range;
   const suffix = layer.units === "coherence" ? "" : ` ${layer.units}`;
 
   return (
     <figure className="legend">
       <figcaption className="legend__title">{layer.title}</figcaption>
-      {ramp ? (
+      {isCoherence ? (
+        <>
+          <div
+            className="legend__ramp"
+            style={{ background: coherenceRampCss() }}
+            aria-hidden="true"
+          />
+          <div className="legend__scale">
+            <span>0 (low)</span>
+            <span>1 (high)</span>
+          </div>
+          <p className="legend__note">Colour marks low coherence (smoothed for display); it is transparent where coherence is high.</p>
+        </>
+      ) : ramp ? (
         <>
           <div
             className="legend__ramp"
