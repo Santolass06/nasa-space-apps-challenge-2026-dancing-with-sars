@@ -140,14 +140,16 @@ def backscatter_db(power: np.ndarray) -> np.ndarray:
 def backscatter_layer(h5_path: Path, pol: str, orbit: str, date: str, out_dir: Path) -> dict:
     """Write one backscatter PNG and return its manifest entry."""
     layer_id = f"{pol}_{orbit}_{date.replace('-', '')}"
-    db = export.downsample2(backscatter_db(power_on_grid(h5_path, pol)))
     vmin, vmax = _RANGES[pol]
-    index = export.scalar_index(db, _COLORMAPS[pol], vmin, vmax)
-    export.write_palette_png(out_dir / f"{layer_id}.png", index, _COLORMAPS[pol])
+    for db, name in export.lod_fields(backscatter_db(power_on_grid(h5_path, pol)), layer_id):
+        index = export.scalar_index(db, _COLORMAPS[pol], vmin, vmax)
+        export.write_palette_png(out_dir / name, index, _COLORMAPS[pol])
+    half, full = export.lod_files(layer_id)
     return export.layer_entry(
         layer_id=layer_id,
         kind=pol,
-        file=f"{layer_id}.png",
+        file=half,
+        hires=full,
         orbit=orbit,
         dates=[date],
         title=f"Backscatter {pol.upper()}, {_pretty(date)}",
@@ -166,14 +168,16 @@ def difference_layer(
     d1, d2 = dates
     layer_id = f"d{pol}_{orbit}_{d1.replace('-', '')}_{d2.replace('-', '')}"
     change = backscatter_db(power_on_grid(after, pol)) - backscatter_db(power_on_grid(before, pol))
-    change = export.downsample2(change)
     vmin, vmax = _DIFF_RANGE
-    index = export.scalar_index(change, "rdbu", vmin, vmax)
-    export.write_palette_png(out_dir / f"{layer_id}.png", index, "rdbu")
+    for field, name in export.lod_fields(change, layer_id):
+        index = export.scalar_index(field, "rdbu", vmin, vmax)
+        export.write_palette_png(out_dir / name, index, "rdbu")
+    half, full = export.lod_files(layer_id)
     return export.layer_entry(
         layer_id=layer_id,
         kind=f"d{pol}",
-        file=f"{layer_id}.png",
+        file=half,
+        hires=full,
         orbit=orbit,
         dates=[d1, d2],
         title=f"Backscatter change {pol.upper()}, {_pretty(d1)} to {_pretty(d2)}",
@@ -188,31 +192,36 @@ def difference_layer(
 def rgb_layer(h5_path: Path, orbit: str, date: str, out_dir: Path) -> dict:
     """Write the HH/HV/HH-HV colour composite of one date and return its manifest entry."""
     layer_id = f"rgb_{orbit}_{date.replace('-', '')}"
-    hh = export.downsample2(backscatter_db(power_on_grid(h5_path, "hh")))
-    hv = export.downsample2(backscatter_db(power_on_grid(h5_path, "hv")))
-    ratio = hh - hv
+    hh_full = backscatter_db(power_on_grid(h5_path, "hh"))
+    hv_full = backscatter_db(power_on_grid(h5_path, "hv"))
 
     def stretch(data: np.ndarray, limits: tuple[float, float]) -> np.ndarray:
         low, high = limits
         return np.clip((data - low) / (high - low), 0.0, 1.0)
 
-    rgb = np.stack(
-        [
-            stretch(hh, _RANGES["hh"]),
-            stretch(hv, _RANGES["hv"]),
-            stretch(ratio, _RATIO_RANGE),
-        ],
-        axis=-1,
-    )
-    valid = np.isfinite(hh) & np.isfinite(hv)
-    rgb = np.round(np.nan_to_num(rgb * 255.0, nan=0.0)).astype(np.uint8)
-    index, palette = export.rgb_index(rgb)
-    index[~valid] = 255  # the four nodata pixels at the swath edge stay transparent
-    export.write_palette_png(out_dir / f"{layer_id}.png", index, palette)
+    for (hh, name), (hv, _) in zip(
+        export.lod_fields(hh_full, layer_id), export.lod_fields(hv_full, layer_id), strict=True
+    ):
+        ratio = hh - hv
+        rgb = np.stack(
+            [
+                stretch(hh, _RANGES["hh"]),
+                stretch(hv, _RANGES["hv"]),
+                stretch(ratio, _RATIO_RANGE),
+            ],
+            axis=-1,
+        )
+        valid = np.isfinite(hh) & np.isfinite(hv)
+        rgb = np.round(np.nan_to_num(rgb * 255.0, nan=0.0)).astype(np.uint8)
+        index, palette = export.rgb_index(rgb)
+        index[~valid] = 255  # the nodata pixels at the swath edge stay transparent
+        export.write_palette_png(out_dir / name, index, palette)
+    half, full = export.lod_files(layer_id)
     return export.layer_entry(
         layer_id=layer_id,
         kind="rgb",
-        file=f"{layer_id}.png",
+        file=half,
+        hires=full,
         orbit=orbit,
         dates=[date],
         title=f"Colour composite (HH, HV, HH/HV), {_pretty(date)}",

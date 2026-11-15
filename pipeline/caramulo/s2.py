@@ -20,6 +20,7 @@ from rasterio.vrt import WarpedVRT
 from caramulo.export import (
     downsample_rgba,
     layer_entry,
+    lod_files,
     rgb_index,
     rgb_rgba,
     write_manifest,
@@ -106,18 +107,20 @@ def main(argv: list[str] | None = None) -> None:
         layers = manifest["layers"]
 
     catalog = Client.open(CATALOG_URL)
-    images = {day: downsample_rgba(render_scene(catalog, day)) for day in SCENES}
+    images = {day: render_scene(catalog, day) for day in SCENES}
 
     for day, rgba in images.items():
         layer_id = f"s2_{day:%Y%m%d}"
-        filename = f"{layer_id}.png"
-        index, palette = rgb_index(rgba[..., :3])
-        index[rgba[..., 3] < 128] = 255
-        write_palette_png(args.out / filename, index, palette)
+        filename, hires = lod_files(layer_id)
+        for image, name in ((downsample_rgba(rgba), filename), (rgba, hires)):
+            index, palette = rgb_index(image[..., :3])
+            index[image[..., 3] < 128] = 255
+            write_palette_png(args.out / name, index, palette)
         entry = layer_entry(
             layer_id=layer_id,
             kind="s2",
             file=filename,
+            hires=hires,
             orbit=None,
             dates=[day.isoformat()],
             title=f"Sentinel-2 true colour, {day:%d %b %Y}",
