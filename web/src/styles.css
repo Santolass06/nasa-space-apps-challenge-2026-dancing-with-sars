@@ -1402,3 +1402,13 @@ h1 {
 .story-loading {
   min-height: 70vh;
 }
+
+/* Ash falling behind the page in the fire act (Embers.tsx): never over text or maps. */
+.embers {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}

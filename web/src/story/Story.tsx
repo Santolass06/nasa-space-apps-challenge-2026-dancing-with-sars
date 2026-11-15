@@ -17,6 +17,7 @@ import {
   type FlatStep,
   type Step,
 } from "./storyTypes";
+import Embers from "./Embers";
 import { hectares, loadStats, type Polarization, type Stats } from "./stats";
 
 /**
@@ -353,6 +354,7 @@ export default function Story() {
 
   return (
     <div className={`story${current?.step.focus ? " is-wide" : ""}`}>
+      <Embers active={activeAct === "fire"} />
       <div className="story__text">
         {story.acts.map((act) => (
           <section className="story__act" key={act.id} id={`act-${act.id}`}>
