@@ -352,14 +352,20 @@ a,
     color 1.1s ease;
 }
 
-/* While the reader rests, the blobs drift (moodDrift.ts sets data-drift); they ease in slowly
-   and ease back to their places quickly when the reader moves again. */
-:root[data-drift] {
+/* The blobs always drift (moodDrift.ts sets data-drift): a third of the way while the reader
+   scrolls or moves, and they open up slowly to the full amplitude after a few quiet seconds.
+   Without the attribute (no script, or reduced motion) they stay where they are. */
+:root[data-drift="full"] {
   --amp-dur: 4s;
 }
 
-:root[data-drift] body::before,
-:root[data-drift] .story__act-title {
+:root[data-drift="low"] body::before,
+:root[data-drift="low"] .story__act-title {
+  --amp: 0.35;
+}
+
+:root[data-drift="full"] body::before,
+:root[data-drift="full"] .story__act-title {
   --amp: 1;
 }
 

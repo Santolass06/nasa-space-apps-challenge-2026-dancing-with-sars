@@ -51,9 +51,10 @@ export default function MapView({ onReady, className, cooperativeGestures = true
       center: VOUZELA,
       zoom: 10.5,
       attributionControl: false,
-      // Render at least at 2x and let the browser scale down: labels and edges
-      // come out smoother on ordinary (1x) screens.
-      pixelRatio: Math.max(window.devicePixelRatio || 1, 2),
+      // Render at 2x and let the browser scale: labels and edges come out smoother on
+      // ordinary (1x) screens. Never above 2x: a phone at 3x would draw 2.25 times the
+      // pixels (and the explorer can have four maps) for no visible gain.
+      pixelRatio: 2,
       cooperativeGestures,
     });
     // The story widens and narrows the map frame after frame. A canvas at 2x that is

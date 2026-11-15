@@ -332,16 +332,21 @@ export default function Story() {
       return;
     }
     const now = performance.now();
-    manager.setPace(now - lastApplied.current < FAST_SCROLL_MS);
+    // A flick of the thumb passes several steps in a second: on a phone the moves keep their
+    // full length, so each step still shows what it changed instead of flashing past.
+    manager.setPace(!window.matchMedia(STACKED).matches && now - lastApplied.current < FAST_SCROLL_MS);
     lastApplied.current = now;
     applyStep(manager, current.step);
     setPicked(null);
   }, [applied, comparison, applyStep, current]);
 
   /** The text of a step: its sentence, one caption per layer, sources, and the numbers panels. */
-  const stepContent = (item: FlatStep) => (
+  const actSteps = steps.filter((item) => item.act.id === steps[active]?.act.id);
+  const actPosition = actSteps.findIndex((item) => item.index === active);
+
+  const stepContent = (item: FlatStep, compact = false) => {
+    const details = (
     <>
-          <p className="story__step-text">{item.step.text}</p>
           <ul className="story__captions">
             {item.step.layers.map((ref) => (
               <li key={ref.id}>
@@ -363,6 +368,19 @@ export default function Story() {
               ))}
             </p>
           )}
+    </>
+    );
+    return (
+    <>
+          <p className="story__step-text">{item.step.text}</p>
+          {compact ? (
+            <details className="story__more">
+              <summary>About these layers</summary>
+              {details}
+            </details>
+          ) : (
+            details
+          )}
           {item.index === active && item.act.id === "scar" && !item.step.focus && stats && (
             <StatsPanel stats={stats} />
           )}
@@ -370,12 +388,13 @@ export default function Story() {
             <Act4Panel act4={stats.act4} />
           )}
     </>
-  );
+    );
+  };
 
   return (
     <div className={`story${current?.step.focus || current?.step.wide ? " is-wide" : ""}`}>
       <Embers active={activeAct === "fire"} />
-      <StoryIndex acts={story.acts} activeAct={activeAct} />
+      {!stacked && <StoryIndex acts={story.acts} activeAct={activeAct} />}
       <div className="story__text">
         {story.acts.map((act) => (
           <section className="story__act" key={act.id} id={`act-${act.id}`}>
@@ -480,9 +499,18 @@ export default function Story() {
 
       {stacked && (
         <div className="story__sheet" role="region" aria-live="polite" aria-label="About this view">
-          <p className="story__sheet-act">{steps[active].act.title}</p>
+          <div className="story__sheet-progress" aria-hidden="true">
+            <span style={{ width: `${((actPosition + 1) / actSteps.length) * 100}%` }} />
+          </div>
+          <div className="story__sheet-head">
+            <p className="story__sheet-act">{steps[active].act.title}</p>
+            <span className="story__sheet-count">
+              {actPosition + 1} / {actSteps.length}
+            </span>
+            <StoryIndex acts={story.acts} activeAct={activeAct} inline />
+          </div>
           <div className="story__sheet-body" key={steps[active].step.id}>
-            {stepContent(steps[active])}
+            {stepContent(steps[active], true)}
           </div>
         </div>
       )}

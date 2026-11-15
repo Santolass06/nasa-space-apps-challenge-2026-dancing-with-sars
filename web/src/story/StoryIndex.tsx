@@ -4,6 +4,8 @@ type Props = {
   acts: Array<{ id: string; title: string }>;
   /** The act the reader is in, marked in the list. */
   activeAct?: string;
+  /** In the phone's sheet: a small button in the sheet's header, the list as a panel above it. */
+  inline?: boolean;
 };
 
 /**
@@ -11,7 +13,7 @@ type Props = {
  * The links are plain anchors (`#act-<id>`, `#step-explore-the-map`), so the browser does
  * the scrolling and Back returns to where the reader was.
  */
-export default function StoryIndex({ acts, activeAct }: Props) {
+export default function StoryIndex({ acts, activeAct, inline }: Props) {
   const [open, setOpen] = useState(false);
   const root = useRef<HTMLDivElement>(null);
   const toggle = useRef<HTMLButtonElement>(null);
@@ -43,7 +45,7 @@ export default function StoryIndex({ acts, activeAct }: Props) {
   const close = () => setOpen(false);
 
   return (
-    <div className="story__index" ref={root}>
+    <div className={`story__index${inline ? " story__index--inline" : ""}`} ref={root}>
       <button
         ref={toggle}
         type="button"
