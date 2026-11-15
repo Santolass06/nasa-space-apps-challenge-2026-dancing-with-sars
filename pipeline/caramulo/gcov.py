@@ -20,14 +20,16 @@ from __future__ import annotations
 
 import argparse
 import gc
+import json
 from pathlib import Path
 
 import h5py
 import numpy as np
+from rasterio.features import rasterize
 from rasterio.transform import from_bounds, from_origin
-from rasterio.warp import Resampling, reproject
+from rasterio.warp import Resampling, reproject, transform_geom
 
-from caramulo import export
+from caramulo import export, gunw
 from caramulo.grid import CRS, EXTENT_3857, HEIGHT, WIDTH
 
 # GCOV layout confirmed on the first real file (task B1, 2026-11-14): the
@@ -222,13 +224,101 @@ def rgb_layer(h5_path: Path, orbit: str, date: str, out_dir: Path) -> dict:
     )
 
 
+def _scar_mask(layers_dir: Path) -> np.ndarray:
+    """Burn polygon rasterised on the analysis grid (burn_nisar.geojson)."""
+    feature = json.loads((layers_dir / "burn_nisar.geojson").read_text(encoding="utf-8"))
+    geometry = feature["features"][0]["geometry"]
+    geom_merc = transform_geom("EPSG:4326", CRS, geometry)
+    grid = rasterize(
+        [(geom_merc, 1)],
+        out_shape=(HEIGHT, WIDTH),
+        transform=from_bounds(*EXTENT_3857, WIDTH, HEIGHT),
+        fill=0,
+        dtype="uint8",
+    )
+    return np.asarray(grid, dtype="uint8").astype(bool)
+
+
+def _means(data: np.ndarray, scar: np.ndarray) -> dict[str, float]:
+    """Mean inside the scar and outside it, ignoring non-finite pixels."""
+    valid = np.isfinite(data)
+    return {
+        "inside": round(float(np.mean(data[valid & scar])), 3),
+        "outside": round(float(np.mean(data[valid & ~scar])), 3),
+    }
+
+
+def act4_numbers(layers_dir: Path, data_dir: Path) -> dict:
+    """Means of HH, HV and coherence inside/outside the scar, before and after (B5).
+
+    Computed from the products (not from the PNG layers), so the palette
+    quantisation does not leak into the numbers. Writes the table into
+    stats.json and returns it.
+    """
+    manifest = json.loads((layers_dir / "manifest.json").read_text(encoding="utf-8"))
+    by_id = {layer["id"]: layer for layer in manifest["layers"]}
+    scar = _scar_mask(layers_dir)
+    dates = {"before": "2026-06-29", "after": "2026-07-11"}
+
+    table: dict = {
+        "method": (
+            "mean inside the burn polygon vs the rest of the grid, computed from "
+            "the products, not from the PNG layers"
+        ),
+        "dates": dates,
+        "backscatter_db": {},
+        "coherence": {},
+    }
+
+    for pol in ("hh", "hv"):
+        row: dict = {}
+        for label, date in dates.items():
+            source = data_dir / by_id[f"{pol}_D52_{date.replace('-', '')}"]["source"]
+            row[label] = _means(backscatter_db(power_on_grid(source, pol)), scar)
+        row["change_inside_db"] = round(row["after"]["inside"] - row["before"]["inside"], 3)
+        row["change_outside_db"] = round(row["after"]["outside"] - row["before"]["outside"], 3)
+        table["backscatter_db"][pol] = row
+
+    coherence_pairs = (
+        ("fire", "coh_D52_20260629_20260711"),
+        ("control", "coh_D52_20260711_20260723"),
+    )
+    for label, layer_id in coherence_pairs:
+        source = data_dir / by_id[layer_id]["source"]
+        table["coherence"][label] = _means(gunw.coherence_on_grid(source), scar)
+
+    hh = table["backscatter_db"]["hh"]
+    hv = table["backscatter_db"]["hv"]
+    fire = table["coherence"]["fire"]
+    control = table["coherence"]["control"]
+    factor = float("nan")
+    if hh["change_inside_db"]:
+        factor = hv["change_inside_db"] / hh["change_inside_db"]
+    table["answer"] = (
+        f"Inside the scar HV changes {hv['change_inside_db']:+.2f} dB and HH "
+        f"{hh['change_inside_db']:+.2f} dB between {dates['before']} and {dates['after']}; "
+        f"outside, {hv['change_outside_db']:+.2f} and {hh['change_outside_db']:+.2f} dB. "
+        f"HV moves {factor:.1f}x more than HH inside the scar: the scar is visible in HV "
+        f"and barely in HH. Coherence inside the scar is {fire['inside']:.2f} in the fire "
+        f"pair against {control['inside']:.2f} in the control pair (a drop of "
+        f"{control['inside'] - fire['inside']:.2f}); outside it is {fire['outside']:.2f} "
+        f"and {control['outside']:.2f}."
+    )
+
+    stats_path = layers_dir / "stats.json"
+    stats = json.loads(stats_path.read_text(encoding="utf-8")) if stats_path.exists() else {}
+    stats["act4"] = table
+    stats_path.write_text(json.dumps(stats, indent=2) + "\n", encoding="utf-8")
+    return table
+
+
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
     )
-    parser.add_argument("h5", type=Path, help="GCOV .h5 file")
-    parser.add_argument("--orbit", required=True, help="orbit name, e.g. D52")
-    parser.add_argument("--date", required=True, help="acquisition date (YYYY-MM-DD)")
+    parser.add_argument("h5", type=Path, nargs="?", help="GCOV .h5 file (omit with --act4)")
+    parser.add_argument("--orbit", help="orbit name, e.g. D52")
+    parser.add_argument("--date", help="acquisition date (YYYY-MM-DD)")
     parser.add_argument(
         "--out",
         type=Path,
@@ -251,11 +341,28 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         action="store_true",
         help="also write the HH/HV/HH-HV colour composite of this date",
     )
+    parser.add_argument(
+        "--act4",
+        action="store_true",
+        help="write the act-4 table (HH, HV and coherence inside/outside the scar) to stats.json",
+    )
+    parser.add_argument(
+        "--data",
+        type=Path,
+        default=Path("../data/raw"),
+        help="directory with the products (default: ../data/raw)",
+    )
     return parser.parse_args(argv)
 
 
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
+    if args.act4:
+        table = act4_numbers(args.out, args.data)
+        print(json.dumps(table, indent=2))
+        return 0
+    if args.h5 is None or args.orbit is None or args.date is None:
+        raise SystemExit("give a GCOV .h5 file with --orbit and --date (or use --act4)")
     if args.difference is not None and args.before_date is None:
         raise SystemExit("--difference needs --before-date")
     extras = args.difference is not None or args.rgb
