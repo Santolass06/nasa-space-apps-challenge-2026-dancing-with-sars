@@ -17,6 +17,7 @@ import {
   type FlatStep,
   type Step,
 } from "./storyTypes";
+import { startMoodDrift } from "../moodDrift";
 import Embers from "./Embers";
 import { hectares, loadStats, type Polarization, type Stats } from "./stats";
 
@@ -308,6 +309,9 @@ export default function Story() {
       delete root.dataset.act;
     };
   }, [activeAct]);
+
+  // The glow behind the page drifts while the reader rests (the act labels exist by now).
+  useEffect(() => startMoodDrift(), []);
 
   // Leaving the explore step closes the expanded view; while it is open the page behind stays put.
   useEffect(() => {
