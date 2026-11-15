@@ -5,6 +5,12 @@ import { useEffect } from "react";
  * Keep the cameras of several maps identical: move one and the others follow.
  * The equality check is what stops the loop (a jumpTo fires "move" on the
  * others, and the second pass finds nothing to change).
+ *
+ * The copy waits for the next frame. When the story's frame changes width it resizes every
+ * map of the group at once and each one shifts its own camera so its ground stays still;
+ * copied from one map in the middle of that, a twin that had not shifted yet would write its
+ * old camera back over the corrected one and the picture slid by half the frame change. A
+ * frame later both have shifted, their cameras agree, and there is nothing to copy.
  */
 export function useSyncedMaps(maps: Array<MapLibreMap | null>): void {
   useEffect(() => {
@@ -12,7 +18,8 @@ export function useSyncedMaps(maps: Array<MapLibreMap | null>): void {
     if (ready.length < 2) {
       return;
     }
-    const follow = (from: MapLibreMap) => () => {
+    let scheduled = 0;
+    const copy = (from: MapLibreMap) => {
       const a = from.getCenter();
       for (const to of ready) {
         if (to === from) {
@@ -34,11 +41,22 @@ export function useSyncedMaps(maps: Array<MapLibreMap | null>): void {
         });
       }
     };
+    const follow = (from: MapLibreMap) => () => {
+      // One copy per frame: the first map to move is the one the others follow.
+      if (scheduled) {
+        return;
+      }
+      scheduled = requestAnimationFrame(() => {
+        scheduled = 0;
+        copy(from);
+      });
+    };
     const handlers = ready.map((map) => [map, follow(map)] as const);
     for (const [map, handler] of handlers) {
       map.on("move", handler);
     }
     return () => {
+      cancelAnimationFrame(scheduled);
       for (const [map, handler] of handlers) {
         map.off("move", handler);
       }
