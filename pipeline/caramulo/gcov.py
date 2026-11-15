@@ -58,7 +58,7 @@ _MONTHS = (
 
 _CAVEAT = (
     "Speckle is present. The scar darkens only slightly in backscatter; the "
-    "standing-trunk explanation in docs/DOSSIER.md is a hypothesis, not a "
+    "standing-trunk explanation is a hypothesis, not a "
     "measurement. Coherence is the fire signal."
 )
 
@@ -248,6 +248,30 @@ def _means(data: np.ndarray, scar: np.ndarray) -> dict[str, float]:
     }
 
 
+def act4_answer(table: dict) -> str:
+    """The act-4 sentence, built only from the numbers in the table.
+
+    Taking just the table means it can be rebuilt without reading the products.
+    """
+    hh, hv = table["backscatter_db"]["hh"], table["backscatter_db"]["hv"]
+    fire, control = table["coherence"]["fire"], table["coherence"]["control"]
+    dates = table["dates"]
+    net_hv = hv["change_inside_db"] - hv["change_outside_db"]
+    net_hh = hh["change_inside_db"] - hh["change_outside_db"]
+    return (
+        f"Between {dates['before']} and {dates['after']}, HV changes {hv['change_inside_db']:+.2f} "
+        f"dB inside the scar and {hv['change_outside_db']:+.2f} dB outside; HH "
+        f"{hh['change_inside_db']:+.2f} and {hh['change_outside_db']:+.2f} dB. Net of the change "
+        f"outside, that is {net_hv:+.2f} dB in HV and {net_hh:+.2f} dB in HH: small, a few tenths "
+        "of a dB, with speckle dominating at pixel level. It fits the standing-trunk hypothesis "
+        "(HH, sensitive to trunk echo, hardly moves; the HV volume signal drops a little), but "
+        "that explanation is not tested. Coherence, not brightness, is the fire signal: inside "
+        f"the scar it is {fire['inside']:.2f} in the fire pair against {control['inside']:.2f} in "
+        f"the control pair (a drop of {control['inside'] - fire['inside']:.2f}); outside it is "
+        f"{fire['outside']:.2f} and {control['outside']:.2f}."
+    )
+
+
 def act4_numbers(layers_dir: Path, data_dir: Path) -> dict:
     """Means of HH, HV and coherence inside/outside the scar, before and after (B5).
 
@@ -287,23 +311,7 @@ def act4_numbers(layers_dir: Path, data_dir: Path) -> dict:
         source = data_dir / by_id[layer_id]["source"]
         table["coherence"][label] = _means(gunw.coherence_on_grid(source), scar)
 
-    hh = table["backscatter_db"]["hh"]
-    hv = table["backscatter_db"]["hv"]
-    fire = table["coherence"]["fire"]
-    control = table["coherence"]["control"]
-    factor = float("nan")
-    if hh["change_inside_db"]:
-        factor = hv["change_inside_db"] / hh["change_inside_db"]
-    table["answer"] = (
-        f"Inside the scar HV changes {hv['change_inside_db']:+.2f} dB and HH "
-        f"{hh['change_inside_db']:+.2f} dB between {dates['before']} and {dates['after']}; "
-        f"outside, {hv['change_outside_db']:+.2f} and {hh['change_outside_db']:+.2f} dB. "
-        f"HV moves {factor:.1f}x more than HH inside the scar: the scar is visible in HV "
-        f"and barely in HH. Coherence inside the scar is {fire['inside']:.2f} in the fire "
-        f"pair against {control['inside']:.2f} in the control pair (a drop of "
-        f"{control['inside'] - fire['inside']:.2f}); outside it is {fire['outside']:.2f} "
-        f"and {control['outside']:.2f}."
-    )
+    table["answer"] = act4_answer(table)
 
     stats_path = layers_dir / "stats.json"
     stats = json.loads(stats_path.read_text(encoding="utf-8")) if stats_path.exists() else {}

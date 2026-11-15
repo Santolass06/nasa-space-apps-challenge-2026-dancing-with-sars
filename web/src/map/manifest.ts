@@ -5,6 +5,8 @@ export type Layer = {
   id: string;
   kind: LayerKind;
   file: string;
+  /** The full-grid version (2000 px), loaded when the reader zooms in. Optional. */
+  hires?: string;
   orbit: string | null;
   dates: string[];
   title: string;
@@ -47,4 +49,8 @@ export async function loadManifest(): Promise<Manifest> {
 
 export function layerUrl(layer: Layer): string {
   return `${layersBase()}${layer.file}`;
+}
+
+export function layerHiresUrl(layer: Layer): string | undefined {
+  return layer.hires ? `${layersBase()}${layer.hires}` : undefined;
 }

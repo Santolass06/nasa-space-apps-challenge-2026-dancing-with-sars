@@ -43,7 +43,7 @@
       ],
       "colormap": "gray",
       "source": "NISAR_L2_PR_GUNW_025_052_D_068_026_2000_SH_20260711T193423_20260711T193458_20260723T193423_20260723T193458_P05023_N_F_J_001.h5",
-      "caveat": "Low coherence also occurs over water and dense forest; this pair brackets the fire (2-5 Jul 2026)."
+      "caveat": "Low coherence also occurs over water and dense forest; both acquisitions are after the fire (2-5 Jul 2026)."
     },
     {
       "id": "s2_20260629",
@@ -98,7 +98,7 @@
       ],
       "colormap": "gray",
       "source": "NISAR_L2_PR_GUNW_023_052_D_068_024_2000_SH_20260617T193425_20260617T193500_20260629T193424_20260629T193459_P05023_N_F_J_001.h5",
-      "caveat": "Low coherence also occurs over water and dense forest; this pair brackets the fire (2-5 Jul 2026)."
+      "caveat": "Low coherence also occurs over water and dense forest; both acquisitions are before the fire (2-5 Jul 2026)."
     },
     {
       "id": "coh_A15_20260627_20260709",
@@ -136,7 +136,7 @@
       ],
       "colormap": "gray",
       "source": "NISAR_L2_PR_GUNW_023_116_A_022_024_2000_SH_20260622T054039_20260622T054111_20260704T054038_20260704T054111_P05023_N_F_J_001.h5",
-      "caveat": "Low coherence also occurs over water and dense forest; this pair brackets the fire (2-5 Jul 2026)."
+      "caveat": "Low coherence also occurs over water and dense forest; the second acquisition falls during the fire (2-5 Jul 2026)."
     },
     {
       "id": "coh_D124_20260622_20260704",
@@ -155,7 +155,7 @@
       ],
       "colormap": "gray",
       "source": "NISAR_L2_PR_GUNW_023_124_D_068_024_2000_SH_20260622T192605_20260622T192640_20260704T192605_20260704T192639_P05023_N_F_J_001.h5",
-      "caveat": "Low coherence also occurs over water and dense forest; this pair brackets the fire (2-5 Jul 2026)."
+      "caveat": "Low coherence also occurs over water and dense forest; the second acquisition falls during the fire (2-5 Jul 2026)."
     },
     {
       "id": "hh_D52_20260629",
@@ -173,7 +173,7 @@
       ],
       "colormap": "viridis",
       "source": "NISAR_L2_PR_GCOV_024_052_D_068_2005_DHDH_A_20260629T193424_20260629T193459_P05023_N_F_J_001.h5",
-      "caveat": "Speckle is present. The scar darkens only slightly in backscatter; the standing-trunk explanation in docs/DOSSIER.md is a hypothesis, not a measurement. Coherence is the fire signal."
+      "caveat": "Speckle is present. The scar darkens only slightly in backscatter; the standing-trunk explanation is a hypothesis, not a measurement. Coherence is the fire signal."
     },
     {
       "id": "hv_D52_20260629",
@@ -191,7 +191,7 @@
       ],
       "colormap": "magma",
       "source": "NISAR_L2_PR_GCOV_024_052_D_068_2005_DHDH_A_20260629T193424_20260629T193459_P05023_N_F_J_001.h5",
-      "caveat": "Speckle is present. The scar darkens only slightly in backscatter; the standing-trunk explanation in docs/DOSSIER.md is a hypothesis, not a measurement. Coherence is the fire signal."
+      "caveat": "Speckle is present. The scar darkens only slightly in backscatter; the standing-trunk explanation is a hypothesis, not a measurement. Coherence is the fire signal."
     },
     {
       "id": "hh_D52_20260711",
@@ -209,7 +209,7 @@
       ],
       "colormap": "viridis",
       "source": "NISAR_L2_PR_GCOV_025_052_D_068_2005_DHDH_A_20260711T193423_20260711T193458_P05023_N_F_J_001.h5",
-      "caveat": "Speckle is present. The scar darkens only slightly in backscatter; the standing-trunk explanation in docs/DOSSIER.md is a hypothesis, not a measurement. Coherence is the fire signal."
+      "caveat": "Speckle is present. The scar darkens only slightly in backscatter; the standing-trunk explanation is a hypothesis, not a measurement. Coherence is the fire signal."
     },
     {
       "id": "hv_D52_20260711",
@@ -227,7 +227,7 @@
       ],
       "colormap": "magma",
       "source": "NISAR_L2_PR_GCOV_025_052_D_068_2005_DHDH_A_20260711T193423_20260711T193458_P05023_N_F_J_001.h5",
-      "caveat": "Speckle is present. The scar darkens only slightly in backscatter; the standing-trunk explanation in docs/DOSSIER.md is a hypothesis, not a measurement. Coherence is the fire signal."
+      "caveat": "Speckle is present. The scar darkens only slightly in backscatter; the standing-trunk explanation is a hypothesis, not a measurement. Coherence is the fire signal."
     },
     {
       "id": "coh_D52_20261003_20261015",
@@ -246,7 +246,7 @@
       ],
       "colormap": "gray",
       "source": "NISAR_L2_PR_GUNW_032_052_D_068_033_2000_SH_20261003T193421_20261003T193456_20261015T193421_20261015T193456_P05023_N_F_J_001.h5",
-      "caveat": "Low coherence also occurs over water and dense forest; this pair brackets the fire (2-5 Jul 2026)."
+      "caveat": "Low coherence also occurs over water and dense forest; both acquisitions are after the fire (2-5 Jul 2026)."
     },
     {
       "id": "hh_D52_20260816",
@@ -264,7 +264,7 @@
       ],
       "colormap": "viridis",
       "source": "NISAR_L2_PR_GCOV_028_052_D_068_2005_DHDH_A_20260816T193421_20260816T193456_P05023_N_F_J_001.h5",
-      "caveat": "Speckle is present. The scar darkens only slightly in backscatter; the standing-trunk explanation in docs/DOSSIER.md is a hypothesis, not a measurement. Coherence is the fire signal."
+      "caveat": "Speckle is present. The scar darkens only slightly in backscatter; the standing-trunk explanation is a hypothesis, not a measurement. Coherence is the fire signal."
     },
     {
       "id": "hv_D52_20260816",
@@ -282,7 +282,7 @@
       ],
       "colormap": "magma",
       "source": "NISAR_L2_PR_GCOV_028_052_D_068_2005_DHDH_A_20260816T193421_20260816T193456_P05023_N_F_J_001.h5",
-      "caveat": "Speckle is present. The scar darkens only slightly in backscatter; the standing-trunk explanation in docs/DOSSIER.md is a hypothesis, not a measurement. Coherence is the fire signal."
+      "caveat": "Speckle is present. The scar darkens only slightly in backscatter; the standing-trunk explanation is a hypothesis, not a measurement. Coherence is the fire signal."
     },
     {
       "id": "dhh_D52_20260629_20260711",
