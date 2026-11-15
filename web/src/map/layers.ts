@@ -1,18 +1,31 @@
-import { Marker, type Map as MapLibreMap } from "maplibre-gl";
+import { Marker, type ExpressionSpecification, type Map as MapLibreMap } from "maplibre-gl";
 
 import { layerUrl, layersBase, type Bounds, type Layer, type Manifest } from "./manifest";
 import { recolourCoherence } from "./style";
 
 const OPACITY = 0.85;
 
-/** The vector layers that ship with the manifest (docs/CONTRACT.md). */
-export type VectorId = "burn_nisar" | "burn_official";
+/** The polygon layers that ship with the manifest (docs/CONTRACT.md). */
+export type VectorId = "burn_nisar" | "burn_official" | "progress";
 
-const VECTOR_STYLE: Record<VectorId, { color: string; width: number; fill: number; dash?: number[] }> = {
+/** Everything `showVector` accepts: the polygons plus the place labels. */
+export type OverlayId = VectorId | "places";
+
+const VECTOR_STYLE: Record<
+  VectorId,
+  { color: string | ExpressionSpecification; width: number; fill: number; dash?: number[] }
+> = {
   // Our perimeter, from the coherence difference: a warmer, dashed line.
   burn_nisar: { color: "#ff9d4d", width: 2.4, fill: 0.1, dash: [2, 1.4] },
   // The ICNF perimeter: cooler, solid.
   burn_official: { color: "#4da3ff", width: 2.0, fill: 0.12 },
+  // Burnt area up to each date: one feature per phase, coloured by `phase` (the
+  // "before" feature has no geometry, so only "during" and "after" are drawn).
+  progress: {
+    color: ["match", ["get", "phase"], "during", "#ffd24d", "after", "#ff9d4d", "#ffffff"],
+    width: 2.0,
+    fill: 0.1,
+  },
 };
 
 type Place = { name: string; kind: string; description: string };
@@ -73,18 +86,25 @@ export class LayerManager {
     }
   }
 
-  /** Show exactly these vector layers (perimeters); the others are hidden. */
-  showVector(ids: VectorId[]): void {
-    const wanted = new Set(ids);
+  /**
+   * Show exactly these vector layers (the perimeters, the progression and the
+   * place labels); the others are hidden. One call, so the story asks for all
+   * four the same way.
+   */
+  showVector(ids: OverlayId[]): void {
+    const wanted = new Set<OverlayId>(ids);
     for (const id of Object.keys(VECTOR_STYLE) as VectorId[]) {
       if (!wanted.has(id)) {
         this.setVectorVisible(id, false);
       }
     }
     for (const id of ids) {
-      this.ensureVector(id);
-      this.setVectorVisible(id, true);
+      if (id !== "places") {
+        this.ensureVector(id);
+        this.setVectorVisible(id, true);
+      }
     }
+    this.showPlaces(wanted.has("places"));
   }
 
   /** Toggle the place labels (HTML markers, so no glyph server is needed). */

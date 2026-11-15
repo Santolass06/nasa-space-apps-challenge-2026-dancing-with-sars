@@ -18,8 +18,10 @@ type Props = {
  * Before/after slider (C2): two synchronised maps, the right one clipped.
  *
  * No plugin: two MapLibre instances keep their cameras in step, and a CSS
- * `clip-path` on the top pane reveals the bottom one. Dragging the handle (or
- * moving the pointer over the map) moves the split.
+ * `clip-path` on the top pane reveals the bottom one. Only the handle moves the
+ * split (drag it, or use the arrow keys); dragging anywhere else pans the maps.
+ * The handle sits above both maps and captures the pointer, so grabbing it never
+ * grabs the map underneath.
  */
 export default function CompareView({
   before,
@@ -95,35 +97,51 @@ export default function CompareView({
   };
 
   return (
-    <div
-      ref={container}
-      className={`compare ${className ?? ""}`}
-      onPointerDown={(event) => {
-        dragging.current = true;
-        try {
-          event.currentTarget.setPointerCapture(event.pointerId);
-        } catch {
-          // Synthetic events (and some browsers) have no pointer to capture.
-        }
-        moveTo(event.clientX);
-      }}
-      onPointerMove={(event) => {
-        if (dragging.current) {
-          moveTo(event.clientX);
-        }
-      }}
-      onPointerUp={() => {
-        dragging.current = false;
-      }}
-      onPointerCancel={() => {
-        dragging.current = false;
-      }}
-    >
+    <div ref={container} className={`compare ${className ?? ""}`}>
       <MapView className="compare__map" onReady={makeReady(before, 0)} />
       <div className="compare__top" style={{ clipPath: `inset(0 0 0 ${split}%)` }}>
         <MapView className="compare__map" onReady={makeReady(after, 1)} />
       </div>
-      <div className="compare__handle" style={{ left: `${split}%` }} aria-hidden="true" />
+      <div
+        className="compare__handle"
+        style={{ left: `${split}%` }}
+        role="slider"
+        tabIndex={0}
+        aria-label="Comparison divider"
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={Math.round(split)}
+        onPointerDown={(event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          dragging.current = true;
+          try {
+            event.currentTarget.setPointerCapture(event.pointerId);
+          } catch {
+            // Synthetic events (and some browsers) have no pointer to capture.
+          }
+          moveTo(event.clientX);
+        }}
+        onPointerMove={(event) => {
+          if (dragging.current) {
+            moveTo(event.clientX);
+          }
+        }}
+        onPointerUp={() => {
+          dragging.current = false;
+        }}
+        onPointerCancel={() => {
+          dragging.current = false;
+        }}
+        onKeyDown={(event) => {
+          const step = event.shiftKey ? 10 : 2;
+          if (event.key === "ArrowLeft") {
+            setSplit((value) => Math.max(0, value - step));
+          } else if (event.key === "ArrowRight") {
+            setSplit((value) => Math.min(100, value + step));
+          }
+        }}
+      />
       <span className="compare__label compare__label--left">{beforeLabel}</span>
       <span className="compare__label compare__label--right">{afterLabel}</span>
     </div>
