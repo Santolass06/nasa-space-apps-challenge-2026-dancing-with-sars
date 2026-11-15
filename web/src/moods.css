@@ -92,6 +92,17 @@
   initial-value: 1;
 }
 
+/*
+ * A glow this soft and this dark has fewer than 256 levels to work with, so on a large
+ * screen it shows as steps ("lines"). A fine grain, laid over it with the overlay blend at
+ * about two levels (an opaque grey tile centred on mid grey, so it adds no brightness), breaks the steps up (dithering) and the colours read as even. The same
+ * tile is aligned to the viewport on the page layer and on the sticky act label, so the
+ * label still matches the page exactly.
+ */
+:root {
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n' color-interpolation-filters='sRGB' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='.33 .33 .33 0 0 .33 .33 .33 0 0 .33 .33 .33 0 0 0 0 0 0 1'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.16'/%3E%3C/svg%3E");
+}
+
 :root {
   --amp-dur: 1.6s;
   --target-mx: 1;
@@ -294,7 +305,8 @@ body::before,
   background-image: var(--mood-glow);
 }
 
-body::before {
+body::before,
+body::after {
   content: "";
   position: fixed;
   inset: 0;
@@ -302,7 +314,17 @@ body::before {
   pointer-events: none;
 }
 
+body::after {
+  background-image: var(--grain);
+  background-size: 160px 160px;
+  mix-blend-mode: overlay;
+}
+
 .story__act-title {
+  /* grain on top (overlay), then the four glow layers; one entry per layer */
+  background-image: var(--grain), var(--mood-glow);
+  background-size: 160px 160px, auto, auto, auto, auto;
+  background-blend-mode: overlay, normal, normal, normal, normal;
   background-attachment: fixed;
 }
 
