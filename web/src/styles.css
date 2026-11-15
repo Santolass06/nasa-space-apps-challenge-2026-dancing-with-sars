@@ -1309,9 +1309,16 @@ h1 {
     display: none;
   }
 
+  /* A flick of the thumb settles on a step instead of running through several. Only near
+     one (proximity), so the hero, the footer and a slow drag stay free. */
+  html {
+    scroll-snap-type: y proximity;
+  }
+
   .story__step {
-    min-height: 62vh;
-    min-height: 62dvh;
+    min-height: 85vh;
+    min-height: 85dvh;
+    scroll-snap-align: center;
     border-top: 0;
     opacity: 1;
   }
@@ -1321,8 +1328,8 @@ h1 {
     bottom: 0;
     z-index: 4;
     display: block;
-    max-height: 42vh;
-    max-height: 42dvh;
+    max-height: 36vh;
+    max-height: 36dvh;
     margin: 0 -1.25rem;
     padding: 0.9rem 1.25rem calc(1rem + env(safe-area-inset-bottom, 0px));
     overflow-y: auto;
@@ -1332,8 +1339,75 @@ h1 {
     box-shadow: 0 -12px 30px rgba(0, 0, 0, 0.45);
   }
 
+  .story__sheet-head {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .story__sheet-count {
+    margin-left: auto;
+    font-size: 0.7rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--muted);
+  }
+
+  /* Where the reader is in the act: a thin line along the sheet's top edge. */
+  .story__sheet-progress {
+    position: sticky;
+    top: -0.9rem;
+    height: 2px;
+    margin: -0.9rem -1.25rem 0.7rem;
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  .story__sheet-progress span {
+    display: block;
+    height: 100%;
+    background: var(--act-accent);
+    transition: width 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* The layer notes and the sources fold: the sheet keeps the sentence and the numbers. */
+  .story__more {
+    margin: 0 0 0.5rem;
+  }
+
+  .story__more summary {
+    padding: 0.2rem 0;
+    font-size: 0.78rem;
+    color: var(--muted);
+    cursor: pointer;
+  }
+
+  .story__more[open] summary {
+    margin-bottom: 0.3rem;
+  }
+
+  /* The index lives in the sheet's header here; its list opens as a panel above everything. */
+  .story__index.story__index--inline {
+    position: static;
+  }
+
+  .story__index--inline .story__index-toggle {
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+
+  .story__index.story__index--inline nav {
+    position: fixed;
+    top: auto;
+    right: 1rem;
+    bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+    left: 1rem;
+    width: auto;
+    z-index: 30;
+    box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.6);
+  }
+
   .story__sheet-act {
-    margin: 0 0 0.35rem;
+    margin: 0;
     font-size: 0.68rem;
     font-weight: 700;
     letter-spacing: 0.16em;
@@ -1491,9 +1565,16 @@ h1 {
     gap: 0.5rem;
   }
 
-  /* The layer names above the attribution and the zoom buttons, not under them. */
+  /* The layer names along the top edge: the bottom belongs to the zoom buttons and the
+     attribution. Each takes at most half the width and is cut with an ellipsis. */
   .compare__label:not(.is-interactive) {
-    bottom: 2.7rem;
+    top: 0.5rem;
+    bottom: auto;
+    max-width: calc(50% - 1rem);
+    overflow: hidden;
+    font-size: 0.68rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 }
 
