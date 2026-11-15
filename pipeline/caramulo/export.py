@@ -13,7 +13,9 @@ deliberately not a dependency for a handful of lookup tables.
 
 from __future__ import annotations
 
+import contextlib
 import json
+import os
 import struct
 import zlib
 from pathlib import Path
@@ -424,13 +426,44 @@ def layer_entry(
     return entry
 
 
-def write_manifest(path: Path | str, layers: list[dict]) -> Path:
-    """Write manifest.json: version, bounds (single source: caramulo.grid) and layers."""
-    manifest = {"version": 1, "bounds": list(BBOX), "layers": layers}
+STAGE_ENV = "CARAMULO_MANIFEST_STAGE"
+
+
+def manifest_target(path: Path | str) -> Path:
+    """Where a step should write the manifest right now.
+
+    During ``run.py --real`` the environment points this at a staging file, so the
+    published ``manifest.json`` is never half-built: it keeps the previous layers
+    until the whole run succeeds and the staging file is swapped in (#92).
+    """
     path = Path(path)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(manifest, indent=2) + "\n")
-    return path
+    stage = os.environ.get(STAGE_ENV)
+    return path.with_name(path.name + stage) if stage else path
+
+
+def read_manifest(path: Path | str) -> dict:
+    """Read the manifest a step should see: the staging file mid-run, else the real one."""
+    target = manifest_target(path)
+    return json.loads(target.read_text(encoding="utf-8"))
+
+
+def _write_manifest_file(target: Path, layers: list[dict]) -> Path:
+    """Write the manifest to an exact path, atomically. No staging logic here."""
+    manifest = {"version": 1, "bounds": list(BBOX), "layers": layers}
+    target.parent.mkdir(parents=True, exist_ok=True)
+    staged = target.with_name(target.name + ".tmp")
+    staged.write_text(json.dumps(manifest, indent=2) + "\n")
+    os.replace(staged, target)
+    return target
+
+
+def write_manifest(path: Path | str, layers: list[dict]) -> Path:
+    """Write manifest.json: version, bounds (single source: caramulo.grid) and layers.
+
+    Written beside the target and moved into place with os.replace, so an interrupted
+    write never leaves a truncated JSON that the app cannot parse.
+    """
+    return _write_manifest_file(manifest_target(path), layers)
 
 
 def upsert_manifest_entry(path: Path | str, entry: dict) -> Path:
@@ -439,11 +472,11 @@ def upsert_manifest_entry(path: Path | str, entry: dict) -> Path:
     A replaced entry keeps its original position, so re-running one step does not
     reshuffle the manifest and every diff stays about the data, not the order.
     """
-    path = Path(path)
+    target = manifest_target(path)
     layers: list[dict] = []
     replaced = False
-    if path.exists():
-        existing = json.loads(path.read_text())
+    if target.exists():
+        existing = json.loads(target.read_text(encoding="utf-8"))
         for layer in existing.get("layers", []):
             if layer.get("id") == entry["id"]:
                 layers.append(entry)
@@ -452,7 +485,37 @@ def upsert_manifest_entry(path: Path | str, entry: dict) -> Path:
                 layers.append(layer)
     if not replaced:
         layers.append(entry)
-    return write_manifest(path, layers)
+    return _write_manifest_file(target, layers)
+
+
+@contextlib.contextmanager
+def staged_manifest(path: Path | str):
+    """Build the manifest beside the live one and swap it in only if the block succeeds.
+
+    The published file is untouched while the run works, which is the point of #92: an
+    aborted run — a failing step, Ctrl-C, or a kill — leaves the app with the manifest
+    it already had, never an empty or half-built one.
+    """
+    path = Path(path)
+    stage = ".pending"
+    staged = path.with_name(path.name + stage)
+    previous = os.environ.get(STAGE_ENV)
+    os.environ[STAGE_ENV] = stage
+    staged.unlink(missing_ok=True)
+    try:
+        yield staged
+    except BaseException:
+        staged.unlink(missing_ok=True)
+        raise
+    else:
+        if not staged.exists():
+            raise RuntimeError(f"{staged} was never written: the run produced no manifest")
+        os.replace(staged, path)
+    finally:
+        if previous is None:
+            os.environ.pop(STAGE_ENV, None)
+        else:
+            os.environ[STAGE_ENV] = previous
 
 
 def write_geojson(path: Path | str, features: list[tuple[BaseGeometry, dict]]) -> Path:
@@ -555,4 +618,38 @@ if __name__ == "__main__":
             pass
         else:
             raise AssertionError(f"write_png accepted shape {bad.shape}")
+    # staged_manifest (#92): a --real run writes to a staging file, so the published
+    # manifest keeps its old layers until the run succeeds, and a failed run leaves it
+    # byte-for-byte as it was — the point raised in review on #99.
+    live = tmp / "manifest.json"
+    write_manifest(live, [{"id": "old"}])
+    with staged_manifest(live):
+        upsert_manifest_entry(live, {"id": "new"})
+        assert b'"old"' in live.read_bytes(), "the live manifest must not change mid-run"
+        assert b'"new"' in (tmp / "manifest.json.pending").read_bytes()
+    assert b'"new"' in live.read_bytes() and b'"old"' not in live.read_bytes()
+    assert not (tmp / "manifest.json.pending").exists()
+
+    write_manifest(live, [{"id": "old"}])
+    before = live.read_bytes()
+    try:
+        with staged_manifest(live):
+            upsert_manifest_entry(live, {"id": "new"})
+            raise RuntimeError("a step blew up")
+    except RuntimeError:
+        pass
+    assert live.read_bytes() == before, "a failed run must leave the manifest as it was"
+    assert not (tmp / "manifest.json.pending").exists()
+    assert not (tmp / "manifest.json.tmp").exists()
+
+    # a run that produces no manifest at all is a bug, not a silent empty one
+    try:
+        with staged_manifest(tmp / "empty.json"):
+            pass
+    except RuntimeError:
+        pass
+    else:
+        raise AssertionError("staged_manifest accepted a run that produced no manifest")
+    assert not (tmp / "empty.json").exists()
+
     print("export self-check ok")
