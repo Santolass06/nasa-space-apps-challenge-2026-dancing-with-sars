@@ -10,13 +10,15 @@ type Props = {
   onChange: (id: string) => void;
   /** Open the tooltips above the chips instead of below them. */
   tipsAbove?: boolean;
+  /** Line the tooltips up with the right edge (for a chooser at the right of the screen). */
+  tipsRight?: boolean;
 };
 
 /**
  * Pick a layer: a chip per kind of layer (hover or focus it for what that kind
  * usually reveals), then the date. Controlled: the parent owns the choice.
  */
-export default function LayerChooser({ manifest, value, onChange, tipsAbove }: Props) {
+export default function LayerChooser({ manifest, value, onChange, tipsAbove, tipsRight }: Props) {
   const kinds = useMemo(() => {
     const seen: LayerKind[] = [];
     for (const layer of manifest.layers) {
@@ -54,7 +56,7 @@ export default function LayerChooser({ manifest, value, onChange, tipsAbove }: P
               {guide && (
                 <span
                   role="tooltip"
-                  className={`chooser__tip${tipsAbove ? " chooser__tip--above" : ""}`}
+                  className={`chooser__tip${tipsAbove ? " chooser__tip--above" : ""}${tipsRight ? " chooser__tip--right" : ""}`}
                 >
                   <strong>{guide.name}</strong>
                   <span>{guide.reveals}</span>

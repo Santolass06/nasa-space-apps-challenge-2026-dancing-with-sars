@@ -4,9 +4,41 @@ import CompareView from "./CompareView";
 import GridView from "./GridView";
 import LayerChooser from "./LayerChooser";
 import type { Manifest } from "./manifest";
+import QuadView from "./QuadView";
 import { recipesFor } from "./recipes";
 
 export type ExploreMode = 1 | 2 | 4;
+
+/** The two ways to lay out four layers; the separate maps need the room of the expanded view. */
+type FourStyle = "point" | "grid";
+
+// Icons for the two layouts: a square split by a point, and a 2x2 grid of maps.
+const POINT_ICON = (
+  <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true">
+    <rect x="1.5" y="1.5" width="17" height="17" rx="2.5" fill="none" stroke="currentColor" strokeWidth="1.5" />
+    <path d="M10 1.5v17M1.5 10h17" stroke="currentColor" strokeWidth="1.2" />
+    <circle cx="10" cy="10" r="3" fill="currentColor" stroke="#0b1020" strokeWidth="1" />
+  </svg>
+);
+const GRID_ICON = (
+  <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true">
+    {[1.5, 11].flatMap((x) =>
+      [1.5, 11].map((y) => (
+        <rect
+          key={`${x}-${y}`}
+          x={x}
+          y={y}
+          width="7.5"
+          height="7.5"
+          rx="1.5"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+        />
+      )),
+    )}
+  </svg>
+);
 
 type Props = {
   manifest: Manifest;
@@ -17,18 +49,20 @@ type Props = {
 };
 
 const MODES: Array<{ mode: ExploreMode; label: string; hint: string }> = [
-  { mode: 1, label: "1 map", hint: "One layer on the whole map" },
-  { mode: 2, label: "2 maps", hint: "Before and after, with a slider" },
-  { mode: 4, label: "4 maps", hint: "Four layers side by side, moving together" },
+  { mode: 1, label: "1 layer", hint: "One layer on the whole map" },
+  { mode: 2, label: "2 layers", hint: "Two layers split by a slider" },
+  { mode: 4, label: "4 layers", hint: "Four layers split by a point you can drag anywhere" },
 ];
 
 /**
- * The last step: explore the layers on one map, as a before/after pair with a
- * slider, or as four maps that move together, optionally almost full screen.
+ * The last step: explore the layers on one map, as a before/after pair split by
+ * a slider, or as four layers split by a point you drag freely, optionally
+ * almost full screen.
  * The one-map mode is the story's own map; this draws the controls for all
  * three and the two- and four-map views over it.
  */
 export default function Explorer({ manifest, mode, onModeChange, full, onFullChange }: Props) {
+  const [fourStyle, setFourStyle] = useState<FourStyle>("point");
   const [ids, setIds] = useState<string[]>(() => {
     const four = recipesFor(manifest, 4)[0]?.ids;
     return four ?? manifest.layers.slice(0, 4).map((layer) => layer.id);
@@ -82,7 +116,11 @@ export default function Explorer({ manifest, mode, onModeChange, full, onFullCha
       )}
       {mode === 4 && (
         <div className="explorer__stage">
-          <GridView manifest={manifest} ids={ids} onChange={setOne} />
+          {full && fourStyle === "grid" ? (
+            <GridView manifest={manifest} ids={ids} onChange={setOne} />
+          ) : (
+            <QuadView manifest={manifest} ids={ids} onChange={setOne} />
+          )}
         </div>
       )}
 
@@ -120,6 +158,23 @@ export default function Explorer({ manifest, mode, onModeChange, full, onFullCha
               </option>
             ))}
           </select>
+        )}
+        {mode === 4 && full && (
+          <button
+            type="button"
+            className="explorer__style"
+            title={
+              fourStyle === "point"
+                ? "Show four separate maps side by side"
+                : "Show one map split by a point"
+            }
+            aria-label={
+              fourStyle === "point" ? "Four separate maps" : "One map split by a point"
+            }
+            onClick={() => setFourStyle(fourStyle === "point" ? "grid" : "point")}
+          >
+            {fourStyle === "point" ? GRID_ICON : POINT_ICON}
+          </button>
         )}
         <button
           type="button"

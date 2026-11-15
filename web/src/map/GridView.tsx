@@ -15,7 +15,7 @@ type Props = {
 };
 
 /**
- * Four maps in a 2×2 grid, each with its own layer, all sharing one camera:
+ * Four maps in a 2×2 grid (the expanded view's alternative to the split point), each with its own layer, all sharing one camera:
  * pan or zoom any of them and the others follow.
  */
 export default function GridView({ manifest, ids, onChange }: Props) {
