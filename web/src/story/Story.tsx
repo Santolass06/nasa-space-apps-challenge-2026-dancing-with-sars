@@ -278,6 +278,19 @@ export default function Story() {
     </div>
   );
 
+  // The page takes the mood of the act being read (colours are CSS variables keyed on this).
+  const activeAct = steps[active]?.act.id;
+  useEffect(() => {
+    if (!activeAct) {
+      return;
+    }
+    const root = document.documentElement;
+    root.dataset.act = activeAct;
+    return () => {
+      delete root.dataset.act;
+    };
+  }, [activeAct]);
+
   // Leaving the explore step closes the expanded view; while it is open the page behind stays put.
   useEffect(() => {
     if (!exploring) {
