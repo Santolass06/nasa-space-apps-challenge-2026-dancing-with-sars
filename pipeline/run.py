@@ -450,6 +450,13 @@ def run_real(args: argparse.Namespace) -> int:
     if args.plan:
         print("--plan: nothing was written.")
         return 0
+    # The run rebuilds the manifest: every entry must come from this run, not from
+    # whatever was there before (upserts never prune, so a stale entry would stay).
+    manifest_path = args.out / "manifest.json"
+    if manifest_path.exists():
+        backup = manifest_path.with_suffix(".json.prev")
+        manifest_path.replace(backup)
+        print(f"  previous manifest kept as {backup.name}; this run rebuilds it")
     for index, (label, run) in enumerate(steps, start=1):
         print(f"[{index}/{len(steps)}] {label}")
         code = run()
