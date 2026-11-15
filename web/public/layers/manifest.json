@@ -319,6 +319,62 @@
       "colormap": "magma",
       "source": "NISAR_L2_PR_GCOV_028_052_D_068_2005_DHDH_A_20260816T193421_20260816T193456_P05023_N_F_J_001.h5",
       "caveat": "Speckle is present. The scar darkens only slightly in backscatter; the standing-trunk explanation in docs/DOSSIER.md is a hypothesis, not a measurement. Coherence is the fire signal."
+    },
+    {
+      "id": "dhh_D52_20260629_20260711",
+      "kind": "dhh",
+      "file": "dhh_D52_20260629_20260711.png",
+      "orbit": "D52",
+      "dates": [
+        "2026-06-29",
+        "2026-07-11"
+      ],
+      "title": "Backscatter change HH, 29 Jun to 11 Jul",
+      "units": "dB",
+      "range": [
+        -2.5,
+        2.5
+      ],
+      "colormap": "rdbu",
+      "source": "NISAR_L2_PR_GCOV_024_052_D_068_2005_DHDH_A_20260629T193424_20260629T193459_P05023_N_F_J_001.h5 / NISAR_L2_PR_GCOV_025_052_D_068_2005_DHDH_A_20260711T193423_20260711T193458_P05023_N_F_J_001.h5",
+      "caveat": "After minus before, in dB: negative means a weaker return after the fire. Over most of the scene the change is a few tenths of a dB, and speckle dominates at pixel scale, so read the pattern, not single pixels."
+    },
+    {
+      "id": "dhv_D52_20260629_20260711",
+      "kind": "dhv",
+      "file": "dhv_D52_20260629_20260711.png",
+      "orbit": "D52",
+      "dates": [
+        "2026-06-29",
+        "2026-07-11"
+      ],
+      "title": "Backscatter change HV, 29 Jun to 11 Jul",
+      "units": "dB",
+      "range": [
+        -2.5,
+        2.5
+      ],
+      "colormap": "rdbu",
+      "source": "NISAR_L2_PR_GCOV_024_052_D_068_2005_DHDH_A_20260629T193424_20260629T193459_P05023_N_F_J_001.h5 / NISAR_L2_PR_GCOV_025_052_D_068_2005_DHDH_A_20260711T193423_20260711T193458_P05023_N_F_J_001.h5",
+      "caveat": "After minus before, in dB: negative means a weaker return after the fire. Over most of the scene the change is a few tenths of a dB, and speckle dominates at pixel scale, so read the pattern, not single pixels."
+    },
+    {
+      "id": "rgb_D52_20260711",
+      "kind": "rgb",
+      "file": "rgb_D52_20260711.png",
+      "orbit": "D52",
+      "dates": [
+        "2026-07-11"
+      ],
+      "title": "Colour composite (HH, HV, HH/HV), 11 Jul",
+      "units": "RGB",
+      "range": [
+        0.0,
+        255.0
+      ],
+      "colormap": "rgb",
+      "source": "NISAR_L2_PR_GCOV_025_052_D_068_2005_DHDH_A_20260711T193423_20260711T193458_P05023_N_F_J_001.h5",
+      "caveat": "R = HH, G = HV, B = HH/HV, all in dB with fixed ranges: a colour image made from radar, not a photograph."
     }
   ]
 }

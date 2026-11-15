@@ -117,9 +117,10 @@ def coherence_layer(h5_path: Path, orbit: str, dates: list[str], out_dir: Path) 
     """Write the coherence PNG and return its manifest entry."""
     d1, d2 = dates
     layer_id = f"coh_{orbit}_{d1.replace('-', '')}_{d2.replace('-', '')}"
-    coh = coherence_on_grid(h5_path)
-    rgba = export.scalar_rgba(coh, "gray", 0.0, 1.0)
-    export.write_png(out_dir / f"{layer_id}.png", rgba)
+    coh = export.downsample2(coherence_on_grid(h5_path))
+    gray = np.round(np.clip(np.nan_to_num(coh, nan=0.0), 0.0, 1.0) * 255.0).astype(np.uint8)
+    alpha = np.where(np.isfinite(coh), 255, 0).astype(np.uint8)
+    export.write_gray_png(out_dir / f"{layer_id}.png", gray, alpha)
     return export.layer_entry(
         layer_id=layer_id,
         kind="coh",
